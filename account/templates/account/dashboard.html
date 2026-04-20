@@ -1,0 +1,1743 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4" style="background: #f8fafc; min-height: 100vh;">
+
+    <!-- HEADER -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5">
+        <div class="d-flex align-items-center mb-3 mb-md-0">
+            {% if user.profile_picture %}
+            <img src="{{ user.profile_picture.url }}" 
+                 alt="{{ user.full_name }}" 
+                 class="rounded-circle me-3"
+                 style="width: 60px; height: 60px; object-fit: cover; border: 2px solid #e2e8f0;">
+            {% else %}
+            <div class="rounded-circle me-3 d-flex align-items-center justify-content-center"
+                 style="width: 60px; height: 60px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 24px; font-weight: 500; border: 2px solid #e2e8f0;">
+                {{ user.full_name|slice:":1"|upper }}
+            </div>
+            {% endif %}
+            <div>
+                <h2 class="fw-light mb-1" style="color: #1e293b; font-size: clamp(1.25rem, 4vw, 2rem);">Welcome back, {{ user.full_name }}</h2>
+                <p class="text-secondary mb-0" style="font-size: 0.9rem; letter-spacing: 0.3px;">
+                    {{ user.email }} • Member since {{ user.date_joined|date:"F Y" }}
+                </p>
+            </div>
+        </div>
+        
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-dark px-4 py-2 rounded-3" 
+                    style="border-color: #cbd5e1; color: #334155; font-weight: 400; font-size: 0.9rem;"
+                    onclick="openImportModal()">
+                📱 Import Contacts
+            </button>
+            <button class="btn btn-dark px-4 py-2 rounded-3" 
+                    style="background: #1e293b; border: none; font-weight: 400; font-size: 0.9rem;"
+                    data-bs-toggle="modal" data-bs-target="#addContactModal">
+                + Add Person
+            </button>
+        </div>
+    </div>
+
+    <!-- 🔔 RECONNECT -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="bg-white rounded-4 p-3 p-md-4" style="border: 1px solid #e2e8f0;">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="d-flex align-items-center">
+                        <span class="me-2 fs-5">🔔</span>
+                        <h6 class="fw-semibold mb-0 text-uppercase tracking-wide" style="color: #64748b; font-size: 0.8rem; letter-spacing: 0.5px;">Reconnect Now</h6>
+                    </div>
+                    {% if reconnect_contacts %}
+                    <button class="btn btn-link btn-sm text-decoration-none" 
+                            style="color: #64748b; font-size: 0.75rem;"
+                            onclick="openFullListModal('reconnect')">
+                        View All →
+                    </button>
+                    {% endif %}
+                </div>
+
+                <div class="vstack gap-1">
+                    {% for contact in reconnect_contacts|slice:":5" %}
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3" 
+                         style="border-bottom: 1px solid #f1f5f9;">
+                        <div class="d-flex align-items-center mb-2 mb-md-0">
+                            <div class="me-3">
+                                <button class="btn btn-link p-0 text-decoration-none" 
+                                        style="color: #64748b;"
+                                        onclick="viewProfile({{ contact.id }})"
+                                        title="View Profile">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                         style="width: 40px; height: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 16px; font-weight: 500;">
+                                        {{ contact.name|slice:":1"|upper }}
+                                    </div>
+                                </button>
+                            </div>
+                            <div>
+                                <p class="fw-medium mb-1" style="color: #0f172a;">
+                                    <button class="btn btn-link p-0 text-decoration-none" 
+                                            style="color: #0f172a; font-weight: 500;"
+                                            onclick="viewProfile({{ contact.id }})">
+                                        {{ contact.name }}
+                                    </button>
+                                </p>
+                                <small style="color: #94a3b8; font-size: 0.8rem;">
+                                    Last interaction: {{ contact.last_interaction|default:"Never" }}
+                                </small>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-secondary btn-sm rounded-3 px-3" 
+                                    style="border-color: #cbd5e1; color: #64748b; font-size: 0.75rem;"
+                                    onclick="viewProfile({{ contact.id }})">
+                                View
+                            </button>
+                            <button class="btn btn-outline-dark btn-sm rounded-3 px-3" 
+                                    style="border-color: #cbd5e1; color: #334155; font-size: 0.8rem;"
+                                    onclick="recordInteraction({{ contact.id }})">
+                                Reconnect
+                            </button>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted text-center py-4" style="color: #94a3b8 !important;">No reconnect needed 🎉</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🎂 EVENTS & 📍 RECENT CONTACTS -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="bg-white rounded-4 p-3 p-md-4 h-100" style="border: 1px solid #e2e8f0;">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="d-flex align-items-center">
+                        <span class="me-2 fs-5">🎂</span>
+                        <h6 class="fw-semibold mb-0 text-uppercase tracking-wide" style="color: #64748b; font-size: 0.8rem; letter-spacing: 0.5px;">Upcoming Events</h6>
+                    </div>
+                    <div>
+                        {% if upcoming_events %}
+                        <button class="btn btn-link btn-sm text-decoration-none me-2" 
+                                style="color: #64748b; font-size: 0.75rem;"
+                                onclick="openFullListModal('events')">
+                            View All →
+                        </button>
+                        {% endif %}
+                        <button class="btn btn-sm btn-outline-primary rounded-3" 
+                                style="font-size: 0.75rem;"
+                                data-bs-toggle="modal" data-bs-target="#addEventModal">
+                            + Add
+                        </button>
+                    </div>
+                </div>
+
+                <div class="vstack gap-1">
+                    {% for event in upcoming_events|slice:":5" %}
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3" 
+                        style="border-bottom: 1px solid #f1f5f9;">
+                        <div class="d-flex align-items-center mb-2 mb-md-0">
+                            <div class="me-3">
+                                <button class="btn btn-link p-0 text-decoration-none" 
+                                        style="color: #64748b;"
+                                        onclick="viewProfile({{ event.contact.id }})"
+                                        title="View Profile">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                         style="width: 40px; height: 40px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; font-size: 16px; font-weight: 500;">
+                                        {{ event.contact.name|slice:":1"|upper }}
+                                    </div>
+                                </button>
+                            </div>
+                            <div>
+                                <p class="fw-medium mb-1" style="color: #0f172a;">
+                                    <button class="btn btn-link p-0 text-decoration-none" 
+                                            style="color: #0f172a; font-weight: 500;"
+                                            onclick="viewProfile({{ event.contact.id }})">
+                                        {{ event.contact.name }}
+                                    </button>
+                                </p>
+                                <small style="color: #94a3b8; font-size: 0.8rem;">{{ event.title }}</small>
+                            </div>
+                        </div>
+                        <div class="text-md-end">
+                            <span class="badge rounded-3 px-3 py-2 mb-1" 
+                                style="background: #fef3c7; color: #92400e; font-weight: 400; font-size: 0.75rem;">
+                                {{ event.date|date:"M d, Y" }}
+                            </span>
+                            {% if event.date == today %}
+                                <small class="d-block text-success" style="font-size: 0.7rem;">Today!</small>
+                            {% elif event.date == tomorrow %}
+                                <small class="d-block text-warning" style="font-size: 0.7rem;">Tomorrow</small>
+                            {% else %}
+                                <small class="d-block text-muted" style="font-size: 0.7rem;">
+                                    In {{ event.date|timeuntil }}
+                                </small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4">
+                        <p class="text-muted mb-3" style="color: #94a3b8 !important;">No upcoming events</p>
+                        <button class="btn btn-primary btn-sm rounded-3 px-4" 
+                                data-bs-toggle="modal" data-bs-target="#addEventModal">
+                            + Create Your First Event
+                        </button>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="bg-white rounded-4 p-3 p-md-4 h-100" style="border: 1px solid #e2e8f0;">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="d-flex align-items-center">
+                        <span class="me-2 fs-5">📍</span>
+                        <h6 class="fw-semibold mb-0 text-uppercase tracking-wide" style="color: #64748b; font-size: 0.8rem; letter-spacing: 0.5px;">Recently Added</h6>
+                    </div>
+                    {% if recent_contacts %}
+                    <button class="btn btn-link btn-sm text-decoration-none" 
+                            style="color: #64748b; font-size: 0.75rem;"
+                            onclick="openFullListModal('recent')">
+                        View All →
+                    </button>
+                    {% endif %}
+                </div>
+
+                <div class="vstack gap-1">
+                    {% for contact in recent_contacts|slice:":5" %}
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3" 
+                        style="border-bottom: 1px solid #f1f5f9;">
+                        <div class="d-flex align-items-center mb-2 mb-md-0">
+                            <div class="me-3">
+                                <button class="btn btn-link p-0 text-decoration-none" 
+                                        style="color: #64748b;"
+                                        onclick="viewProfile({{ contact.id }})"
+                                        title="View Profile">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                         style="width: 40px; height: 40px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; font-size: 16px; font-weight: 500;">
+                                        {{ contact.name|slice:":1"|upper }}
+                                    </div>
+                                </button>
+                            </div>
+                            <div>
+                                <p class="fw-medium mb-1" style="color: #0f172a;">
+                                    <button class="btn btn-link p-0 text-decoration-none" 
+                                            style="color: #0f172a; font-weight: 500;"
+                                            onclick="viewProfile({{ contact.id }})">
+                                        {{ contact.name }}
+                                    </button>
+                                </p>
+                                <small style="color: #94a3b8; font-size: 0.8rem;">
+                                    Added {{ contact.created_at|date:"M d, Y" }}
+                                </small>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-secondary btn-sm rounded-3 px-3" 
+                                    style="border-color: #cbd5e1; color: #64748b; font-size: 0.75rem;"
+                                    onclick="viewProfile({{ contact.id }})">
+                                View
+                            </button>
+                            <button class="btn btn-link btn-sm text-decoration-none" 
+                                    style="color: #475569; font-size: 0.8rem;"
+                                    onclick="recordInteraction({{ contact.id }})">
+                                Log Interaction →
+                            </button>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted text-center py-4" style="color: #94a3b8 !important;">No recent contacts</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🎓 ALUMNI -->
+    <div class="row">
+        <div class="col-12">
+            <div class="bg-white rounded-4 p-3 p-md-4" style="border: 1px solid #e2e8f0;">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="d-flex align-items-center">
+                        <span class="me-2 fs-5">🎓</span>
+                        <h6 class="fw-semibold mb-0 text-uppercase tracking-wide" style="color: #64748b; font-size: 0.8rem; letter-spacing: 0.5px;">Alumni Network</h6>
+                    </div>
+                    {% if alumni_contacts %}
+                    <button class="btn btn-link btn-sm text-decoration-none" 
+                            style="color: #64748b; font-size: 0.75rem;"
+                            onclick="openFullListModal('alumni')">
+                        View All →
+                    </button>
+                    {% endif %}
+                </div>
+
+                <div class="vstack gap-1">
+                    {% for contact in alumni_contacts|slice:":5" %}
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3" 
+                        style="border-bottom: 1px solid #f1f5f9;">
+                        <div class="d-flex align-items-center mb-2 mb-md-0">
+                            <div class="me-3">
+                                <button class="btn btn-link p-0 text-decoration-none" 
+                                        style="color: #64748b;"
+                                        onclick="viewProfile({{ contact.id }})"
+                                        title="View Profile">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                         style="width: 40px; height: 40px; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; font-size: 16px; font-weight: 500;">
+                                        {{ contact.name|slice:":1"|upper }}
+                                    </div>
+                                </button>
+                            </div>
+                            <div>
+                                <p class="fw-medium mb-1" style="color: #0f172a;">
+                                    <button class="btn btn-link p-0 text-decoration-none" 
+                                            style="color: #0f172a; font-weight: 500;"
+                                            onclick="viewProfile({{ contact.id }})">
+                                        {{ contact.name }}
+                                    </button>
+                                </p>
+                                <small style="color: #94a3b8; font-size: 0.8rem;">
+                                    {{ contact.alumni_type|default:"Alumni" }}
+                                    {% if contact.last_interaction %}
+                                        • Last interaction: {{ contact.last_interaction|date:"M d, Y" }}
+                                    {% endif %}
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-secondary btn-sm rounded-3 px-3" 
+                                    style="border-color: #cbd5e1; color: #64748b; font-size: 0.75rem;"
+                                    onclick="viewProfile({{ contact.id }})">
+                                View
+                            </button>
+                            {% if not contact.has_interacted_before %}
+                                <button class="btn btn-sm rounded-3 px-3" 
+                                        style="background: #3b82f6; color: white; font-size: 0.8rem;"
+                                        onclick="recordInteraction({{ contact.id }})">
+                                    Connect
+                                </button>
+                            {% elif contact.needs_reconnect %}
+                                <button class="btn btn-sm rounded-3 px-3" 
+                                        style="background: #f59e0b; color: white; font-size: 0.8rem;"
+                                        onclick="recordInteraction({{ contact.id }})">
+                                    Reconnect
+                                </button>
+                            {% else %}
+                                <button class="btn btn-sm rounded-3 px-3" 
+                                        style="background: #10b981; color: white; font-size: 0.8rem; cursor: default;"
+                                        disabled>
+                                    ✓ Connected
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted text-center py-4" style="color: #94a3b8 !important;">No alumni contacts yet</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= CONTACT PROFILE MODAL ================= -->
+    <div class="modal fade" id="contactProfileModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content border-0 rounded-4">
+                <div class="modal-header border-0 px-4 pt-4 pb-2">
+                    <h5 class="modal-title fw-medium" style="color: #1e293b;" id="contactProfileModalTitle">Contact Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body px-4 pb-4" id="contactProfileModalBody">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 px-4 pb-4 pt-0">
+                    <button type="button" class="btn btn-outline-secondary rounded-3 px-4" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary rounded-3 px-4" id="contactProfileRecordInteractionBtn">Record Interaction</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= ADD CONTACT MODAL ================= -->
+    <div class="modal fade" id="addContactModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4">
+                <div class="modal-header border-0 px-4 pt-4 pb-2">
+                    <h5 class="modal-title fw-medium" style="color: #1e293b;">Add New Person</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body px-4 pb-4">
+                    <div id="contactMessage"></div>
+
+                    <form id="contactForm">
+                        <div class="mb-3">
+                            <label class="form-label small fw-medium text-secondary text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Full Name</label>
+                            <input type="text" class="form-control bg-light border-0 rounded-3 py-2" 
+                                   id="name" placeholder="John Doe" required
+                                   style="background: #f8fafc !important;">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label small fw-medium text-secondary text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Phone Number</label>
+                            <input type="tel" class="form-control bg-light border-0 rounded-3 py-2" 
+                                   id="phone_number" placeholder="+1 (555) 123-4567" required
+                                   style="background: #f8fafc !important;">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label small fw-medium text-secondary text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Email</label>
+                            <input type="email" class="form-control bg-light border-0 rounded-3 py-2" 
+                                   id="email" placeholder="john@example.com"
+                                   style="background: #f8fafc !important;">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label small fw-medium text-secondary text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Notes</label>
+                            <textarea class="form-control bg-light border-0 rounded-3 py-2" 
+                                      id="notes" rows="2" placeholder="Add any additional notes..."
+                                      style="background: #f8fafc !important;"></textarea>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label small fw-medium text-secondary text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Meeting Context</label>
+                            <input type="text" class="form-control bg-light border-0 rounded-3 py-2" 
+                                   id="meeting_context" placeholder="Conference, Coffee, etc."
+                                   style="background: #f8fafc !important;">
+                        </div>
+
+                        <button type="submit" class="btn btn-dark w-100 rounded-3 py-2" 
+                                style="background: #1e293b; border: none; font-weight: 400;">
+                            Save Contact
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= IMPORT CONTACTS MODAL ================= -->
+    <div class="modal fade" id="importContactsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content border-0 rounded-4">
+                <div class="modal-header border-0 px-4 pt-4 pb-2">
+                    <h5 class="modal-title fw-medium" style="color: #1e293b;">
+                        <span class="me-2">📱</span>Import Contacts from Phone
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body px-4 pb-4">
+                    <div id="importMessage"></div>
+                    
+                    <!-- Import Options -->
+                    <div class="mb-4">
+                        <div class="d-grid gap-3">
+                            <button class="btn btn-outline-primary rounded-3 py-3" onclick="requestContactPermission()">
+                                <span class="me-2">📋</span>Select Contacts to Import
+                            </button>
+                            <button class="btn btn-outline-secondary rounded-3 py-3" onclick="importAllContacts()">
+                                <span class="me-2">📱</span>Import All Contacts
+                            </button>
+                        </div>
+                        <p class="text-muted small mt-3 mb-0 text-center">
+                            Your contacts are processed locally. We only save the ones you choose to import.
+                        </p>
+                    </div>
+
+                    <!-- Contact List Container -->
+                    <div id="contactListContainer" style="display: none;">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="fw-medium mb-0" style="color: #1e293b;">Select Contacts</h6>
+                            <div>
+                                <button class="btn btn-link btn-sm text-decoration-none me-2" onclick="selectAllContacts()">
+                                    Select All
+                                </button>
+                                <button class="btn btn-link btn-sm text-decoration-none" onclick="deselectAllContacts()">
+                                    Deselect All
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Search Box -->
+                        <div class="mb-3">
+                            <input type="text" 
+                                   class="form-control bg-light border-0 rounded-3 py-2" 
+                                   id="contactSearchInput" 
+                                   placeholder="Search contacts..."
+                                   onkeyup="filterContacts()"
+                                   style="background: #f8fafc !important;">
+                        </div>
+                        
+                        <!-- Contact List -->
+                        <div id="contactSelectList" class="mb-3" style="max-height: 400px; overflow-y: auto;">
+                            <!-- Contacts will be populated here -->
+                        </div>
+                        
+                        <!-- Selected Count and Import Button -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted small">
+                                Selected: <span id="selectedCount">0</span> contacts
+                            </span>
+                            <div>
+                                <button class="btn btn-outline-secondary rounded-3 px-4 me-2" onclick="backToImportOptions()">
+                                    Back
+                                </button>
+                                <button class="btn btn-dark rounded-3 px-4" onclick="importSelectedContacts()" id="importSelectedBtn" disabled>
+                                    Import Selected
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Import Progress -->
+                    <div id="importProgress" style="display: none;">
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary mb-3" role="status"></div>
+                            <h6 class="mb-2">Importing Contacts...</h6>
+                            <p class="text-muted small mb-0">
+                                <span id="importedCount">0</span> / <span id="totalToImport">0</span> contacts imported
+                            </p>
+                            <div class="progress mt-3" style="height: 6px;">
+                                <div id="importProgressBar" class="progress-bar bg-primary" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= ADD EVENT MODAL ================= -->
+    <div class="modal fade" id="addEventModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4">
+                <div class="modal-header border-0 px-4 pt-4 pb-2">
+                    <h5 class="modal-title fw-medium" style="color: #1e293b;">Add New Event</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body px-4 pb-4">
+                    <div id="eventMessage"></div>
+
+                    <form id="eventForm">
+                        <div class="mb-3">
+                            <label class="form-label small fw-medium text-secondary text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Select Contact</label>
+                            <select class="form-select bg-light border-0 rounded-3 py-2" 
+                                    id="event_contact" required
+                                    style="background: #f8fafc !important;">
+                                <option value="">Choose a contact...</option>
+                                {% for contact in all_contacts %}
+                                <option value="{{ contact.id }}">{{ contact.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label small fw-medium text-secondary text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Event Title</label>
+                            <input type="text" class="form-control bg-light border-0 rounded-3 py-2" 
+                                id="event_title" placeholder="Birthday, Anniversary, etc." required
+                                style="background: #f8fafc !important;">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label small fw-medium text-secondary text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Event Type</label>
+                            <select class="form-select bg-light border-0 rounded-3 py-2" 
+                                    id="event_type"
+                                    style="background: #f8fafc !important;">
+                                <option value="birthday">Birthday</option>
+                                <option value="wedding">Wedding</option>
+                                <option value="anniversary">Anniversary</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label small fw-medium text-secondary text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Event Date</label>
+                            <input type="date" class="form-control bg-light border-0 rounded-3 py-2" 
+                                id="event_date" required
+                                min="{{ today|date:'Y-m-d' }}"
+                                style="background: #f8fafc !important;">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label small fw-medium text-secondary text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Reminder (days before)</label>
+                            <select class="form-select bg-light border-0 rounded-3 py-2" 
+                                    id="event_reminder"
+                                    style="background: #f8fafc !important;">
+                                <option value="1">1 day before</option>
+                                <option value="3">3 days before</option>
+                                <option value="7">1 week before</option>
+                                <option value="14">2 weeks before</option>
+                                <option value="30">1 month before</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-dark w-100 rounded-3 py-2" 
+                                style="background: #1e293b; border: none; font-weight: 400;">
+                            Create Event
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= FULL LIST MODAL ================= -->
+    <div class="modal fade" id="fullListModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content border-0 rounded-4">
+                <div class="modal-header border-0 px-4 pt-4 pb-2">
+                    <h5 class="modal-title fw-medium" style="color: #1e293b;" id="modalTitle">Full List</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body px-4 pb-4" id="modalBody">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 px-4 pb-4 pt-0" id="modalFooter">
+                    <!-- Pagination will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<style>
+    .tracking-wide {
+        letter-spacing: 0.5px;
+    }
+    
+    .btn:hover {
+        opacity: 0.85;
+        transition: opacity 0.2s ease;
+    }
+    
+    .bg-white {
+        transition: box-shadow 0.2s ease;
+    }
+    
+    .bg-white:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+    
+    .form-control:focus, .form-select:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(30, 41, 59, 0.1);
+        background: #ffffff !important;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideOut {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+    
+    .pagination .page-link {
+        color: #1e293b;
+        border: none;
+        padding: 0.5rem 0.75rem;
+        margin: 0 0.25rem;
+        border-radius: 0.5rem !important;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background-color: #1e293b;
+        color: white;
+    }
+    
+    .pagination .page-link:hover {
+        background-color: #f1f5f9;
+    }
+    
+    .profile-avatar-large {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 36px;
+        font-weight: 500;
+        color: white;
+        margin: 0 auto;
+    }
+    
+    /* Contact selection styles */
+    .contact-select-item {
+        transition: background-color 0.2s ease;
+        cursor: pointer;
+    }
+    
+    .contact-select-item:hover {
+        background-color: #f8fafc;
+    }
+    
+    .contact-select-item.selected {
+        background-color: #e0f2fe;
+        border-left: 3px solid #3b82f6;
+    }
+    
+    .contact-checkbox {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+    
+    /* Mobile responsive styles */
+    @media (max-width: 768px) {
+        .container-fluid {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+        
+        .profile-avatar-large {
+            width: 80px !important;
+            height: 80px !important;
+            font-size: 28px !important;
+        }
+        
+        .modal-dialog {
+            margin: 0.5rem !important;
+        }
+        
+        .modal-body {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+        
+        .btn {
+            white-space: nowrap;
+        }
+        
+        .badge {
+            white-space: normal;
+            word-break: break-word;
+        }
+        
+        h2 {
+            font-size: 1.5rem !important;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .btn-sm {
+            padding: 0.25rem 0.5rem !important;
+            font-size: 0.7rem !important;
+        }
+        
+        .vstack.gap-1 > div {
+            padding-top: 0.75rem !important;
+            padding-bottom: 0.75rem !important;
+        }
+        
+        .d-flex.gap-2 {
+            margin-top: 0.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const contactUrl = "{% url 'account:api_create_contact' %}";
+const bulkImportUrl = "{% url 'account:api_bulk_import_contacts' %}";
+const interactionBaseUrl = "{% url 'account:api_record_interaction' 0 %}";
+const createEventUrl = "{% url 'account:api_create_event' %}";
+const contactDetailUrl = "{% url 'account:api_contact_detail' 0 %}";
+
+// API endpoints for paginated data
+const apiEndpoints = {
+    reconnect: "{% url 'account:api_paginated_reconnect' %}",
+    events: "{% url 'account:api_paginated_events' %}",
+    recent: "{% url 'account:api_paginated_recent_contacts' %}",
+    alumni: "{% url 'account:api_paginated_alumni' %}"
+};
+
+let currentModalType = '';
+let currentPage = 1;
+
+// Contact import variables
+let allPhoneContacts = [];
+let filteredPhoneContacts = [];
+let selectedContactIds = new Set();
+
+function getCookie(name) {
+    let cookieValue = null;
+    document.cookie.split(';').forEach(cookie => {
+        cookie = cookie.trim();
+        if (cookie.startsWith(name + '=')) {
+            cookieValue = decodeURIComponent(cookie.split('=')[1]);
+        }
+    });
+    return cookieValue;
+}
+
+const csrftoken = getCookie('csrftoken');
+
+// ================= CONTACT IMPORT FUNCTIONS =================
+function openImportModal() {
+    const modal = new bootstrap.Modal(document.getElementById('importContactsModal'));
+    resetImportModal();
+    modal.show();
+}
+
+function resetImportModal() {
+    document.getElementById('importMessage').innerHTML = '';
+    document.getElementById('contactListContainer').style.display = 'none';
+    document.getElementById('importProgress').style.display = 'none';
+    document.querySelector('#importContactsModal .modal-body > div:first-of-type').style.display = 'block';
+    allPhoneContacts = [];
+    filteredPhoneContacts = [];
+    selectedContactIds.clear();
+}
+
+function backToImportOptions() {
+    document.getElementById('contactListContainer').style.display = 'none';
+    document.querySelector('#importContactsModal .modal-body > div:first-of-type').style.display = 'block';
+    selectedContactIds.clear();
+    document.getElementById('importMessage').innerHTML = '';
+}
+
+async function requestContactPermission() {
+    if (!('contacts' in navigator)) {
+        showImportMessage('Your browser does not support the Contact Picker API. Please use "Import All Contacts" or add contacts manually.', 'danger');
+        return;
+    }
+    
+    try {
+        const props = ['name', 'tel', 'email'];
+        const opts = {multiple: true};
+        
+        const contacts = await navigator.contacts.select(props, opts);
+        
+        if (contacts.length === 0) {
+            showImportMessage('No contacts selected.', 'warning');
+            return;
+        }
+        
+        // Process selected contacts
+        allPhoneContacts = contacts.map(contact => ({
+            name: contact.name || 'Unknown',
+            phone: contact.tel && contact.tel.length > 0 ? contact.tel[0] : '',
+            email: contact.email && contact.email.length > 0 ? contact.email[0] : ''
+        })).filter(c => c.phone); // Only keep contacts with phone numbers
+        
+        filteredPhoneContacts = [...allPhoneContacts];
+        displayContactList();
+        
+    } catch (error) {
+        console.error('Contact picker error:', error);
+        showImportMessage('Unable to access contacts. Please use "Import All Contacts" or add contacts manually.', 'danger');
+    }
+}
+
+async function importAllContacts() {
+    // Show progress
+    document.querySelector('#importContactsModal .modal-body > div:first-of-type').style.display = 'none';
+    document.getElementById('contactListContainer').style.display = 'none';
+    document.getElementById('importProgress').style.display = 'block';
+    
+    try {
+        if ('contacts' in navigator && 'getAll' in navigator.contacts) {
+            // Use getAll if available
+            const contacts = await navigator.contacts.getAll(['name', 'tel', 'email']);
+            await processBulkImport(contacts);
+        } else {
+            // Fallback: ask user to select all contacts manually
+            const props = ['name', 'tel', 'email'];
+            const opts = {multiple: true};
+            
+            const contacts = await navigator.contacts.select(props, opts);
+            await processBulkImport(contacts);
+        }
+    } catch (error) {
+        console.error('Import error:', error);
+        document.getElementById('importProgress').style.display = 'none';
+        document.querySelector('#importContactsModal .modal-body > div:first-of-type').style.display = 'block';
+        showImportMessage('Unable to import all contacts. Please try selecting contacts manually.', 'danger');
+    }
+}
+
+async function processBulkImport(contacts) {
+    const validContacts = contacts
+        .filter(c => c.name && c.tel && c.tel.length > 0)
+        .map(c => ({
+            name: c.name,
+            phone_number: c.tel[0],
+            email: c.email && c.email.length > 0 ? c.email[0] : '',
+            notes: 'Imported from phone contacts',
+            meeting_context: 'Phone contact import'
+        }));
+    
+    if (validContacts.length === 0) {
+        showImportMessage('No valid contacts found with phone numbers.', 'warning');
+        document.getElementById('importProgress').style.display = 'none';
+        document.querySelector('#importContactsModal .modal-body > div:first-of-type').style.display = 'block';
+        return;
+    }
+    
+    document.getElementById('totalToImport').textContent = validContacts.length;
+    
+    let imported = 0;
+    const batchSize = 10;
+    const totalBatches = Math.ceil(validContacts.length / batchSize);
+    
+    for (let i = 0; i < totalBatches; i++) {
+        const batch = validContacts.slice(i * batchSize, (i + 1) * batchSize);
+        
+        try {
+            const response = await fetch(bulkImportUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({ contacts: batch })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                imported += data.imported_count || batch.length;
+            }
+        } catch (error) {
+            console.error('Batch import error:', error);
+        }
+        
+        // Update progress
+        document.getElementById('importedCount').textContent = imported;
+        const progress = (imported / validContacts.length) * 100;
+        document.getElementById('importProgressBar').style.width = progress + '%';
+    }
+    
+    // Complete
+    setTimeout(() => {
+        const modal = bootstrap.Modal.getInstance(document.getElementById('importContactsModal'));
+        modal.hide();
+        showToast(`Successfully imported ${imported} contacts`, 'success');
+        setTimeout(() => location.reload(), 1500);
+    }, 500);
+}
+
+function displayContactList() {
+    const container = document.getElementById('contactSelectList');
+    const searchInput = document.getElementById('contactSearchInput');
+    
+    container.innerHTML = '';
+    searchInput.value = '';
+    
+    if (filteredPhoneContacts.length === 0) {
+        container.innerHTML = '<p class="text-muted text-center py-4">No contacts with phone numbers found.</p>';
+        document.querySelector('#importContactsModal .modal-body > div:first-of-type').style.display = 'none';
+        document.getElementById('contactListContainer').style.display = 'block';
+        return;
+    }
+    
+    filteredPhoneContacts.forEach((contact, index) => {
+        const contactId = `contact_${index}_${contact.phone.replace(/\D/g, '')}`;
+        const div = document.createElement('div');
+        div.className = 'contact-select-item p-3 border-bottom';
+        div.dataset.contactId = contactId;
+        div.dataset.index = index;
+        div.onclick = (e) => toggleContactSelection(contactId, e);
+        
+        const isSelected = selectedContactIds.has(contactId);
+        if (isSelected) {
+            div.classList.add('selected');
+        }
+        
+        div.innerHTML = `
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <input type="checkbox" 
+                           class="contact-checkbox" 
+                           id="check_${contactId}" 
+                           ${isSelected ? 'checked' : ''}
+                           onclick="event.stopPropagation(); toggleContactSelection('${contactId}', event)">
+                </div>
+                <div class="flex-grow-1">
+                    <div class="d-flex align-items-center mb-1">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-2"
+                             style="width: 32px; height: 32px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 14px;">
+                            ${contact.name ? contact.name.charAt(0).toUpperCase() : '?'}
+                        </div>
+                        <strong style="color: #0f172a;">${contact.name || 'Unknown'}</strong>
+                    </div>
+                    <div class="ms-5 ps-2">
+                        <small style="color: #64748b;">📱 ${contact.phone}</small>
+                        ${contact.email ? `<br><small style="color: #64748b;">✉️ ${contact.email}</small>` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        container.appendChild(div);
+    });
+    
+    updateSelectedCount();
+    document.querySelector('#importContactsModal .modal-body > div:first-of-type').style.display = 'none';
+    document.getElementById('contactListContainer').style.display = 'block';
+}
+
+function toggleContactSelection(contactId, event) {
+    const item = document.querySelector(`[data-contact-id="${contactId}"]`);
+    const checkbox = document.getElementById(`check_${contactId}`);
+    
+    if (selectedContactIds.has(contactId)) {
+        selectedContactIds.delete(contactId);
+        item.classList.remove('selected');
+        if (checkbox) checkbox.checked = false;
+    } else {
+        selectedContactIds.add(contactId);
+        item.classList.add('selected');
+        if (checkbox) checkbox.checked = true;
+    }
+    
+    updateSelectedCount();
+}
+
+function selectAllContacts() {
+    filteredPhoneContacts.forEach((contact, index) => {
+        const contactId = `contact_${index}_${contact.phone.replace(/\D/g, '')}`;
+        selectedContactIds.add(contactId);
+        const item = document.querySelector(`[data-contact-id="${contactId}"]`);
+        const checkbox = document.getElementById(`check_${contactId}`);
+        if (item) item.classList.add('selected');
+        if (checkbox) checkbox.checked = true;
+    });
+    updateSelectedCount();
+}
+
+function deselectAllContacts() {
+    selectedContactIds.clear();
+    document.querySelectorAll('.contact-select-item').forEach(item => {
+        item.classList.remove('selected');
+    });
+    document.querySelectorAll('.contact-checkbox').forEach(cb => {
+        cb.checked = false;
+    });
+    updateSelectedCount();
+}
+
+function filterContacts() {
+    const searchTerm = document.getElementById('contactSearchInput').value.toLowerCase();
+    
+    if (searchTerm === '') {
+        filteredPhoneContacts = [...allPhoneContacts];
+    } else {
+        filteredPhoneContacts = allPhoneContacts.filter(contact => 
+            (contact.name && contact.name.toLowerCase().includes(searchTerm)) ||
+            (contact.phone && contact.phone.includes(searchTerm)) ||
+            (contact.email && contact.email.toLowerCase().includes(searchTerm))
+        );
+    }
+    
+    displayContactList();
+}
+
+function updateSelectedCount() {
+    const count = selectedContactIds.size;
+    document.getElementById('selectedCount').textContent = count;
+    document.getElementById('importSelectedBtn').disabled = count === 0;
+}
+
+async function importSelectedContacts() {
+    if (selectedContactIds.size === 0) return;
+    
+    // Get selected contacts
+    const selectedContacts = [];
+    filteredPhoneContacts.forEach((contact, index) => {
+        const contactId = `contact_${index}_${contact.phone.replace(/\D/g, '')}`;
+        if (selectedContactIds.has(contactId)) {
+            selectedContacts.push({
+                name: contact.name || 'Unknown',
+                phone_number: contact.phone,
+                email: contact.email || '',
+                notes: 'Imported from phone contacts',
+                meeting_context: 'Phone contact import'
+            });
+        }
+    });
+    
+    // Hide contact list, show progress
+    document.getElementById('contactListContainer').style.display = 'none';
+    document.getElementById('importProgress').style.display = 'block';
+    document.getElementById('totalToImport').textContent = selectedContacts.length;
+    
+    let imported = 0;
+    
+    // Import contacts one by one
+    for (let i = 0; i < selectedContacts.length; i++) {
+        const contact = selectedContacts[i];
+        
+        try {
+            const response = await fetch(contactUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify(contact)
+            });
+            
+            if (response.ok) {
+                imported++;
+            }
+        } catch (error) {
+            console.error('Import error:', error);
+        }
+        
+        // Update progress
+        document.getElementById('importedCount').textContent = imported;
+        const progress = ((i + 1) / selectedContacts.length) * 100;
+        document.getElementById('importProgressBar').style.width = progress + '%';
+    }
+    
+    // Complete
+    setTimeout(() => {
+        const modal = bootstrap.Modal.getInstance(document.getElementById('importContactsModal'));
+        modal.hide();
+        showToast(`Successfully imported ${imported} contacts`, 'success');
+        setTimeout(() => location.reload(), 1500);
+    }, 500);
+}
+
+function showImportMessage(message, type) {
+    const element = document.getElementById('importMessage');
+    element.innerHTML = `<div class="alert alert-${type} rounded-3 small py-2">${message}</div>`;
+}
+
+// ================= VIEW PROFILE =================
+async function viewProfile(contactId) {
+    console.log('Opening profile for contact ID:', contactId);
+    
+    const modalElement = document.getElementById('contactProfileModal');
+    const modal = new bootstrap.Modal(modalElement);
+    const modalBody = document.getElementById('contactProfileModalBody');
+    const modalTitle = document.getElementById('contactProfileModalTitle');
+    const recordBtn = document.getElementById('contactProfileRecordInteractionBtn');
+    
+    modalTitle.textContent = 'Loading...';
+    modalBody.innerHTML = `
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-3 text-muted">Loading contact details...</p>
+        </div>
+    `;
+    
+    modal.show();
+    
+    try {
+        const url = contactDetailUrl.replace('0', contactId);
+        console.log('Fetching from:', url);
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        console.log('Contact data received:', data);
+        
+        if (data.contact) {
+            const c = data.contact;
+            
+            modalTitle.textContent = c.name;
+            
+            const gradients = [
+                'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'
+            ];
+            const gradient = gradients[contactId % gradients.length];
+            
+            let statusBadge = '';
+            if (!c.has_interacted) {
+                statusBadge = '<span class="badge bg-warning">Never Connected</span>';
+            } else if (c.needs_reconnect) {
+                statusBadge = '<span class="badge bg-info">Needs Reconnect</span>';
+            } else {
+                statusBadge = '<span class="badge bg-success">Connected</span>';
+            }
+            
+            const html = `
+                <div class="text-center mb-4">
+                    <div class="profile-avatar-large" style="background: ${gradient};">
+                        ${c.name ? c.name.charAt(0).toUpperCase() : '?'}
+                    </div>
+                    <h4 class="mt-3 mb-2">${c.name || ''}</h4>
+                    ${statusBadge}
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-12 col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label small fw-medium text-secondary text-uppercase">Phone</label>
+                            <p class="mb-0">${c.phone_number || 'Not provided'}</p>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label small fw-medium text-secondary text-uppercase">Email</label>
+                            <p class="mb-0">${c.email || 'Not provided'}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-12 col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label small fw-medium text-secondary text-uppercase">Added</label>
+                            <p class="mb-0">${c.created_at ? new Date(c.created_at).toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'}) : 'Unknown'}</p>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label small fw-medium text-secondary text-uppercase">Last Interaction</label>
+                            <p class="mb-0">${c.last_interaction ? new Date(c.last_interaction).toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'}) : 'Never'}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label small fw-medium text-secondary text-uppercase">Notes</label>
+                    <p class="mb-0">${c.notes || 'No notes'}</p>
+                </div>
+                
+                ${c.is_alumni ? `
+                <div class="mb-4">
+                    <label class="form-label small fw-medium text-secondary text-uppercase">Alumni Information</label>
+                    <p class="mb-0">
+                        <span class="badge bg-primary me-2">Alumni</span>
+                        ${c.alumni_type || ''}
+                    </p>
+                </div>
+                ` : ''}
+                
+                ${data.events && data.events.length > 0 ? `
+                <div class="mb-4">
+                    <label class="form-label small fw-medium text-secondary text-uppercase">Events</label>
+                    <div class="list-group">
+                        ${data.events.map(event => `
+                            <div class="list-group-item border-0 bg-light mb-2 rounded-3">
+                                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                                    <div class="mb-2 mb-md-0">
+                                        <strong>${event.title}</strong>
+                                        <small class="d-block text-muted">${event.event_type}</small>
+                                    </div>
+                                    <span class="badge ${event.is_past ? 'bg-secondary' : 'bg-warning'} align-self-start align-self-md-center">
+                                        ${new Date(event.date).toLocaleDateString()}
+                                    </span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                ` : ''}
+                
+                <div class="mb-3">
+                    <label class="form-label small fw-medium text-secondary text-uppercase">Statistics</label>
+                    <div class="row g-2">
+                        <div class="col-4">
+                            <div class="bg-light rounded-3 p-3 text-center">
+                                <h3 class="mb-0">${c.interaction_count || 0}</h3>
+                                <small class="text-muted">Interactions</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="bg-light rounded-3 p-3 text-center">
+                                <h3 class="mb-0">${data.events ? data.events.length : 0}</h3>
+                                <small class="text-muted">Events</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="bg-light rounded-3 p-3 text-center">
+                                <h3 class="mb-0">${c.is_alumni ? '🎓' : '👤'}</h3>
+                                <small class="text-muted">Type</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            modalBody.innerHTML = html;
+            
+            recordBtn.onclick = () => {
+                recordInteraction(contactId);
+                modal.hide();
+            };
+            
+        } else {
+            modalBody.innerHTML = `<div class="alert alert-danger">No contact data received</div>`;
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        modalBody.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+    }
+}
+
+// ================= ADD CONTACT FORM =================
+document.getElementById("contactForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Saving...';
+
+    try {
+        const res = await fetch(contactUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrftoken
+            },
+            body: JSON.stringify({
+                name: document.getElementById("name").value,
+                phone_number: document.getElementById("phone_number").value,
+                email: document.getElementById("email").value,
+                notes: document.getElementById("notes").value,
+                meeting_context: document.getElementById("meeting_context").value
+            })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            showMessage("contactMessage", data.message, "success");
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showMessage("contactMessage", data.error || "Error creating contact", "danger");
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        }
+    } catch (error) {
+        showMessage("contactMessage", "Network error occurred", "danger");
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+    }
+});
+
+// ================= ADD EVENT FORM =================
+document.addEventListener('DOMContentLoaded', function() {
+    const dateInput = document.getElementById('event_date');
+    if (dateInput) {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        dateInput.value = tomorrow.toISOString().split('T')[0];
+    }
+});
+
+document.getElementById("eventForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const contactId = document.getElementById("event_contact").value;
+    const title = document.getElementById("event_title").value;
+    const eventType = document.getElementById("event_type").value;
+    const date = document.getElementById("event_date").value;
+    const reminder = document.getElementById("event_reminder").value;
+
+    if (!contactId) {
+        showMessage("eventMessage", "Please select a contact", "danger");
+        return;
+    }
+
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Creating...';
+
+    try {
+        const res = await fetch(createEventUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrftoken
+            },
+            body: JSON.stringify({
+                contact_id: contactId,
+                title: title,
+                event_type: eventType,
+                date: date,
+                reminder_days_before: parseInt(reminder)
+            })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            showMessage("eventMessage", data.message, "success");
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showMessage("eventMessage", data.error || "Error creating event", "danger");
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        }
+    } catch (error) {
+        showMessage("eventMessage", "Network error occurred", "danger");
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+    }
+});
+
+// ================= OPEN FULL LIST MODAL =================
+async function openFullListModal(type, page = 1) {
+    currentModalType = type;
+    currentPage = page;
+    
+    const modal = new bootstrap.Modal(document.getElementById('fullListModal'));
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    
+    const titles = {
+        reconnect: '🔔 Reconnect Contacts',
+        events: '🎂 All Events',
+        recent: '📍 Recently Added Contacts',
+        alumni: '🎓 Alumni Network'
+    };
+    modalTitle.textContent = titles[type] || 'Full List';
+    
+    modalBody.innerHTML = `
+        <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    `;
+    
+    modal.show();
+    await loadModalContent(type, page);
+}
+
+// ================= LOAD MODAL CONTENT =================
+async function loadModalContent(type, page) {
+    try {
+        const url = `${apiEndpoints[type]}?page=${page}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        const modalBody = document.getElementById('modalBody');
+        const modalFooter = document.getElementById('modalFooter');
+        
+        let html = '';
+        
+        if (type === 'reconnect') {
+            html = renderReconnectContent(data.contacts);
+        } else if (type === 'events') {
+            html = renderEventsContent(data.events);
+        } else if (type === 'recent') {
+            html = renderRecentContent(data.contacts);
+        } else if (type === 'alumni') {
+            html = renderAlumniContent(data.contacts);
+        }
+        
+        modalBody.innerHTML = html || '<p class="text-muted text-center py-4">No records found</p>';
+        modalFooter.innerHTML = renderPagination(data, type);
+        
+    } catch (error) {
+        document.getElementById('modalBody').innerHTML = `
+            <div class="alert alert-danger">Error loading data: ${error.message}</div>
+        `;
+    }
+}
+
+// ================= RENDER FUNCTIONS =================
+function renderReconnectContent(contacts) {
+    if (!contacts || contacts.length === 0) return '';
+    
+    return contacts.map(contact => `
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3" 
+             style="border-bottom: 1px solid #f1f5f9;">
+            <div class="d-flex align-items-center mb-2 mb-md-0">
+                <div class="me-3" onclick="viewProfile(${contact.id})" style="cursor: pointer;">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center"
+                         style="width: 40px; height: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 16px;">
+                        ${contact.name.charAt(0).toUpperCase()}
+                    </div>
+                </div>
+                <div>
+                    <p class="fw-medium mb-1" style="color: #0f172a; cursor: pointer;" onclick="viewProfile(${contact.id})">${contact.name}</p>
+                    <small style="color: #94a3b8; font-size: 0.8rem;">
+                        ${contact.phone_number || 'No phone'} • ${contact.email || 'No email'}<br>
+                        Last interaction: ${contact.last_interaction || 'Never'}
+                        ${contact.days_since ? `(${contact.days_since} days ago)` : ''}
+                    </small>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-secondary btn-sm rounded-3 px-3" 
+                        style="border-color: #cbd5e1; color: #64748b; font-size: 0.75rem;"
+                        onclick="viewProfile(${contact.id})">
+                    View
+                </button>
+                <button class="btn btn-outline-dark btn-sm rounded-3 px-3" 
+                        style="border-color: #cbd5e1; color: #334155; font-size: 0.8rem;"
+                        onclick="recordInteractionFromModal(${contact.id})">
+                    Reconnect
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderEventsContent(events) {
+    if (!events || events.length === 0) return '';
+    
+    return events.map(event => `
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3" 
+             style="border-bottom: 1px solid #f1f5f9;">
+            <div class="d-flex align-items-center mb-2 mb-md-0">
+                <div class="me-3" onclick="viewProfile(${event.contact_id})" style="cursor: pointer;">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center"
+                         style="width: 40px; height: 40px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; font-size: 16px;">
+                        ${event.contact_name.charAt(0).toUpperCase()}
+                    </div>
+                </div>
+                <div>
+                    <p class="fw-medium mb-1" style="color: #0f172a; cursor: pointer;" onclick="viewProfile(${event.contact_id})">${event.contact_name}</p>
+                    <small style="color: #94a3b8; font-size: 0.8rem;">
+                        ${event.title} • ${event.event_type}
+                    </small>
+                </div>
+            </div>
+            <div class="text-md-end">
+                <span class="badge rounded-3 px-3 py-2 mb-1" 
+                    style="background: ${event.is_past ? '#e2e8f0' : '#fef3c7'}; 
+                           color: ${event.is_past ? '#64748b' : '#92400e'}; 
+                           font-weight: 400; font-size: 0.75rem;">
+                    ${new Date(event.date).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}
+                </span>
+                ${!event.is_past && event.days_until !== null ? `
+                    <small class="d-block ${event.days_until === 0 ? 'text-success' : event.days_until === 1 ? 'text-warning' : 'text-muted'}" 
+                           style="font-size: 0.7rem;">
+                        ${event.days_until === 0 ? 'Today!' : event.days_until === 1 ? 'Tomorrow' : `In ${event.days_until} days`}
+                    </small>
+                ` : ''}
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderRecentContent(contacts) {
+    if (!contacts || contacts.length === 0) return '';
+    
+    return contacts.map(contact => `
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3" 
+             style="border-bottom: 1px solid #f1f5f9;">
+            <div class="d-flex align-items-center mb-2 mb-md-0">
+                <div class="me-3" onclick="viewProfile(${contact.id})" style="cursor: pointer;">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center"
+                         style="width: 40px; height: 40px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; font-size: 16px;">
+                        ${contact.name.charAt(0).toUpperCase()}
+                    </div>
+                </div>
+                <div>
+                    <p class="fw-medium mb-1" style="color: #0f172a; cursor: pointer;" onclick="viewProfile(${contact.id})">${contact.name}</p>
+                    <small style="color: #94a3b8; font-size: 0.8rem;">
+                        ${contact.phone_number || 'No phone'} • ${contact.email || 'No email'}<br>
+                        Added ${new Date(contact.created_at).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}
+                    </small>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-secondary btn-sm rounded-3 px-3" 
+                        style="border-color: #cbd5e1; color: #64748b; font-size: 0.75rem;"
+                        onclick="viewProfile(${contact.id})">
+                    View
+                </button>
+                <button class="btn btn-link btn-sm text-decoration-none" 
+                        style="color: #475569; font-size: 0.8rem;"
+                        onclick="recordInteractionFromModal(${contact.id})">
+                    Log Interaction →
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderAlumniContent(contacts) {
+    if (!contacts || contacts.length === 0) return '';
+    
+    return contacts.map(contact => {
+        let buttonHtml = '';
+        if (!contact.has_interacted) {
+            buttonHtml = `<button class="btn btn-sm rounded-3 px-3" 
+                                   style="background: #3b82f6; color: white; font-size: 0.8rem;"
+                                   onclick="recordInteractionFromModal(${contact.id})">
+                            Connect
+                          </button>`;
+        } else if (contact.needs_reconnect) {
+            buttonHtml = `<button class="btn btn-sm rounded-3 px-3" 
+                                   style="background: #f59e0b; color: white; font-size: 0.8rem;"
+                                   onclick="recordInteractionFromModal(${contact.id})">
+                            Reconnect
+                          </button>`;
+        } else {
+            buttonHtml = `<button class="btn btn-sm rounded-3 px-3" 
+                                   style="background: #10b981; color: white; font-size: 0.8rem; cursor: default;"
+                                   disabled>
+                            ✓ Connected
+                          </button>`;
+        }
+        
+        return `
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3" 
+                 style="border-bottom: 1px solid #f1f5f9;">
+                <div class="d-flex align-items-center mb-2 mb-md-0">
+                    <div class="me-3" onclick="viewProfile(${contact.id})" style="cursor: pointer;">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center"
+                             style="width: 40px; height: 40px; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; font-size: 16px;">
+                            ${contact.name.charAt(0).toUpperCase()}
+                        </div>
+                    </div>
+                    <div>
+                        <p class="fw-medium mb-1" style="color: #0f172a; cursor: pointer;" onclick="viewProfile(${contact.id})">${contact.name}</p>
+                        <small style="color: #94a3b8; font-size: 0.8rem;">
+                            ${contact.alumni_type || 'Alumni'} • 
+                            ${contact.phone_number || 'No phone'}<br>
+                            Interactions: ${contact.interaction_count || 0}
+                            ${contact.last_interaction ? ` • Last: ${new Date(contact.last_interaction).toLocaleDateString()}` : ''}
+                        </small>
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-secondary btn-sm rounded-3 px-3" 
+                            style="border-color: #cbd5e1; color: #64748b; font-size: 0.75rem;"
+                            onclick="viewProfile(${contact.id})">
+                        View
+                    </button>
+                    ${buttonHtml}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function renderPagination(data, type) {
+    if (data.total_pages <= 1) return '';
+    
+    let html = '<nav><ul class="pagination justify-content-center flex-wrap mb-0">';
+    
+    html += `
+        <li class="page-item ${!data.has_previous ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="loadModalContent('${type}', ${data.page - 1}); return false;">
+                ←
+            </a>
+        </li>
+    `;
+    
+    for (let i = 1; i <= data.total_pages; i++) {
+        if (i === 1 || i === data.total_pages || (i >= data.page - 2 && i <= data.page + 2)) {
+            html += `
+                <li class="page-item ${i === data.page ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="loadModalContent('${type}', ${i}); return false;">
+                        ${i}
+                    </a>
+                </li>
+            `;
+        } else if (i === data.page - 3 || i === data.page + 3) {
+            html += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+        }
+    }
+    
+    html += `
+        <li class="page-item ${!data.has_next ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="loadModalContent('${type}', ${data.page + 1}); return false;">
+                →
+            </a>
+        </li>
+    `;
+    
+    html += '</ul></nav>';
+    return html;
+}
+
+// ================= RECORD INTERACTION =================
+async function recordInteraction(contactId) {
+    await performRecordInteraction(contactId);
+}
+
+async function recordInteractionFromModal(contactId) {
+    await performRecordInteraction(contactId);
+}
+
+async function performRecordInteraction(contactId) {
+    const url = interactionBaseUrl.replace("0", contactId);
+
+    try {
+        const res = await fetch(url, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrftoken,
+                "Content-Type": "application/json"
+            }
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            showToast("Interaction recorded successfully", "success");
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast(data.error || "Error recording interaction", "error");
+        }
+    } catch (error) {
+        showToast("Network error occurred", "error");
+    }
+}
+
+// ================= HELPER FUNCTIONS =================
+function showMessage(elementId, message, type) {
+    const element = document.getElementById(elementId);
+    element.innerHTML = `<div class="alert alert-${type} rounded-3 small py-2">${message}</div>`;
+    
+    if (type === "success") {
+        setTimeout(() => {
+            element.innerHTML = '';
+        }, 3000);
+    }
+}
+
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed top-0 end-0 m-3`;
+    toast.style.zIndex = '9999';
+    toast.style.animation = 'slideIn 0.3s ease';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+</script>
+{% endblock %}

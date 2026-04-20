@@ -1,0 +1,517 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Sign In · Circo{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-3 px-md-4" style="background: #f8fafc; min-height: calc(100vh - 73px); overflow-x: hidden;">
+    <div class="row align-items-center justify-content-center" style="min-height: calc(100vh - 73px);">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+            
+            <!-- Logo Centered -->
+            <div class="text-center mb-4">
+                <div class="d-flex align-items-center justify-content-center gap-2 mb-3">
+                    <div class="rounded-3 d-flex align-items-center justify-content-center" 
+                         style="width: clamp(40px, 10vw, 48px); height: clamp(40px, 10vw, 48px); background: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%);">
+                        <span style="color: white; font-weight: 600; font-size: clamp(1.2rem, 4vw, 1.5rem); letter-spacing: -0.5px;">C</span>
+                    </div>
+                    <span class="fw-semibold" style="color: #1e293b; font-size: clamp(1.2rem, 4vw, 1.5rem);">Circo</span>
+                </div>
+                <p class="text-muted" style="font-size: clamp(0.85rem, 2.5vw, 0.95rem); color: #64748b !important;">
+                    Welcome back to your relationship intelligence hub
+                </p>
+            </div>
+            
+            <!-- Login Card -->
+            <div class="bg-white rounded-4 p-3 p-md-5" style="border: 1px solid #e2e8f0; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);">
+                
+                <h2 class="fw-light mb-1" style="color: #0f172a; letter-spacing: -0.02em; font-size: clamp(1.5rem, 5vw, 2rem);">Sign In</h2>
+                <p class="text-muted mb-4" style="font-size: clamp(0.8rem, 2.5vw, 0.9rem);">Enter your credentials to continue</p>
+                
+                <div id="message"></div>
+                
+                <div id="loginFormContainer">
+                    {% csrf_token %}
+                    
+                    <!-- Email Field -->
+                    <div class="mb-3">
+                        <label class="form-label" for="emailInput" style="font-size: clamp(0.75rem, 2vw, 0.8rem);">
+                            Email Address
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0" style="border-color: #e2e8f0;">
+                                <i class="bi bi-envelope" style="color: #64748b; font-size: clamp(0.9rem, 3vw, 1rem);"></i>
+                            </span>
+                            <input type="email" 
+                                   class="form-control border-start-0 ps-0" 
+                                   id="emailInput" 
+                                   name="email"
+                                   placeholder="you@example.com" 
+                                   autocomplete="email"
+                                   style="border-color: #e2e8f0; font-size: clamp(0.85rem, 2.5vw, 0.95rem);">
+                        </div>
+                    </div>
+                    
+                    <!-- Password Field -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap">
+                            <label class="form-label" for="passwordInput" style="font-size: clamp(0.75rem, 2vw, 0.8rem);">Password</label>
+                            <a href="#" class="small text-decoration-none" style="color: #64748b; font-size: clamp(0.7rem, 2vw, 0.8rem);">
+                                Forgot password?
+                            </a>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0" style="border-color: #e2e8f0;">
+                                <i class="bi bi-lock" style="color: #64748b; font-size: clamp(0.9rem, 3vw, 1rem);"></i>
+                            </span>
+                            <input type="password" 
+                                   class="form-control border-start-0 border-end-0 ps-0" 
+                                   id="passwordInput" 
+                                   name="password"
+                                   placeholder="••••••••" 
+                                   autocomplete="current-password"
+                                   style="border-color: #e2e8f0; font-size: clamp(0.85rem, 2.5vw, 0.95rem);">
+                            <button class="btn btn-outline-secondary border-start-0" 
+                                    type="button" 
+                                    id="togglePasswordBtn"
+                                    style="border-color: #e2e8f0; background: white;">
+                                <i class="bi bi-eye" id="togglePasswordIcon" style="font-size: clamp(0.9rem, 3vw, 1rem);"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Remember Me -->
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="rememberMeCheck" style="border-color: #cbd5e1;">
+                            <label class="form-check-label small" for="rememberMeCheck" style="color: #475569; font-size: clamp(0.75rem, 2vw, 0.85rem);">
+                                Remember me for 30 days
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <button type="button" 
+                            class="btn btn-dark w-100 rounded-3 py-2 py-md-3 mb-3 d-flex align-items-center justify-content-center gap-2"
+                            id="loginSubmitBtn"
+                            style="background: #1e293b; border: none; font-weight: 400; font-size: clamp(0.9rem, 2.5vw, 1rem);">
+                        <span>Sign In</span>
+                        <i class="bi bi-arrow-right"></i>
+                    </button>
+                    
+                    <!-- Divider -->
+                    <div class="position-relative my-4">
+                        <hr class="text-muted" style="border-color: #e2e8f0;">
+                        <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 small text-muted" style="font-size: clamp(0.7rem, 2vw, 0.8rem);">
+                            or
+                        </span>
+                    </div>
+                    
+                    <!-- Social Login Buttons (Optional) -->
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-outline-secondary rounded-3 py-2 py-md-3 d-flex align-items-center justify-content-center gap-2" disabled>
+                            <i class="bi bi-google"></i>
+                            <span style="font-size: clamp(0.85rem, 2.5vw, 0.95rem);">Continue with Google</span>
+                            <span class="badge bg-light text-dark ms-2" style="font-size: clamp(0.55rem, 1.5vw, 0.6rem);">Soon</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Register Link -->
+                <p class="text-center mt-4 mb-0 small" style="color: #64748b; font-size: clamp(0.8rem, 2.5vw, 0.9rem);">
+                    Don't have an account?
+                    <a href="{% url 'account:register' %}" 
+                       class="text-decoration-none fw-medium" 
+                       style="color: #1e293b;">
+                        Create free account
+                        <i class="bi bi-arrow-right ms-1" style="font-size: 0.7rem;"></i>
+                    </a>
+                </p>
+            </div>
+            
+            <!-- Footer Links -->
+            <div class="text-center mt-4">
+                <div class="d-flex justify-content-center gap-2 gap-md-3 flex-wrap">
+                    <a href="#" class="small text-muted text-decoration-none" style="color: #94a3b8 !important; font-size: clamp(0.7rem, 2vw, 0.8rem);">Privacy</a>
+                    <span class="text-muted" style="color: #cbd5e1 !important;">·</span>
+                    <a href="#" class="small text-muted text-decoration-none" style="color: #94a3b8 !important; font-size: clamp(0.7rem, 2vw, 0.8rem);">Terms</a>
+                    <span class="text-muted" style="color: #cbd5e1 !important;">·</span>
+                    <a href="#" class="small text-muted text-decoration-none" style="color: #94a3b8 !important; font-size: clamp(0.7rem, 2vw, 0.8rem);">Help</a>
+                </div>
+                <p class="small text-muted mt-3 mb-0" style="color: #94a3b8 !important; font-size: clamp(0.65rem, 1.8vw, 0.75rem);">
+                    © 2024 Circo. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Global box-sizing */
+    * {
+        box-sizing: border-box;
+    }
+    
+    /* Form input styling */
+    .form-control:focus {
+        border-color: #1e293b !important;
+        box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.1) !important;
+        outline: none;
+    }
+    
+    .input-group-text {
+        transition: border-color 0.15s ease;
+    }
+    
+    .input-group:focus-within .input-group-text {
+        border-color: #1e293b !important;
+    }
+    
+    .input-group:focus-within .btn-outline-secondary {
+        border-color: #1e293b !important;
+    }
+    
+    /* Button hover effects */
+    .btn-dark:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        background: #0f172a !important;
+    }
+    
+    .btn-outline-secondary:hover {
+        background: #f8fafc !important;
+        border-color: #94a3b8 !important;
+    }
+    
+    /* Loading state */
+    .spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    /* Mobile optimizations */
+    @media (max-width: 576px) {
+        .container-fluid {
+            padding-left: 0.75rem !important;
+            padding-right: 0.75rem !important;
+        }
+        
+        .bg-white {
+            padding: 1.25rem !important;
+        }
+        
+        .btn {
+            padding: 0.625rem 0.75rem !important;
+            white-space: normal;
+            word-break: break-word;
+        }
+        
+        .input-group-text {
+            padding: 0.375rem 0.5rem;
+        }
+        
+        .form-control {
+            padding: 0.375rem 0.5rem;
+        }
+    }
+    
+    @media (min-width: 577px) and (max-width: 768px) {
+        .bg-white {
+            padding: 1.5rem !important;
+        }
+    }
+    
+    /* Checkbox styling */
+    .form-check-input:checked {
+        background-color: #1e293b;
+        border-color: #1e293b;
+    }
+    
+    .form-check-input:focus {
+        border-color: #1e293b;
+        box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.1);
+    }
+    
+    /* Smooth transitions */
+    .bg-white {
+        transition: all 0.3s ease;
+    }
+    
+    /* Alert styling */
+    .alert {
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: clamp(0.8rem, 2.5vw, 0.875rem);
+        animation: slideDown 0.3s ease;
+        word-break: break-word;
+    }
+    
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .alert-success {
+        background: #f0fdf4;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+    }
+    
+    .alert-danger {
+        background: #fef2f2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+    
+    /* Prevent overflow on mobile */
+    .row, .col-12, .container-fluid {
+        overflow-x: hidden;
+    }
+    
+    /* Better touch targets for mobile */
+    @media (max-width: 768px) {
+        .btn, .form-check-label, .dropdown-item {
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .form-check-label {
+            min-height: auto;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// CSRF Token function
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Wait for everything to load
+window.addEventListener('load', function() {
+    
+    // Get elements
+    const emailInput = document.getElementById('emailInput');
+    const passwordInput = document.getElementById('passwordInput');
+    const loginBtn = document.getElementById('loginSubmitBtn');
+    const messageDiv = document.getElementById('message');
+    const rememberCheck = document.getElementById('rememberMeCheck');
+    const toggleBtn = document.getElementById('togglePasswordBtn');
+    const toggleIcon = document.getElementById('togglePasswordIcon');
+    
+    // Check if elements exist
+    console.log('Elements found:', {
+        emailInput: !!emailInput,
+        passwordInput: !!passwordInput,
+        loginBtn: !!loginBtn,
+        messageDiv: !!messageDiv
+    });
+    
+    if (!emailInput || !passwordInput || !loginBtn) {
+        console.error('Required elements not found!');
+        return;
+    }
+    
+    // URLs from Django
+    const loginUrl = "{% url 'account:api_login' %}";
+    const dashboardUrl = "{% url 'account:dashboard' %}";
+    const csrftoken = getCookie('csrftoken');
+    
+    console.log('Login URL:', loginUrl);
+    console.log('CSRF Token exists:', !!csrftoken);
+    
+    // Focus email
+    emailInput.focus();
+    
+    // Toggle password visibility
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', function() {
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                if (toggleIcon) {
+                    toggleIcon.classList.remove('bi-eye');
+                    toggleIcon.classList.add('bi-eye-slash');
+                }
+            } else {
+                passwordInput.type = 'password';
+                if (toggleIcon) {
+                    toggleIcon.classList.remove('bi-eye-slash');
+                    toggleIcon.classList.add('bi-eye');
+                }
+            }
+        });
+    }
+    
+    // Load remembered email
+    const rememberedEmail = localStorage.getItem('rememberedEmail');
+    if (rememberedEmail && emailInput) {
+        emailInput.value = rememberedEmail;
+        if (rememberCheck) rememberCheck.checked = true;
+    }
+    
+    // Login function
+    async function performLogin() {
+        // Get values DIRECTLY from inputs
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+        
+        console.log('=== LOGIN ATTEMPT ===');
+        console.log('Email value:', email);
+        console.log('Password value length:', password.length);
+        console.log('Password first char:', password.charAt(0));
+        console.log('Password full value for debugging:', password); // REMOVE THIS IN PRODUCTION
+        
+        // Validation
+        if (!email) {
+            messageDiv.innerHTML = '<div class="alert alert-danger">Email is required</div>';
+            emailInput.focus();
+            return;
+        }
+        
+        if (!password) {
+            messageDiv.innerHTML = '<div class="alert alert-danger">Password is required</div>';
+            passwordInput.focus();
+            return;
+        }
+        
+        // Clear message
+        messageDiv.innerHTML = '';
+        
+        // Update button
+        const originalHTML = loginBtn.innerHTML;
+        loginBtn.innerHTML = '<span class="spinner"></span><span>Logging in...</span>';
+        loginBtn.disabled = true;
+        
+        // Prepare data
+        const data = {
+            email: email,
+            password: password
+        };
+        
+        console.log('Sending data:', {
+            email: email,
+            password: '***HIDDEN***'
+        });
+        
+        try {
+            const response = await fetch(loginUrl, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify(data)
+            });
+            
+            console.log('Response status:', response.status);
+            
+            const result = await response.json();
+            console.log('Response data:', result);
+            
+            if (response.ok) {
+                // Success
+                messageDiv.innerHTML = '<div class="alert alert-success">' + (result.message || 'Login successful!') + '</div>';
+                
+                // Remember me
+                if (rememberCheck && rememberCheck.checked) {
+                    localStorage.setItem('rememberedEmail', email);
+                } else {
+                    localStorage.removeItem('rememberedEmail');
+                }
+                
+                // Redirect
+                console.log('Redirecting to:', dashboardUrl);
+                setTimeout(function() {
+                    window.location.href = dashboardUrl;
+                }, 1000);
+                
+            } else {
+                // Error
+                loginBtn.innerHTML = originalHTML;
+                loginBtn.disabled = false;
+                
+                let errorMsg = result.detail || 'Login failed';
+                if (result.errors) {
+                    const errors = [];
+                    for (const field in result.errors) {
+                        errors.push(field + ': ' + result.errors[field].join(', '));
+                    }
+                    errorMsg = errors.join('<br>');
+                }
+                
+                messageDiv.innerHTML = '<div class="alert alert-danger">' + errorMsg + '</div>';
+            }
+            
+        } catch (error) {
+            console.error('Fetch error:', error);
+            loginBtn.innerHTML = originalHTML;
+            loginBtn.disabled = false;
+            messageDiv.innerHTML = '<div class="alert alert-danger">Network error: ' + error.message + '</div>';
+        }
+    }
+    
+    // Add click handler to button
+    loginBtn.addEventListener('click', performLogin);
+    
+    // Add enter key handlers
+    emailInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            passwordInput.focus();
+        }
+    });
+    
+    passwordInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && !loginBtn.disabled) {
+            performLogin();
+        }
+    });
+    
+    // Clear error on input
+    emailInput.addEventListener('input', function() {
+        const alert = messageDiv.querySelector('.alert');
+        if (alert && !alert.classList.contains('alert-success')) {
+            messageDiv.innerHTML = '';
+        }
+    });
+    
+    passwordInput.addEventListener('input', function() {
+        const alert = messageDiv.querySelector('.alert');
+        if (alert && !alert.classList.contains('alert-success')) {
+            messageDiv.innerHTML = '';
+        }
+    });
+    
+});
+</script>
+{% endblock %}

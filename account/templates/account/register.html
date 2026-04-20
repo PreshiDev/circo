@@ -1,0 +1,341 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Sign Up · Circo{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-3 px-md-4" style="background: #f8fafc; min-height: calc(100vh - 73px);">
+    <div class="row align-items-center justify-content-center" style="min-height: calc(100vh - 73px);">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+            
+            <!-- Logo Centered -->
+            <div class="text-center mb-4">
+                <div class="d-flex align-items-center justify-content-center gap-2 mb-3">
+                    <div class="rounded-3 d-flex align-items-center justify-content-center" 
+                         style="width: 48px; height: 48px; background: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%);">
+                        <span style="color: white; font-weight: 600; font-size: 1.5rem; letter-spacing: -0.5px;">C</span>
+                    </div>
+                    <span class="fw-semibold" style="color: #1e293b; font-size: 1.5rem;">Circo</span>
+                </div>
+                <p class="text-muted" style="font-size: 0.95rem; color: #64748b !important;">
+                    Start building meaningful relationships today
+                </p>
+            </div>
+            
+            <!-- Registration Card -->
+            <div class="bg-white rounded-4 p-4 p-md-5" style="border: 1px solid #e2e8f0; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);">
+                
+                <h2 class="fw-light mb-1" style="color: #0f172a; letter-spacing: -0.02em;">Create Account</h2>
+                <p class="text-muted mb-4" style="font-size: 0.9rem;">Get started with your free account</p>
+                
+                <div id="message"></div>
+                
+                <form id="registerForm">
+                    {% csrf_token %}
+                    
+                    <!-- Full Name Field -->
+                    <div class="mb-3">
+                        <label class="form-label" for="full_name">Full Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0" style="border-color: #e2e8f0;">
+                                <i class="bi bi-person" style="color: #64748b;"></i>
+                            </span>
+                            <input type="text" 
+                                   class="form-control border-start-0 ps-0" 
+                                   id="full_name" 
+                                   placeholder="John Doe" 
+                                   required
+                                   style="border-color: #e2e8f0;">
+                        </div>
+                    </div>
+                    
+                    <!-- Email Field -->
+                    <div class="mb-3">
+                        <label class="form-label" for="email">Email</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0" style="border-color: #e2e8f0;">
+                                <i class="bi bi-envelope" style="color: #64748b;"></i>
+                            </span>
+                            <input type="email" 
+                                   class="form-control border-start-0 ps-0" 
+                                   id="email" 
+                                   placeholder="you@example.com" 
+                                   required
+                                   style="border-color: #e2e8f0;">
+                        </div>
+                    </div>
+                    
+                    <!-- Phone Number Field -->
+                    <div class="mb-3">
+                        <label class="form-label" for="phone_number">Phone Number</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0" style="border-color: #e2e8f0;">
+                                <i class="bi bi-telephone" style="color: #64748b;"></i>
+                            </span>
+                            <input type="text" 
+                                   class="form-control border-start-0 ps-0" 
+                                   id="phone_number" 
+                                   placeholder="+1 (555) 123-4567"
+                                   style="border-color: #e2e8f0;">
+                        </div>
+                    </div>
+                    
+                    <!-- Password Field -->
+                    <div class="mb-4">
+                        <label class="form-label" for="password">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0" style="border-color: #e2e8f0;">
+                                <i class="bi bi-lock" style="color: #64748b;"></i>
+                            </span>
+                            <input type="password" 
+                                   class="form-control border-start-0 border-end-0 ps-0" 
+                                   id="password" 
+                                   placeholder="••••••••" 
+                                   required
+                                   style="border-color: #e2e8f0;">
+                            <button class="btn btn-outline-secondary border-start-0" 
+                                    type="button" 
+                                    onclick="togglePasswordVisibility()"
+                                    style="border-color: #e2e8f0; background: white;">
+                                <i class="bi bi-eye" id="togglePasswordIcon"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Password Strength Indicator (Visual Enhancement Only) -->
+                        <div class="password-strength mt-2" id="passwordStrengthWrapper" style="display: none;">
+                            <div class="password-strength-bar rounded-pill" id="passwordStrengthBar" 
+                                 style="height: 4px; width: 0%; transition: all 0.3s ease;"></div>
+                            <div class="d-flex justify-content-between mt-1">
+                                <small id="passwordStrengthText" style="font-size: 0.75rem;"></small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <button type="submit" 
+                            class="btn btn-dark w-100 rounded-3 py-2"
+                            id="registerBtn"
+                            style="background: #1e293b; border: none; font-weight: 400;">
+                        Create Account
+                    </button>
+                </form>
+                
+                <!-- Login Link -->
+                <p class="text-center mt-4 mb-0 small" style="color: #64748b;">
+                    Already have an account? 
+                    <a href="{% url 'account:login' %}" 
+                       class="text-decoration-none fw-medium" 
+                       style="color: #1e293b;">
+                        Sign in
+                    </a>
+                </p>
+            </div>
+            
+            <!-- Footer -->
+            <div class="text-center mt-4">
+                <p class="small text-muted mb-0" style="color: #94a3b8 !important; font-size: 0.75rem;">
+                    <i class="bi bi-shield-lock me-1"></i>
+                    Your data is encrypted and secure
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Form input styling */
+    .form-control:focus {
+        border-color: #1e293b !important;
+        box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.1) !important;
+        outline: none;
+    }
+    
+    .input-group-text {
+        transition: border-color 0.15s ease;
+    }
+    
+    .input-group:focus-within .input-group-text {
+        border-color: #1e293b !important;
+    }
+    
+    .input-group:focus-within .btn-outline-secondary {
+        border-color: #1e293b !important;
+    }
+    
+    /* Button hover effects */
+    .btn-dark:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        background: #0f172a !important;
+    }
+    
+    .btn-outline-secondary:hover {
+        background: #f8fafc !important;
+        border-color: #94a3b8 !important;
+    }
+    
+    /* Mobile optimizations */
+    @media (max-width: 576px) {
+        .bg-white {
+            padding: 1.5rem !important;
+        }
+        
+        h2 {
+            font-size: 1.75rem;
+        }
+        
+        .btn {
+            padding: 0.625rem 1rem !important;
+        }
+    }
+    
+    /* Alert styling */
+    .alert {
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+        animation: slideDown 0.3s ease;
+    }
+    
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .alert-success {
+        background: #f0fdf4;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+    }
+    
+    .alert-danger {
+        background: #fef2f2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+    
+    /* Smooth transitions */
+    .bg-white {
+        transition: all 0.3s ease;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const registerUrl = "{% url 'account:register' %}".replace("register/", "api/auth/register/");
+
+// Toggle password visibility (UI enhancement only)
+function togglePasswordVisibility() {
+    const passwordInput = document.getElementById('password');
+    const toggleIcon = document.getElementById('togglePasswordIcon');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('bi-eye');
+        toggleIcon.classList.add('bi-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('bi-eye-slash');
+        toggleIcon.classList.add('bi-eye');
+    }
+}
+
+// Password strength checker (visual enhancement only - doesn't block submission)
+function checkPasswordStrength(password) {
+    const wrapper = document.getElementById('passwordStrengthWrapper');
+    const bar = document.getElementById('passwordStrengthBar');
+    const text = document.getElementById('passwordStrengthText');
+    
+    if (password.length === 0) {
+        wrapper.style.display = 'none';
+        return;
+    }
+    
+    wrapper.style.display = 'block';
+    
+    let strength = 0;
+    if (password.length >= 6) strength++;
+    if (password.length >= 8) strength++;
+    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^a-zA-Z0-9]/.test(password)) strength++;
+    
+    const percentage = (strength / 5) * 100;
+    bar.style.width = percentage + '%';
+    
+    if (strength <= 1) {
+        bar.style.background = '#ef4444';
+        text.textContent = 'Weak password';
+        text.style.color = '#ef4444';
+    } else if (strength <= 2) {
+        bar.style.background = '#f59e0b';
+        text.textContent = 'Fair password';
+        text.style.color = '#f59e0b';
+    } else if (strength <= 3) {
+        bar.style.background = '#3b82f6';
+        text.textContent = 'Good password';
+        text.style.color = '#3b82f6';
+    } else {
+        bar.style.background = '#10b981';
+        text.textContent = 'Strong password';
+        text.style.color = '#10b981';
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    const passwordInput = document.getElementById('password');
+    
+    // Add password strength listener (visual only)
+    passwordInput.addEventListener('input', function() {
+        checkPasswordStrength(this.value);
+    });
+});
+
+// Original registration functionality preserved exactly
+document.getElementById("registerForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const messageDiv = document.getElementById("message");
+    messageDiv.innerHTML = "";
+    
+    const registerBtn = document.getElementById("registerBtn");
+    const originalText = registerBtn.textContent;
+    registerBtn.textContent = "Creating account...";
+    registerBtn.disabled = true;
+
+    const response = await fetch(registerUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            full_name: document.getElementById("full_name").value,
+            email: document.getElementById("email").value,
+            phone_number: document.getElementById("phone_number").value,
+            password: document.getElementById("password").value
+        })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+        messageDiv.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+        setTimeout(() => {
+            window.location.href = "{% url 'account:login' %}";
+        }, 1500);
+    } else {
+        registerBtn.textContent = originalText;
+        registerBtn.disabled = false;
+        messageDiv.innerHTML = `<div class="alert alert-danger">${JSON.stringify(data)}</div>`;
+    }
+});
+</script>
+{% endblock %}

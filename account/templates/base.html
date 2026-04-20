@@ -1,0 +1,1258 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>{% block title %}Circo{% endblock %}</title>
+
+    <!-- favicon added -->
+    <link rel="icon" type="image/png" href="{% static 'images/circoapp_logo.jpg' %}">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Inter Font - Modern, Clean Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            max-width: 100%;
+        }
+        
+        body {
+            background: #f8fafc;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            color: #1e293b;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+        
+        /* Loading Screen */
+        #globalLoadingScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(8px);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+        }
+        
+        #globalLoadingScreen.show {
+            display: flex;
+        }
+        
+        .loading-content {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .loading-logo {
+            margin-bottom: 2rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .loading-logo img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+        }
+        
+        @media (min-width: 768px) {
+            .loading-logo img {
+                width: 100px;
+                height: 100px;
+                border-radius: 50%;
+            }
+        }
+        
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid #e2e8f0;
+            border-top-color: #1e293b;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+        
+        .loading-text {
+            color: #64748b;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Modern Navigation */
+        .navbar {
+            background: #ffffff !important;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0.75rem 0;
+        }
+        
+        .navbar-brand {
+            font-weight: 500;
+            font-size: clamp(1rem, 4vw, 1.25rem);
+            letter-spacing: -0.02em;
+            color: #0f172a !important;
+            word-break: break-word;
+        }
+        
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        @media (min-width: 768px) {
+            .nav-container {
+                padding: 0 1.5rem;
+            }
+        }
+        
+        /* User Avatar Button */
+        .user-menu-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 8px 4px 4px;
+            border-radius: 100px;
+            border: none;
+            background: transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .user-menu-btn:hover {
+            background: #f1f5f9;
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%);
+            border-radius: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            flex-shrink: 0;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 100px;
+        }
+        
+        @media (min-width: 768px) {
+            .user-avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 0.9rem;
+            }
+        }
+        
+        .user-name {
+            color: #1e293b;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        /* Dropdown Menu */
+        .dropdown-menu {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            padding: 8px;
+            min-width: 260px;
+            max-width: 90vw;
+            margin-top: 8px;
+        }
+        
+        @media (min-width: 768px) {
+            .dropdown-menu {
+                min-width: 280px;
+            }
+        }
+        
+        .dropdown-header-custom {
+            padding: 12px 12px 8px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            margin-bottom: 8px;
+        }
+        
+        .dropdown-item {
+            padding: 10px 12px;
+            border-radius: 8px;
+            color: #334155;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.15s ease;
+            word-break: break-word;
+        }
+        
+        .dropdown-item:hover {
+            background: #f8fafc;
+            color: #0f172a;
+        }
+        
+        .dropdown-item i {
+            font-size: 1.1rem;
+            color: #64748b;
+            width: 20px;
+            flex-shrink: 0;
+        }
+        
+        .dropdown-divider {
+            margin: 8px 0;
+            border-color: #f1f5f9;
+        }
+        
+        /* Modal Styling */
+        .modal-content {
+            border: none;
+            border-radius: 16px;
+            margin: 0.5rem;
+        }
+        
+        @media (min-width: 576px) {
+            .modal-content {
+                margin: 0;
+            }
+        }
+        
+        .modal-header {
+            border-bottom: 1px solid #f1f5f9;
+            padding: 16px 20px;
+        }
+        
+        @media (min-width: 576px) {
+            .modal-header {
+                padding: 20px 24px;
+            }
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        @media (min-width: 576px) {
+            .modal-body {
+                padding: 24px;
+            }
+        }
+        
+        .modal-footer {
+            border-top: 1px solid #f1f5f9;
+            padding: 16px 20px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        @media (min-width: 576px) {
+            .modal-footer {
+                padding: 16px 24px;
+                flex-wrap: nowrap;
+            }
+        }
+        
+        /* Profile Picture Upload */
+        .profile-picture-wrapper {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            cursor: pointer;
+        }
+        
+        .profile-picture-wrapper:hover .profile-picture-overlay {
+            opacity: 1;
+        }
+        
+        .profile-picture-large {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%);
+            border-radius: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            background-size: cover;
+            background-position: center;
+            border: 3px solid #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .profile-picture-large img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 100px;
+        }
+        
+        .profile-picture-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            color: white;
+        }
+        
+        .profile-picture-overlay i {
+            font-size: 1.5rem;
+        }
+        
+        .profile-avatar-large {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%);
+            border-radius: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+            font-size: 1.75rem;
+            text-transform: uppercase;
+            margin: 0 auto 16px;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .profile-avatar-large img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 100px;
+        }
+        
+        @media (min-width: 576px) {
+            .profile-avatar-large {
+                width: 80px;
+                height: 80px;
+                font-size: 2rem;
+            }
+            
+            .profile-picture-wrapper {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .profile-picture-large {
+                width: 120px;
+                height: 120px;
+                font-size: 3rem;
+            }
+        }
+        
+        /* Smooth Transitions */
+        a, button {
+            transition: all 0.2s ease;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        @media (min-width: 768px) {
+            ::-webkit-scrollbar {
+                width: 8px;
+                height: 8px;
+            }
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        
+        /* Selection Color */
+        ::selection {
+            background: rgba(30, 41, 59, 0.1);
+            color: #1e293b;
+        }
+        
+        /* Form Styling */
+        .form-label {
+            color: #475569;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        
+        @media (min-width: 576px) {
+            .form-label {
+                font-size: 0.8rem;
+            }
+        }
+        
+        .form-control {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 0.9rem;
+            background: #ffffff;
+            transition: all 0.2s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #1e293b;
+            box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.1);
+            outline: none;
+        }
+        
+        .form-control:disabled {
+            background: #f8fafc;
+            color: #64748b;
+        }
+        
+        /* Button Responsiveness */
+        .btn {
+            white-space: nowrap;
+        }
+        
+        @media (max-width: 576px) {
+            .modal-footer .btn {
+                width: 100%;
+                white-space: normal;
+            }
+        }
+        
+        /* Password Strength Indicator */
+        .password-strength {
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        
+        .password-strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease, background 0.3s ease;
+        }
+        
+        /* Mobile Optimizations */
+        @media (max-width: 576px) {
+            .modal-dialog {
+                margin: 0.5rem;
+            }
+            
+            .dropdown-menu {
+                position: fixed !important;
+                top: auto !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                margin: 0 !important;
+                border-radius: 16px 16px 0 0 !important;
+                max-width: 100% !important;
+                transform: none !important;
+            }
+        }
+        
+        /* Image and Media Responsiveness */
+        img, svg, video, canvas, audio, iframe, embed, object {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        /* Prevent overflow on all elements */
+        .row, .col, .container, .container-fluid {
+            overflow-x: hidden;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Global Loading Screen -->
+    <div id="globalLoadingScreen">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <img src="{% static 'images/circoapp_logo.jpg' %}" alt="Circo Logo" class="loading-logo">
+            </div>
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Loading Circo...</div>
+        </div>
+    </div>
+
+    <!-- Minimal Navigation -->
+    <nav class="navbar">
+        <div class="nav-container d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                <span class="navbar-brand mb-0">
+                    <span style="font-weight: 600;">Circo</span>
+                    <span class="d-none d-sm-inline" style="font-weight: 300; color: #64748b; margin-left: 4px;">· relationship intelligence</span>
+                </span>
+            </div>
+            
+            <div class="d-flex align-items-center gap-2 gap-sm-3">
+                {% if user.is_authenticated %}
+                    <div class="dropdown">
+                        <button class="user-menu-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="user-avatar" id="navbarAvatar" style="{% if user.profile_picture %}background-image: url('{{ user.profile_picture.url }}'); background-size: cover; background-position: center;{% else %}background: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%);{% endif %}">
+                                {% if not user.profile_picture %}
+                                    {{ user.full_name|slice:":1"|upper }}
+                                {% endif %}
+                            </div>
+                            <span class="user-name d-none d-sm-inline">{{ user.full_name }}</span>
+                        </button>
+                        
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <!-- Profile Header -->
+                            <li class="dropdown-header-custom">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="user-avatar" style="width: 48px; height: 48px; font-size: 1.2rem; {% if user.profile_picture %}background-image: url('{{ user.profile_picture.url }}'); background-size: cover; background-position: center;{% else %}background: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%);{% endif %}">
+                                        {% if not user.profile_picture %}
+                                            {{ user.full_name|slice:":1"|upper }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="overflow-hidden">
+                                        <div class="fw-semibold text-truncate" style="color: #0f172a; margin-bottom: 2px;">{{ user.full_name }}</div>
+                                        <div class="small text-truncate" style="color: #64748b; font-size: 0.8rem;">{{ user.email|default:"No email" }}</div>
+                                    </div>
+                                </div>
+                            </li>
+                            
+                            <li><hr class="dropdown-divider"></li>
+                            
+                            <!-- View Profile -->
+                            <li>
+                                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#profileModal">
+                                    <i class="bi bi-person"></i>
+                                    View Profile
+                                </a>
+                            </li>
+                            
+                            <!-- Edit Profile -->
+                            <li>
+                                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                                    <i class="bi bi-pencil"></i>
+                                    Edit Profile
+                                </a>
+                            </li>
+                            
+                            <li><hr class="dropdown-divider"></li>
+                            
+                            <!-- Settings Modal Trigger -->
+                            <li>
+                                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#settingsModal">
+                                    <i class="bi bi-gear"></i>
+                                    Settings
+                                </a>
+                            </li>
+                            
+                            <!-- Help -->
+                            <li>
+                                <a class="dropdown-item" href="#">
+                                    <i class="bi bi-question-circle"></i>
+                                    Help & Support
+                                </a>
+                            </li>
+                            
+                            <li><hr class="dropdown-divider"></li>
+                            
+                            <!-- Logout -->
+                            <li>
+                                <form id="logoutForm" method="POST" action="{% url 'account:logout' %}" style="display: none;">
+                                    {% csrf_token %}
+                                </form>
+                                <a class="dropdown-item text-danger" href="#" onclick="event.preventDefault(); document.getElementById('logoutForm').submit();">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                    Sign Out
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <a href="{% url 'account:login' %}" class="btn btn-outline-dark btn-sm rounded-3 px-3">Sign In</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- View Profile Modal -->
+    <div class="modal fade" id="profileModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-medium" style="color: #1e293b;">Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                
+                <div class="modal-body text-center">
+                    <!-- Profile Picture with Upload Button -->
+                    <div class="profile-picture-wrapper" onclick="triggerProfilePictureUpload()">
+                        <div class="profile-picture-large" id="profileModalAvatar" style="{% if user.profile_picture %}background-image: url('{{ user.profile_picture.url }}'); background-size: cover; background-position: center;{% else %}background: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%);{% endif %}">
+                            {% if not user.profile_picture %}
+                                {{ user.full_name|slice:":1"|upper }}
+                            {% endif %}
+                        </div>
+                        <div class="profile-picture-overlay">
+                            <i class="bi bi-camera-fill"></i>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline-secondary btn-sm rounded-3 mb-3" onclick="triggerProfilePictureUpload()">
+                        <i class="bi bi-camera me-1"></i> Change Photo
+                    </button>
+                    
+                    <!-- Hidden file input -->
+                    <input type="file" id="profilePictureInput" accept="image/*" style="display: none;" onchange="uploadProfilePicture(this)">
+                    
+                    <h4 class="mb-1 text-break" style="color: #0f172a;">{{ user.full_name }}</h4>
+                    <p class="text-muted mb-3 text-break" style="font-size: 0.9rem;">{{ user.email|default:"No email provided" }}</p>
+                    
+                    <div class="bg-light rounded-3 p-3 mt-3" style="background: #f8fafc !important;">
+                        <div class="row text-start g-2">
+                            <div class="col-12 col-sm-6 mb-2">
+                                <small class="d-block text-muted" style="font-size: 0.75rem;">Member Since</small>
+                                <span style="color: #334155; font-size: 0.9rem;">{{ user.date_joined|date:"M d, Y"|default:"N/A" }}</span>
+                            </div>
+                            <div class="col-12 col-sm-6 mb-2">
+                                <small class="d-block text-muted" style="font-size: 0.75rem;">Last Login</small>
+                                <span style="color: #334155; font-size: 0.9rem;">{{ user.last_login|date:"M d, Y"|default:"N/A" }}</span>
+                            </div>
+                            <div class="col-12">
+                                <small class="d-block text-muted" style="font-size: 0.75rem;">Phone Number</small>
+                                <span style="color: #334155; font-size: 0.9rem;">{{ user.phone_number|default:"Not provided" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary rounded-3 px-4" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-dark rounded-3 px-4" data-bs-toggle="modal" data-bs-target="#editProfileModal" onclick="closeProfileModal()">
+                        Edit Profile
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal fade" id="editProfileModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-medium" style="color: #1e293b;">Edit Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                
+                <form id="editProfileForm">
+                    <div class="modal-body">
+                        <div id="profileMessage"></div>
+                        
+                        <!-- Profile Picture in Edit Modal -->
+                        <div class="text-center mb-4">
+                            <div class="profile-picture-wrapper" onclick="triggerProfilePictureUpload()">
+                                <div class="profile-picture-large" id="editModalAvatar" style="{% if user.profile_picture %}background-image: url('{{ user.profile_picture.url }}'); background-size: cover; background-position: center;{% else %}background: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%);{% endif %}">
+                                    {% if not user.profile_picture %}
+                                        {{ user.full_name|slice:":1"|upper }}
+                                    {% endif %}
+                                </div>
+                                <div class="profile-picture-overlay">
+                                    <i class="bi bi-camera-fill"></i>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-outline-secondary btn-sm rounded-3" onclick="triggerProfilePictureUpload()">
+                                <i class="bi bi-camera me-1"></i> Change Photo
+                            </button>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="editFullName" value="{{ user.full_name }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="editEmail" value="{{ user.email }}">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="editPhone" value="{{ user.phone_number|default:'' }}" placeholder="+1 (555) 123-4567">
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary rounded-3 px-4" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-dark rounded-3 px-4">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal with Password Change -->
+    <div class="modal fade" id="settingsModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-medium" style="color: #1e293b;">Settings</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                
+                <div class="modal-body">
+                    <div id="settingsMessage"></div>
+                    
+                    <!-- Tabs for Settings -->
+                    <ul class="nav nav-tabs mb-3" id="settingsTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="password-tab" data-bs-toggle="tab" data-bs-target="#password" type="button" role="tab">
+                                <i class="bi bi-key me-1"></i>Change Password
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="notifications-tab" data-bs-toggle="tab" data-bs-target="#notifications" type="button" role="tab">
+                                <i class="bi bi-bell me-1"></i>Notifications
+                            </button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content" id="settingsTabsContent">
+                        <!-- Password Change Tab -->
+                        <div class="tab-pane fade show active" id="password" role="tabpanel">
+                            <form id="changePasswordForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Current Password</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="currentPassword" required>
+                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('currentPassword')">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">New Password</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="newPassword" required minlength="6">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('newPassword')">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div class="password-strength">
+                                        <div class="password-strength-bar" id="passwordStrengthBar"></div>
+                                    </div>
+                                    <small class="text-muted" id="passwordFeedback"></small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Confirm New Password</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="confirmPassword" required>
+                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('confirmPassword')">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div class="invalid-feedback d-block" id="passwordMatchError"></div>
+                                </div>
+                                
+                                <div class="alert alert-light rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                                    <small class="text-muted">
+                                        <i class="bi bi-shield-lock me-1"></i>
+                                        Password must be at least 6 characters long.
+                                    </small>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- Notifications Tab -->
+                        <div class="tab-pane fade" id="notifications" role="tabpanel">
+                            <div class="text-center py-4 text-muted">
+                                <i class="bi bi-bell-slash fs-1 mb-3 d-block"></i>
+                                <p>Notification settings coming soon!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary rounded-3 px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-dark rounded-3 px-4" id="savePasswordBtn">Change Password</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
+    <script>
+        // Global utility functions
+        window.app = window.app || {};
+        
+        // Loading screen functions
+        app.showLoading = function() {
+            document.getElementById('globalLoadingScreen').classList.add('show');
+        };
+        
+        app.hideLoading = function() {
+            document.getElementById('globalLoadingScreen').classList.remove('show');
+        };
+        
+        // Show loading on page navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hide loading initially
+            app.hideLoading();
+            
+            // Show loading on link clicks
+            document.querySelectorAll('a:not([data-bs-toggle]):not([target="_blank"])').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    if (!this.href || this.href === '#' || this.href.includes('javascript:')) return;
+                    app.showLoading();
+                });
+            });
+            
+            // Show loading on form submits
+            document.querySelectorAll('form').forEach(form => {
+                form.addEventListener('submit', function() {
+                    app.showLoading();
+                });
+            });
+        });
+        
+        // Show loading on page unload
+        window.addEventListener('beforeunload', function() {
+            app.showLoading();
+        });
+        
+        // CSRF token helper for AJAX
+        app.getCSRFToken = function() {
+            const name = 'csrftoken';
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        };
+        
+        // Toast notification system
+        app.showToast = function(message, type = 'info') {
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#1e293b';
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                background: ${bgColor};
+                color: white;
+                border-radius: 8px;
+                font-size: 0.875rem;
+                font-weight: 400;
+                z-index: 9999;
+                animation: slideIn 0.3s ease;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                max-width: calc(100vw - 40px);
+                word-break: break-word;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        };
+        
+        // Add animation keyframes
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Close profile modal function
+        function closeProfileModal() {
+            const profileModal = bootstrap.Modal.getInstance(document.getElementById('profileModal'));
+            if (profileModal) profileModal.hide();
+        }
+        
+        // Toggle password visibility
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const icon = field.nextElementSibling.querySelector('i');
+            
+            if (field.type === 'password') {
+                field.type = 'text';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            } else {
+                field.type = 'password';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            }
+        }
+        
+        // Trigger profile picture upload
+        function triggerProfilePictureUpload() {
+            document.getElementById('profilePictureInput').click();
+        }
+        
+        // Upload profile picture
+        async function uploadProfilePicture(input) {
+            if (!input.files || !input.files[0]) return;
+            
+            const file = input.files[0];
+            
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                app.showToast('Please select an image file', 'error');
+                return;
+            }
+            
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                app.showToast('Image size should be less than 5MB', 'error');
+                return;
+            }
+            
+            app.showLoading();
+            
+            const formData = new FormData();
+            formData.append('profile_picture', file);
+            
+            try {
+                const response = await fetch('{% url "account:api_update_profile" %}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': app.getCSRFToken()
+                    },
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    app.showToast('Profile picture updated successfully!', 'success');
+                    
+                    // Update all avatars
+                    const imageUrl = data.profile_picture;
+                    updateAllAvatars(imageUrl);
+                    
+                    // Clear the file input
+                    input.value = '';
+                } else {
+                    app.showToast(data.error || 'Failed to upload profile picture', 'error');
+                }
+            } catch (error) {
+                app.showToast('An error occurred. Please try again.', 'error');
+                console.error('Error:', error);
+            } finally {
+                app.hideLoading();
+            }
+        }
+        
+        // Update all avatar elements with new profile picture
+        function updateAllAvatars(imageUrl) {
+            const avatarElements = [
+                document.getElementById('navbarAvatar'),
+                document.getElementById('profileModalAvatar'),
+                document.getElementById('editModalAvatar')
+            ];
+            
+            avatarElements.forEach(el => {
+                if (el) {
+                    el.style.backgroundImage = `url('${imageUrl}')`;
+                    el.style.backgroundSize = 'cover';
+                    el.style.backgroundPosition = 'center';
+                    el.innerHTML = ''; // Remove any text content
+                }
+            });
+            
+            // Also update the dropdown header avatar
+            const dropdownAvatar = document.querySelector('.dropdown-header-custom .user-avatar');
+            if (dropdownAvatar) {
+                dropdownAvatar.style.backgroundImage = `url('${imageUrl}')`;
+                dropdownAvatar.style.backgroundSize = 'cover';
+                dropdownAvatar.style.backgroundPosition = 'center';
+                dropdownAvatar.innerHTML = '';
+            }
+        }
+        
+        // Password strength checker
+        function checkPasswordStrength(password) {
+            let strength = 0;
+            if (password.length >= 6) strength++;
+            if (password.length >= 10) strength++;
+            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^a-zA-Z0-9]/.test(password)) strength++;
+            
+            const bar = document.getElementById('passwordStrengthBar');
+            const feedback = document.getElementById('passwordFeedback');
+            
+            const percentage = (strength / 5) * 100;
+            bar.style.width = percentage + '%';
+            
+            if (strength <= 2) {
+                bar.style.background = '#ef4444';
+                feedback.textContent = 'Weak password';
+            } else if (strength <= 3) {
+                bar.style.background = '#f59e0b';
+                feedback.textContent = 'Fair password';
+            } else if (strength <= 4) {
+                bar.style.background = '#3b82f6';
+                feedback.textContent = 'Good password';
+            } else {
+                bar.style.background = '#10b981';
+                feedback.textContent = 'Strong password';
+            }
+        }
+        
+        // Handle profile edit form submission
+        document.addEventListener('DOMContentLoaded', function() {
+            const editProfileForm = document.getElementById('editProfileForm');
+            
+            if (editProfileForm) {
+                editProfileForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.textContent;
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Saving...';
+                    
+                    const formData = {
+                        full_name: document.getElementById('editFullName').value,
+                        email: document.getElementById('editEmail').value,
+                        phone_number: document.getElementById('editPhone').value
+                    };
+                    
+                    try {
+                        const response = await fetch('{% url "account:api_update_profile" %}', {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': app.getCSRFToken()
+                            },
+                            body: JSON.stringify(formData)
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (response.ok) {
+                            app.showToast('Profile updated successfully!', 'success');
+                            
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('editProfileModal'));
+                            modal.hide();
+                            
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            const errorMsg = data.error || Object.values(data).flat().join(', ') || 'Failed to update profile';
+                            app.showToast(errorMsg, 'error');
+                            document.getElementById('profileMessage').innerHTML = `
+                                <div class="alert alert-danger rounded-3 py-2">${errorMsg}</div>
+                            `;
+                        }
+                    } catch (error) {
+                        app.showToast('An error occurred. Please try again.', 'error');
+                        console.error('Error:', error);
+                    } finally {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = originalText;
+                    }
+                });
+            }
+            
+            // Password strength listener
+            const newPasswordField = document.getElementById('newPassword');
+            if (newPasswordField) {
+                newPasswordField.addEventListener('input', function() {
+                    checkPasswordStrength(this.value);
+                });
+            }
+            
+            // Password match validation
+            const confirmPasswordField = document.getElementById('confirmPassword');
+            if (confirmPasswordField) {
+                confirmPasswordField.addEventListener('input', function() {
+                    const newPass = document.getElementById('newPassword').value;
+                    const errorDiv = document.getElementById('passwordMatchError');
+                    
+                    if (this.value !== newPass) {
+                        errorDiv.textContent = 'Passwords do not match';
+                    } else {
+                        errorDiv.textContent = '';
+                    }
+                });
+            }
+            
+            // Handle password change
+            const savePasswordBtn = document.getElementById('savePasswordBtn');
+            if (savePasswordBtn) {
+                savePasswordBtn.addEventListener('click', async function() {
+                    const currentPassword = document.getElementById('currentPassword').value;
+                    const newPassword = document.getElementById('newPassword').value;
+                    const confirmPassword = document.getElementById('confirmPassword').value;
+                    
+                    if (!currentPassword || !newPassword || !confirmPassword) {
+                        app.showToast('Please fill in all password fields', 'error');
+                        return;
+                    }
+                    
+                    if (newPassword !== confirmPassword) {
+                        app.showToast('Passwords do not match', 'error');
+                        return;
+                    }
+                    
+                    if (newPassword.length < 6) {
+                        app.showToast('Password must be at least 6 characters', 'error');
+                        return;
+                    }
+                    
+                    const originalText = this.textContent;
+                    this.disabled = true;
+                    this.textContent = 'Changing...';
+                    
+                    try {
+                        const response = await fetch('{% url "account:api_change_password" %}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': app.getCSRFToken()
+                            },
+                            body: JSON.stringify({
+                                current_password: currentPassword,
+                                new_password: newPassword
+                            })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (response.ok) {
+                            app.showToast('Password changed successfully!', 'success');
+                            
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('settingsModal'));
+                            modal.hide();
+                            
+                            document.getElementById('changePasswordForm').reset();
+                            document.getElementById('passwordStrengthBar').style.width = '0%';
+                        } else {
+                            const errorMsg = data.error || data.message || 'Failed to change password';
+                            app.showToast(errorMsg, 'error');
+                            document.getElementById('settingsMessage').innerHTML = `
+                                <div class="alert alert-danger rounded-3 py-2">${errorMsg}</div>
+                            `;
+                        }
+                    } catch (error) {
+                        app.showToast('An error occurred. Please try again.', 'error');
+                        console.error('Error:', error);
+                    } finally {
+                        this.disabled = false;
+                        this.textContent = originalText;
+                    }
+                });
+            }
+            
+            // Clear messages when modals are opened
+            const editProfileModal = document.getElementById('editProfileModal');
+            if (editProfileModal) {
+                editProfileModal.addEventListener('show.bs.modal', function() {
+                    const messageDiv = document.getElementById('profileMessage');
+                    if (messageDiv) messageDiv.innerHTML = '';
+                });
+            }
+            
+            const settingsModal = document.getElementById('settingsModal');
+            if (settingsModal) {
+                settingsModal.addEventListener('show.bs.modal', function() {
+                    const messageDiv = document.getElementById('settingsMessage');
+                    if (messageDiv) messageDiv.innerHTML = '';
+                });
+            }
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

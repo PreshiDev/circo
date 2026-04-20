@@ -1,0 +1,367 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Circo · Relationship Intelligence{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-3 px-md-4" style="background: #f8fafc; min-height: calc(100vh - 73px); overflow-x: hidden;">
+    <div class="row align-items-center py-4 py-lg-0" style="min-height: calc(100vh - 73px);">
+        <div class="col-12 col-lg-10 mx-auto">
+            <div class="row align-items-center g-4 g-lg-5">
+                
+                <!-- Left Column - Main Message -->
+                <div class="col-12 col-lg-6">
+                    <div class="pe-lg-4">
+                        
+                        <!-- Logo and Badge -->
+                        <div class="d-flex flex-wrap align-items-center gap-3 mb-4">
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-3 d-flex align-items-center justify-content-center" 
+                                     style="width: clamp(40px, 10vw, 48px); height: clamp(40px, 10vw, 48px); background: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%);">
+                                    <span style="color: white; font-weight: 600; font-size: clamp(1.2rem, 4vw, 1.5rem); letter-spacing: -0.5px;">C</span>
+                                </div>
+                                <span class="ms-2 fw-semibold" style="color: #1e293b; font-size: clamp(1.1rem, 3.5vw, 1.25rem);">Circo</span>
+                            </div>
+                            <span class="badge rounded-pill px-3 py-2" 
+                                  style="background: #e0e7ff; color: #3730a3; font-weight: 400; font-size: clamp(0.65rem, 2vw, 0.75rem); letter-spacing: 0.3px;">
+                                ✨ Stay Connected Effortlessly
+                            </span>
+                        </div>
+                        
+                        <!-- Main Heading -->
+                        <h1 class="display-4 fw-light mb-3" style="color: #0f172a; letter-spacing: -0.02em; line-height: 1.2; word-wrap: break-word; font-size: clamp(2rem, 6vw, 3.5rem);">
+                            Never lose touch with 
+                            <span style="font-weight: 500; background: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                                people who matter
+                            </span>
+                        </h1>
+                        
+                        <!-- Subheading -->
+                        <p class="lead mb-4" style="color: #64748b; font-size: clamp(0.95rem, 2.5vw, 1.1rem); font-weight: 350; line-height: 1.6;">
+                            Circo helps you track interactions, remember important events, 
+                            and nurture meaningful relationships—all in one beautiful space.
+                        </p>
+                        
+                        <!-- Feature List - Always visible on all screens -->
+                        <div class="row g-3 mb-4 mb-lg-5">
+                            <div class="col-12 col-sm-6">
+                                <div class="d-flex align-items-start gap-2 gap-md-3">
+                                    <div class="rounded-3 p-2 flex-shrink-0" style="background: #ffffff; border: 1px solid #e2e8f0;">
+                                        <i class="bi bi-bell" style="color: #3b82f6; font-size: clamp(1rem, 3vw, 1.2rem);"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="fw-medium mb-1" style="color: #1e293b; font-size: clamp(0.85rem, 2.5vw, 0.95rem);">Smart Reminders</h6>
+                                        <p class="small mb-0" style="color: #64748b; font-size: clamp(0.75rem, 2vw, 0.875rem);">Never miss a follow-up or important date</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="d-flex align-items-start gap-2 gap-md-3">
+                                    <div class="rounded-3 p-2 flex-shrink-0" style="background: #ffffff; border: 1px solid #e2e8f0;">
+                                        <i class="bi bi-calendar-heart" style="color: #ec4899; font-size: clamp(1rem, 3vw, 1.2rem);"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="fw-medium mb-1" style="color: #1e293b; font-size: clamp(0.85rem, 2.5vw, 0.95rem);">Event Tracking</h6>
+                                        <p class="small mb-0" style="color: #64748b; font-size: clamp(0.75rem, 2vw, 0.875rem);">Keep track of birthdays and special moments</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="d-flex align-items-start gap-2 gap-md-3">
+                                    <div class="rounded-3 p-2 flex-shrink-0" style="background: #ffffff; border: 1px solid #e2e8f0;">
+                                        <i class="bi bi-people" style="color: #10b981; font-size: clamp(1rem, 3vw, 1.2rem);"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="fw-medium mb-1" style="color: #1e293b; font-size: clamp(0.85rem, 2.5vw, 0.95rem);">Alumni Network</h6>
+                                        <p class="small mb-0" style="color: #64748b; font-size: clamp(0.75rem, 2vw, 0.875rem);">Connect with your professional community</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="d-flex align-items-start gap-2 gap-md-3">
+                                    <div class="rounded-3 p-2 flex-shrink-0" style="background: #ffffff; border: 1px solid #e2e8f0;">
+                                        <i class="bi bi-lightning-charge" style="color: #f59e0b; font-size: clamp(1rem, 3vw, 1.2rem);"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="fw-medium mb-1" style="color: #1e293b; font-size: clamp(0.85rem, 2.5vw, 0.95rem);">Quick Actions</h6>
+                                        <p class="small mb-0" style="color: #64748b; font-size: clamp(0.75rem, 2vw, 0.875rem);">Log interactions in seconds, not minutes</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- CTA Buttons - Stack on mobile -->
+                        <div class="d-flex flex-column flex-sm-row gap-2 gap-sm-3">
+                            <a href="{% url 'account:register' %}" 
+                               class="btn btn-dark px-4 py-3 rounded-3 d-inline-flex align-items-center justify-content-center w-100 w-sm-auto"
+                               style="background: #1e293b; border: none; font-weight: 400; font-size: clamp(0.9rem, 2.5vw, 1rem); transition: all 0.2s ease;">
+                                Start free trial
+                                <i class="bi bi-arrow-right ms-2"></i>
+                            </a>
+                            <a href="{% url 'account:login' %}" 
+                               class="btn btn-outline-secondary px-4 py-3 rounded-3 d-inline-flex align-items-center justify-content-center w-100 w-sm-auto"
+                               style="border-color: #cbd5e1; color: #475569; font-weight: 400; font-size: clamp(0.9rem, 2.5vw, 1rem); transition: all 0.2s ease;">
+                                Sign in to your account
+                            </a>
+                        </div>
+                        
+                        <!-- Trust Indicator -->
+                        <p class="small text-muted mt-4" style="color: #94a3b8 !important; font-size: clamp(0.75rem, 2vw, 0.875rem);">
+                            <i class="bi bi-shield-check me-1"></i>
+                            Free forever. No credit card required.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Right Column - Visual (Always visible on all screens) -->
+                <div class="col-12 col-lg-6 mt-4 mt-lg-0">
+                    <div class="position-relative">
+                        <!-- Decorative Background -->
+                        <div class="position-absolute top-50 start-50 translate-middle d-none d-md-block" 
+                             style="width: min(400px, 80vw); height: min(400px, 80vw); background: radial-gradient(circle, rgba(59,130,246,0.05) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; z-index: 0;">
+                        </div>
+                        
+                        <!-- Main Card -->
+                        <div class="bg-white rounded-4 p-3 p-md-4 position-relative" 
+                             style="border: 1px solid #e2e8f0; box-shadow: 0 20px 40px -20px rgba(0,0,0,0.1); z-index: 1; max-width: 100%;">
+                            
+                            <!-- Mock Dashboard Header -->
+                            <div class="d-flex align-items-center justify-content-between mb-3 mb-md-4">
+                                <div>
+                                    <div class="bg-light rounded-3" style="width: min(120px, 30vw); height: 8px;"></div>
+                                    <div class="bg-light rounded-3 mt-2" style="width: min(80px, 20vw); height: 6px;"></div>
+                                </div>
+                                <div class="rounded-circle" style="width: clamp(28px, 8vw, 32px); height: clamp(28px, 8vw, 32px); background: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%);"></div>
+                            </div>
+                            
+                            <!-- Mock Stats -->
+                            <div class="row g-2 g-md-3 mb-3 mb-md-4">
+                                <div class="col-4">
+                                    <div class="bg-light rounded-3 p-2 p-md-3" style="background: #f8fafc !important;">
+                                        <div class="small text-muted mb-1" style="font-size: clamp(0.65rem, 2vw, 0.75rem);">Connections</div>
+                                        <div class="fw-bold" style="color: #1e293b; font-size: clamp(1rem, 3vw, 1.25rem);">142</div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="bg-light rounded-3 p-2 p-md-3" style="background: #f8fafc !important;">
+                                        <div class="small text-muted mb-1" style="font-size: clamp(0.65rem, 2vw, 0.75rem);">Events</div>
+                                        <div class="fw-bold" style="color: #1e293b; font-size: clamp(1rem, 3vw, 1.25rem);">8</div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="bg-light rounded-3 p-2 p-md-3" style="background: #f8fafc !important;">
+                                        <div class="small text-muted mb-1" style="font-size: clamp(0.65rem, 2vw, 0.75rem);">Reconnect</div>
+                                        <div class="fw-bold" style="color: #1e293b; font-size: clamp(1rem, 3vw, 1.25rem);">3</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Mock Contact List -->
+                            <div class="vstack gap-2 gap-md-3">
+                                <!-- Contact 1 -->
+                                <div class="d-flex align-items-center gap-2 gap-md-3 flex-wrap flex-md-nowrap">
+                                    <div class="rounded-circle flex-shrink-0" style="width: clamp(32px, 8vw, 40px); height: clamp(32px, 8vw, 40px); background: #64748b;"></div>
+                                    <div class="flex-grow-1">
+                                        <div class="fw-medium" style="color: #1e293b; font-size: clamp(0.85rem, 2.5vw, 1rem);">Sarah Chen</div>
+                                        <div class="small text-muted text-truncate" style="font-size: clamp(0.7rem, 2vw, 0.8rem);">Last contact: 3 days ago</div>
+                                    </div>
+                                    <div class="badge rounded-pill px-2 px-md-3 py-1 py-md-2" style="background: #10b981; color: white; font-size: clamp(0.65rem, 2vw, 0.75rem);">Connected</div>
+                                </div>
+                                
+                                <!-- Contact 2 -->
+                                <div class="d-flex align-items-center gap-2 gap-md-3 flex-wrap flex-md-nowrap">
+                                    <div class="rounded-circle flex-shrink-0" style="width: clamp(32px, 8vw, 40px); height: clamp(32px, 8vw, 40px); background: #64748b;"></div>
+                                    <div class="flex-grow-1">
+                                        <div class="fw-medium" style="color: #1e293b; font-size: clamp(0.85rem, 2.5vw, 1rem);">Marcus Rivera</div>
+                                        <div class="small text-muted text-truncate" style="font-size: clamp(0.7rem, 2vw, 0.8rem);">Birthday next week</div>
+                                    </div>
+                                    <div class="badge rounded-pill px-2 px-md-3 py-1 py-md-2" style="background: #fef3c7; color: #92400e; font-size: clamp(0.65rem, 2vw, 0.75rem);">🎂 Soon</div>
+                                </div>
+                                
+                                <!-- Contact 3 -->
+                                <div class="d-flex align-items-center gap-2 gap-md-3 flex-wrap flex-md-nowrap">
+                                    <div class="rounded-circle flex-shrink-0" style="width: clamp(32px, 8vw, 40px); height: clamp(32px, 8vw, 40px); background: #64748b;"></div>
+                                    <div class="flex-grow-1">
+                                        <div class="fw-medium" style="color: #1e293b; font-size: clamp(0.85rem, 2.5vw, 1rem);">Dr. Emily Watson</div>
+                                        <div class="small text-muted text-truncate" style="font-size: clamp(0.7rem, 2vw, 0.8rem);">Meeting tomorrow</div>
+                                    </div>
+                                    <div class="badge rounded-pill px-2 px-md-3 py-1 py-md-2" style="background: #f1f5f9; color: #475569; font-size: clamp(0.65rem, 2vw, 0.75rem);">Pending</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Decorative Dots -->
+                            <div class="mt-3 mt-md-4 pt-1 pt-md-2">
+                                <div class="d-flex gap-1 justify-content-center">
+                                    <div class="rounded-circle" style="width: clamp(4px, 1.5vw, 6px); height: clamp(4px, 1.5vw, 6px); background: #cbd5e1;"></div>
+                                    <div class="rounded-circle" style="width: clamp(4px, 1.5vw, 6px); height: clamp(4px, 1.5vw, 6px); background: #94a3b8;"></div>
+                                    <div class="rounded-circle" style="width: clamp(4px, 1.5vw, 6px); height: clamp(4px, 1.5vw, 6px); background: #64748b;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Floating Elements - Responsive positioning -->
+                        <div class="position-absolute top-0 end-0 translate-middle-x d-none d-sm-block" style="z-index: 2;">
+                            <div class="bg-white rounded-3 p-2 p-md-3 shadow-sm" style="border: 1px solid #e2e8f0;">
+                                <div class="d-flex align-items-center gap-1 gap-md-2">
+                                    <i class="bi bi-star-fill" style="color: #fbbf24; font-size: clamp(0.75rem, 2vw, 0.9rem);"></i>
+                                    <span class="small fw-medium" style="color: #1e293b; font-size: clamp(0.7rem, 2vw, 0.875rem);">4.9 rating</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="position-absolute bottom-0 start-0 translate-middle-x d-none d-sm-block" style="z-index: 2;">
+                            <div class="bg-white rounded-3 p-2 p-md-3 shadow-sm" style="border: 1px solid #e2e8f0;">
+                                <div class="d-flex align-items-center gap-1 gap-md-2">
+                                    <i class="bi bi-emoji-smile" style="color: #10b981; font-size: clamp(0.75rem, 2vw, 0.9rem);"></i>
+                                    <span class="small fw-medium" style="color: #1e293b; font-size: clamp(0.7rem, 2vw, 0.875rem);">2k+ happy users</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mobile-only stats card (visible below sm breakpoint) -->
+            <div class="row d-sm-none mt-3">
+                <div class="col-12">
+                    <div class="bg-white rounded-4 p-3" style="border: 1px solid #e2e8f0;">
+                        <div class="d-flex justify-content-around text-center">
+                            <div>
+                                <div class="fw-bold fs-5" style="color: #1e293b;">4.9</div>
+                                <div class="small text-muted">
+                                    <i class="bi bi-star-fill" style="color: #fbbf24; font-size: 0.7rem;"></i> Rating
+                                </div>
+                            </div>
+                            <div>
+                                <div class="fw-bold fs-5" style="color: #1e293b;">2k+</div>
+                                <div class="small text-muted">Happy Users</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Mobile Responsiveness */
+    @media (max-width: 576px) {
+        .container-fluid {
+            padding-left: 0.75rem !important;
+            padding-right: 0.75rem !important;
+        }
+        
+        .btn {
+            padding: 0.75rem 1rem !important;
+            white-space: normal;
+            word-break: break-word;
+        }
+        
+        .gap-2 {
+            gap: 0.5rem !important;
+        }
+        
+        .badge {
+            white-space: normal;
+            word-break: break-word;
+        }
+    }
+    
+    @media (min-width: 577px) and (max-width: 768px) {
+        .container-fluid {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+    }
+    
+    /* Button hover effects */
+    .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .btn-outline-secondary:hover {
+        background: #f8fafc;
+        border-color: #94a3b8 !important;
+    }
+    
+    /* Smooth transitions */
+    .bg-white {
+        transition: all 0.3s ease;
+    }
+    
+    /* Prevent overflow */
+    * {
+        max-width: 100%;
+    }
+    
+    img, svg, video, canvas, audio, iframe, embed, object {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    /* Custom width utilities */
+    .w-sm-auto {
+        width: auto !important;
+    }
+    
+    @media (max-width: 576px) {
+        .w-sm-auto {
+            width: 100% !important;
+        }
+    }
+    
+    /* Text truncation for mobile */
+    .text-truncate {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    /* Flexible images */
+    .rounded-circle {
+        object-fit: cover;
+    }
+    
+    /* Gradient text fallback */
+    @supports not (-webkit-background-clip: text) {
+        .display-4 span {
+            background: none !important;
+            -webkit-text-fill-color: #3b82f6 !important;
+            color: #3b82f6;
+        }
+    }
+    
+    /* Better touch targets for mobile */
+    @media (max-width: 768px) {
+        .btn, .dropdown-item, [data-bs-toggle="modal"] {
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+        }
+    }
+    
+    /* Responsive spacing */
+    .row {
+        --bs-gutter-x: 1rem;
+    }
+    
+    @media (min-width: 768px) {
+        .row {
+            --bs-gutter-x: 1.5rem;
+        }
+    }
+    
+    @media (min-width: 992px) {
+        .row {
+            --bs-gutter-x: 2rem;
+        }
+    }
+</style>
+
+<!-- Add Bootstrap Icons if not already in base template -->
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+{% endblock %}
+{% endblock %}
