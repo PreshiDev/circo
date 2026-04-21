@@ -30,7 +30,13 @@
                 
                 <div id="message"></div>
                 
-                <form id="registerForm">
+                <form id="registerForm"
+                      hx-post="{% url 'account:api_register' %}"
+                      hx-trigger="submit"
+                      hx-target="#message"
+                      hx-swap="innerHTML"
+                      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                      hx-indicator="#registerBtn">
                     {% csrf_token %}
                     
                     <!-- Full Name Field -->
@@ -43,6 +49,7 @@
                             <input type="text" 
                                    class="form-control border-start-0 ps-0" 
                                    id="full_name" 
+                                   name="full_name"
                                    placeholder="John Doe" 
                                    required
                                    style="border-color: #e2e8f0;">
@@ -59,6 +66,7 @@
                             <input type="email" 
                                    class="form-control border-start-0 ps-0" 
                                    id="email" 
+                                   name="email"
                                    placeholder="you@example.com" 
                                    required
                                    style="border-color: #e2e8f0;">
@@ -75,6 +83,7 @@
                             <input type="text" 
                                    class="form-control border-start-0 ps-0" 
                                    id="phone_number" 
+                                   name="phone_number"
                                    placeholder="+1 (555) 123-4567"
                                    style="border-color: #e2e8f0;">
                         </div>
@@ -90,6 +99,7 @@
                             <input type="password" 
                                    class="form-control border-start-0 border-end-0 ps-0" 
                                    id="password" 
+                                   name="password"
                                    placeholder="••••••••" 
                                    required
                                    style="border-color: #e2e8f0;">
@@ -101,7 +111,7 @@
                             </button>
                         </div>
                         
-                        <!-- Password Strength Indicator (Visual Enhancement Only) -->
+                        <!-- Password Strength Indicator -->
                         <div class="password-strength mt-2" id="passwordStrengthWrapper" style="display: none;">
                             <div class="password-strength-bar rounded-pill" id="passwordStrengthBar" 
                                  style="height: 4px; width: 0%; transition: all 0.3s ease;"></div>
@@ -116,7 +126,8 @@
                             class="btn btn-dark w-100 rounded-3 py-2"
                             id="registerBtn"
                             style="background: #1e293b; border: none; font-weight: 400;">
-                        Create Account
+                        <span class="htmx-indicator-hide">Create Account</span>
+                        <span class="htmx-indicator">Creating account...</span>
                     </button>
                 </form>
                 
@@ -221,6 +232,24 @@
         border: 1px solid #fecaca;
     }
     
+    /* HTMX indicator */
+    .htmx-indicator {
+        display: none;
+    }
+    
+    .htmx-request .htmx-indicator {
+        display: inline;
+    }
+    
+    .htmx-request .htmx-indicator-hide {
+        display: none;
+    }
+    
+    .htmx-request#registerBtn {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+    
     /* Smooth transitions */
     .bg-white {
         transition: all 0.3s ease;
@@ -230,9 +259,7 @@
 
 {% block extra_js %}
 <script>
-const registerUrl = "{% url 'account:register' %}".replace("register/", "api/auth/register/");
-
-// Toggle password visibility (UI enhancement only)
+// Toggle password visibility
 function togglePasswordVisibility() {
     const passwordInput = document.getElementById('password');
     const toggleIcon = document.getElementById('togglePasswordIcon');
@@ -248,7 +275,7 @@ function togglePasswordVisibility() {
     }
 }
 
-// Password strength checker (visual enhancement only - doesn't block submission)
+// Password strength checker
 function checkPasswordStrength(password) {
     const wrapper = document.getElementById('passwordStrengthWrapper');
     const bar = document.getElementById('passwordStrengthBar');
@@ -293,49 +320,44 @@ function checkPasswordStrength(password) {
 document.addEventListener("DOMContentLoaded", function() {
     const passwordInput = document.getElementById('password');
     
-    // Add password strength listener (visual only)
+    // Add password strength listener
     passwordInput.addEventListener('input', function() {
         checkPasswordStrength(this.value);
     });
-});
-
-// Original registration functionality preserved exactly
-document.getElementById("registerForm").addEventListener("submit", async function(e) {
-    e.preventDefault();
-
-    const messageDiv = document.getElementById("message");
-    messageDiv.innerHTML = "";
     
-    const registerBtn = document.getElementById("registerBtn");
-    const originalText = registerBtn.textContent;
-    registerBtn.textContent = "Creating account...";
-    registerBtn.disabled = true;
-
-    const response = await fetch(registerUrl, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            full_name: document.getElementById("full_name").value,
-            email: document.getElementById("email").value,
-            phone_number: document.getElementById("phone_number").value,
-            password: document.getElementById("password").value
-        })
+    // HTMX event handlers
+    document.body.addEventListener('htmx:afterRequest', function(evt) {
+        if (evt.detail.target.id === 'message') {
+            const response = JSON.parse(evt.detail.xhr.responseText);
+            
+            // Check if registration was successful
+            if (evt.detail.xhr.status === 201) {
+                setTimeout(() => {
+                    window.location.href = "{% url 'account:login' %}";
+                }, 1500);
+            }
+        }
     });
-
-    const data = await response.json();
-
-    if (response.ok) {
-        messageDiv.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
-        setTimeout(() => {
-            window.location.href = "{% url 'account:login' %}";
-        }, 1500);
-    } else {
-        registerBtn.textContent = originalText;
-        registerBtn.disabled = false;
-        messageDiv.innerHTML = `<div class="alert alert-danger">${JSON.stringify(data)}</div>`;
-    }
+    
+    // Handle HTMX errors to ensure proper formatting
+    document.body.addEventListener('htmx:responseError', function(evt) {
+        if (evt.detail.target.id === 'message') {
+            try {
+                const response = JSON.parse(evt.detail.xhr.responseText);
+                let errorMessage = "Registration failed";
+                
+                if (response.detail) {
+                    errorMessage = response.detail;
+                } else if (typeof response === 'object') {
+                    errorMessage = Object.values(response).flat().join(', ');
+                }
+                
+                evt.detail.target.innerHTML = `<div class="alert alert-danger">${errorMessage}</div>`;
+            } catch (e) {
+                evt.detail.target.innerHTML = `<div class="alert alert-danger">Registration failed. Please try again.</div>`;
+            }
+        }
+    });
 });
 </script>
 {% endblock %}

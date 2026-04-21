@@ -3,17 +3,14 @@ from .models import User
 from django.contrib.auth import authenticate
 
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True, required=True)
 
     class Meta:
         model = User
         fields = ['email', 'full_name', 'phone_number', 'password']
 
     def create(self, validated_data):
-        password = validated_data.pop('password')
-        user = User.objects.create_user(password=password, **validated_data)
-        return user
-    
+        return User.objects.create_user(**validated_data)
 
 
 class LoginSerializer(serializers.Serializer):

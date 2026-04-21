@@ -46,24 +46,44 @@ def detect_alumni(text):
     return False, None
 
 
-
+# ✅ API REGISTER
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
 
     def create(self, request, *args, **kwargs):
+        print(f"[DEBUG] RegisterView.create called")
+        print(f"[DEBUG] Request method: {request.method}")
+        print(f"[DEBUG] Request path: {request.path}")
+        print(f"[DEBUG] Request data: {request.data}")
+        print(f"[DEBUG] Request headers: {dict(request.headers)}")
+        
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
+        print(f"[DEBUG] Serializer initialized: {serializer.__class__.__name__}")
+        
+        try:
+            serializer.is_valid(raise_exception=True)
+            print(f"[DEBUG] Serializer validation passed")
+            print(f"[DEBUG] Validated data: {serializer.validated_data}")
+            
+            user = serializer.save()
+            print(f"[DEBUG] User created - ID: {user.id}, Email: {user.email}, Name: {user.full_name}")
 
-        return Response({
-            "message": "User registered successfully",
-            "user": {
-                "id": user.id,
-                "email": user.email,
-                "full_name": user.full_name
+            response_data = {
+                "message": "User registered successfully",
+                "user": {
+                    "id": user.id,
+                    "email": user.email,
+                    "full_name": user.full_name
+                }
             }
-        }, status=status.HTTP_201_CREATED)
-    
+            print(f"[DEBUG] Returning response: {response_data}")
+            
+            return Response(response_data, status=status.HTTP_201_CREATED)
+            
+        except Exception as e:
+            print(f"[DEBUG] Validation failed: {e}")
+            print(f"[DEBUG] Serializer errors: {serializer.errors}")
+            raise
 
 
 
