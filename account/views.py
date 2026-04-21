@@ -128,6 +128,9 @@ from .models import Contact, Event
 # =========================
 # views.py - Updated DashboardAPIView
 
+from .utils import send_dashboard_email  # ✅ reuse shared logic
+
+
 class DashboardAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -143,27 +146,24 @@ class DashboardAPIView(APIView):
             Q(last_interaction__lt=cutoff) | Q(last_interaction__isnull=True)
         ).order_by('last_interaction')
 
-        # 🎂 UPCOMING EVENTS - Fixed to show events by date proximity
-        next_week = today + timedelta(days=7)
-        next_month = today + timedelta(days=30)  # Extended range for better visibility
-        
+        # 🎂 UPCOMING EVENTS - Ordered by closest date
         upcoming_events = Event.objects.filter(
             user=user,
-            date__gte=today  # Only future events
-        ).select_related('contact').order_by('date')[:10]  # Order by closest date
+            date__gte=today
+        ).select_related('contact').order_by('date')[:10]
 
         # 📍 RECENT CONTACTS
         recent_contacts = Contact.objects.filter(
             user=user
         ).order_by('-created_at')[:10]
 
-        # 🎓 ALUMNI with interaction status
+        # 🎓 ALUMNI
         alumni_contacts = Contact.objects.filter(
-            user=user, 
+            user=user,
             is_alumni=True
         ).order_by('name')
 
-        # Format alumni data with interaction status
+        # Format alumni data
         alumni_data = []
         for contact in alumni_contacts:
             alumni_data.append({
@@ -175,6 +175,9 @@ class DashboardAPIView(APIView):
                 "last_interaction": contact.last_interaction,
                 "interaction_count": contact.interaction_count
             })
+
+        # ✅ SEND EMAIL (same logic as template view)
+        send_dashboard_email(user, reconnect_contacts, upcoming_events, today)
 
         return Response({
             "reconnect": [
@@ -211,6 +214,8 @@ class DashboardAPIView(APIView):
 
             "alumni": alumni_data
         })
+    
+
 
 # =========================
 # 🧠 TEMPLATE DASHBOARD VIEW
@@ -219,24 +224,27 @@ class DashboardAPIView(APIView):
 
 # views.py - Updated dashboard_view
 
+from .utils import send_dashboard_email  # ✅ import helper
+
+
 @login_required
 def dashboard_view(request):
     user = request.user
     today = timezone.now().date()
     cutoff = today - timedelta(days=90)
 
-    # Reconnect contacts (90+ days no interaction)
+    # Reconnect contacts
     reconnect_contacts = Contact.objects.filter(
         user=user
     ).filter(
         Q(last_interaction__lt=cutoff) | Q(last_interaction__isnull=True)
     ).order_by('last_interaction')
 
-    # Upcoming events - ALL future events ordered by date
+    # Upcoming events
     upcoming_events = Event.objects.filter(
         user=user,
         date__gte=today
-    ).select_related('contact').order_by('date')[:5]  # Show closest 5 events
+    ).select_related('contact').order_by('date')[:5]
 
     # Recent contacts
     recent_contacts = Contact.objects.filter(
@@ -245,14 +253,17 @@ def dashboard_view(request):
 
     # Alumni contacts
     alumni_contacts = Contact.objects.filter(
-        user=user, 
+        user=user,
         is_alumni=True
     ).order_by('name')
-    
-    # All contacts for event creation dropdown
+
+    # All contacts
     all_contacts = Contact.objects.filter(
         user=user
     ).order_by('name')
+
+    # ✅ SEND EMAIL (same logic reused)
+    send_dashboard_email(user, reconnect_contacts, upcoming_events, today)
 
     return render(request, "account/dashboard.html", {
         "user": user,
@@ -260,9 +271,10 @@ def dashboard_view(request):
         "upcoming_events": upcoming_events,
         "recent_contacts": recent_contacts,
         "alumni_contacts": alumni_contacts,
-        "all_contacts": all_contacts,  # For event creation
+        "all_contacts": all_contacts,
         "today": today,
     })
+
 
 
 from rest_framework.views import APIView

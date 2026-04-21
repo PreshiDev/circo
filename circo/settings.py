@@ -89,13 +89,24 @@ WSGI_APPLICATION = 'circo.wsgi.application'
 #     }
 # }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'circo',
+#         'USER': 'circo_user',
+#         'PASSWORD': 'hpozV7AfgGVWWQ3OdZKjPZrDJt8plv0J',
+#         'HOST': 'dpg-d7jbsohkh4rs73fjih30-a',
+#         'PORT': '5432',
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'circo',
-        'USER': 'circo_user',
-        'PASSWORD': 'hpozV7AfgGVWWQ3OdZKjPZrDJt8plv0J',
-        'HOST': 'dpg-d7jbsohkh4rs73fjih30-a',
+        'NAME': 'upkqvqgd_circo',
+        'USER': 'upkqvqgd_circoapp',
+        'PASSWORD': 'relationship6000',
+        'HOST': 'localhost',
         'PORT': '5432',
     }
 }
@@ -146,3 +157,17 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
+
+
+
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'circo.custom_email_backend.CustomEmailBackend'
+EMAIL_HOST = 'mail.circo.com.ng'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'circoapp@circo.com.ng'
+EMAIL_HOST_PASSWORD = 'confirmation@9000'
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False  # Make sure this is False when using TLS
+EMAIL_TIMEOUT = 30  # Add timeout
+DEFAULT_FROM_EMAIL = 'circoapp@circo.com.ng'  # Important for email headers
+SERVER_EMAIL = 'circoapp@circo.com.ng'  # For admin emails

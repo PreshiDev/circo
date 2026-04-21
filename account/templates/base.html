@@ -3,8 +3,51 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>{% block title %}Circo{% endblock %}</title>
+
+    <title>{% block title %}Circo - Relationship & Interaction Manager{% endblock %}</title>
+
+    <!-- ================= SEO META ================= -->
+    <meta name="description" content="Circo is a smart relationship management platform that helps users track interactions, remember important events, nurture relationships, and stay connected with people who matter.">
+
+    <meta name="keywords" content="Circo, relationship manager, contact tracking app, CRM for individuals, interaction tracking, alumni network, reminder app, personal CRM, networking tool">
+
+    <meta name="author" content="Circo Team">
+
+    <meta name="robots" content="index, follow">
+
+    <link rel="canonical" href="https://your-domain.com/">
+
+    <!-- ================= OPEN GRAPH (FACEBOOK / LINKEDIN) ================= -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Circo - Stay Connected Effortlessly">
+    <meta property="og:description" content="Circo helps you track interactions, remember important events, and nurture meaningful relationships in one beautiful space.">
+    <meta property="og:image" content="{% static 'images/circoapp_logo.jpg' %}">
+    <meta property="og:url" content="https://your-domain.com/">
+    <meta property="og:site_name" content="Circo">
+
+    <!-- ================= TWITTER CARD ================= -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Circo - Relationship Management Made Simple">
+    <meta name="twitter:description" content="Track interactions, remember events, and stay connected with important people effortlessly.">
+    <meta name="twitter:image" content="{% static 'images/circoapp_logo.jpg' %}">
+
+    <!-- ================= STRUCTURED DATA (VERY IMPORTANT FOR AI + SEO) ================= -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Circo",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Web",
+        "description": "Circo is a relationship management and interaction tracking platform that helps users remember important events, nurture relationships, and stay connected with people.",
+        "offers": {
+            "@type": "Offer",
+            "price": "0"
+        }
+    }
+    </script>
 
     <!-- favicon added -->
     <link rel="icon" type="image/png" href="{% static 'images/circoapp_logo.jpg' %}">

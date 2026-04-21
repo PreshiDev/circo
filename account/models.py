@@ -34,6 +34,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     # App-specific fields
     profile_picture = models.ImageField(upload_to='profiles/', blank=True, null=True)
     last_seen = models.DateTimeField(blank=True, null=True)
+    last_dashboard_email_sent = models.DateField(null=True, blank=True)
 
     objects = UserManager()
 
