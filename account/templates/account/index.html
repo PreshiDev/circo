@@ -1,219 +1,152 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Circo · Relationship Intelligence{% endblock %}
+{% block title %}Circ○ · Relationship Memory & Reconnect Reminders{% endblock %}
 
 {% block content %}
-<div class="container-fluid px-3 px-md-4" style="background: #f8fafc; min-height: calc(100vh - 73px); overflow-x: hidden;">
-    <div class="row align-items-center py-4 py-lg-0" style="min-height: calc(100vh - 73px);">
+<div class="container-fluid px-3 px-md-4" style="background: #ffffff; min-height: 100vh; overflow-x: hidden;">
+    <div class="row align-items-center" style="min-height: calc(100vh - 73px);">
         <div class="col-12 col-lg-10 mx-auto">
-            <div class="row align-items-center g-4 g-lg-5">
+            
+            <!-- ==================== SECTION 1: HERO (Above the Fold) ==================== -->
+            <div class="row align-items-center g-4 g-lg-5 py-4 py-lg-5">
                 
-                <!-- Left Column - Main Message -->
+                <!-- Left Column - Clear, Powerful Message -->
                 <div class="col-12 col-lg-6">
                     <div class="pe-lg-4">
                         
-                        <!-- Logo and Badge -->
-                        <div class="d-flex flex-wrap align-items-center gap-3 mb-4">
-                            <div class="d-flex align-items-center">
-                                <div class="rounded-3 d-flex align-items-center justify-content-center" 
-                                     style="width: clamp(40px, 10vw, 48px); height: clamp(40px, 10vw, 48px); background: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%);">
-                                    <span style="color: white; font-weight: 600; font-size: clamp(1.2rem, 4vw, 1.5rem); letter-spacing: -0.5px;">C</span>
-                                </div>
-                                <span class="ms-2 fw-semibold" style="color: #1e293b; font-size: clamp(1.1rem, 3.5vw, 1.25rem);">Circo</span>
-                            </div>
-                            <span class="badge rounded-pill px-3 py-2" 
-                                  style="background: #e0e7ff; color: #3730a3; font-weight: 400; font-size: clamp(0.65rem, 2vw, 0.75rem); letter-spacing: 0.3px;">
-                                ✨ Stay Connected Effortlessly
+                        <!-- Strong Brand Identity with Actual Logo + Blue SVG Circle -->
+                        <div class="d-flex align-items-center gap-2 mb-4">
+                            <img src="{% static 'images/circoapp_logo.jpg' %}" alt="Circo Logo" style="width: 44px; height: 44px; border-radius: 10px; object-fit: cover;">
+                            <span class="fw-bold d-flex align-items-center" style="color: #0a1930; font-size: 1.5rem; letter-spacing: -0.5px;">
+                                Circ
+                                <!-- Blue SVG Circle replacement for emoji -->
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin: 0 1px;">
+                                    <circle cx="12" cy="12" r="10" fill="#3b82f6" stroke="#3b82f6" stroke-width="2"/>
+                                </svg>
                             </span>
                         </div>
                         
-                        <!-- Main Heading -->
-                        <h1 class="display-4 fw-light mb-3" style="color: #0f172a; letter-spacing: -0.02em; line-height: 1.2; word-wrap: break-word; font-size: clamp(2rem, 6vw, 3.5rem);">
-                            Never lose touch with 
-                            <span style="font-weight: 500; background: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
-                                people who matter
-                            </span>
+                        <!-- Headline: "Never forget people you meet again." -->
+                        <h1 class="display-4 fw-bold mb-3" style="color: #0a1930; letter-spacing: -0.03em; line-height: 1.2; font-size: clamp(2rem, 8vw, 3.8rem); word-break: break-word;">
+                            Never forget<br> 
+                            <span style="background: linear-gradient(135deg, #0a1930 0%, #3b82f6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                                people you meet
+                            </span> 
+                            again.
                         </h1>
                         
-                        <!-- Subheading -->
-                        <p class="lead mb-4" style="color: #64748b; font-size: clamp(0.95rem, 2.5vw, 1.1rem); font-weight: 350; line-height: 1.6;">
-                            Circo helps you track interactions, remember important events, 
-                            and nurture meaningful relationships—all in one beautiful space.
+                        <!-- Subheadline: Explains EXACTLY what the app does -->
+                        <p class="lead mb-4" style="color: #475569; font-size: clamp(0.95rem, 3vw, 1.25rem); font-weight: 400; line-height: 1.6;">
+                            Circ
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin: 0 2px;">
+                                <circle cx="12" cy="12" r="10" fill="#3b82f6"/>
+                            </svg>
+                            helps you remember <strong>who you met</strong>, <strong>where you met them</strong>, 
+                            and <strong>reminds you to reconnect</strong> at the right time.
                         </p>
                         
-                        <!-- Feature List - Always visible on all screens -->
-                        <div class="row g-3 mb-4 mb-lg-5">
-                            <div class="col-12 col-sm-6">
-                                <div class="d-flex align-items-start gap-2 gap-md-3">
-                                    <div class="rounded-3 p-2 flex-shrink-0" style="background: #ffffff; border: 1px solid #e2e8f0;">
-                                        <i class="bi bi-bell" style="color: #3b82f6; font-size: clamp(1rem, 3vw, 1.2rem);"></i>
-                                    </div>
-                                    <div>
-                                        <h6 class="fw-medium mb-1" style="color: #1e293b; font-size: clamp(0.85rem, 2.5vw, 0.95rem);">Smart Reminders</h6>
-                                        <p class="small mb-0" style="color: #64748b; font-size: clamp(0.75rem, 2vw, 0.875rem);">Never miss a follow-up or important date</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="d-flex align-items-start gap-2 gap-md-3">
-                                    <div class="rounded-3 p-2 flex-shrink-0" style="background: #ffffff; border: 1px solid #e2e8f0;">
-                                        <i class="bi bi-calendar-heart" style="color: #ec4899; font-size: clamp(1rem, 3vw, 1.2rem);"></i>
-                                    </div>
-                                    <div>
-                                        <h6 class="fw-medium mb-1" style="color: #1e293b; font-size: clamp(0.85rem, 2.5vw, 0.95rem);">Event Tracking</h6>
-                                        <p class="small mb-0" style="color: #64748b; font-size: clamp(0.75rem, 2vw, 0.875rem);">Keep track of birthdays and special moments</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="d-flex align-items-start gap-2 gap-md-3">
-                                    <div class="rounded-3 p-2 flex-shrink-0" style="background: #ffffff; border: 1px solid #e2e8f0;">
-                                        <i class="bi bi-people" style="color: #10b981; font-size: clamp(1rem, 3vw, 1.2rem);"></i>
-                                    </div>
-                                    <div>
-                                        <h6 class="fw-medium mb-1" style="color: #1e293b; font-size: clamp(0.85rem, 2.5vw, 0.95rem);">Alumni Network</h6>
-                                        <p class="small mb-0" style="color: #64748b; font-size: clamp(0.75rem, 2vw, 0.875rem);">Connect with your professional community</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="d-flex align-items-start gap-2 gap-md-3">
-                                    <div class="rounded-3 p-2 flex-shrink-0" style="background: #ffffff; border: 1px solid #e2e8f0;">
-                                        <i class="bi bi-lightning-charge" style="color: #f59e0b; font-size: clamp(1rem, 3vw, 1.2rem);"></i>
-                                    </div>
-                                    <div>
-                                        <h6 class="fw-medium mb-1" style="color: #1e293b; font-size: clamp(0.85rem, 2.5vw, 0.95rem);">Quick Actions</h6>
-                                        <p class="small mb-0" style="color: #64748b; font-size: clamp(0.75rem, 2vw, 0.875rem);">Log interactions in seconds, not minutes</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- CTA Buttons - Stack on mobile -->
-                        <div class="d-flex flex-column flex-sm-row gap-2 gap-sm-3">
+                        <!-- Primary CTA: "Start Managing Your Relationships" -->
+                        <div class="d-flex flex-column flex-sm-row gap-3 mb-4">
                             <a href="{% url 'account:register' %}" 
-                               class="btn btn-dark px-4 py-3 rounded-3 d-inline-flex align-items-center justify-content-center w-100 w-sm-auto"
-                               style="background: #1e293b; border: none; font-weight: 400; font-size: clamp(0.9rem, 2.5vw, 1rem); transition: all 0.2s ease;">
-                                Start free trial
+                               class="btn btn-primary btn-lg px-4 py-3 rounded-3 d-inline-flex align-items-center justify-content-center fw-bold shadow-sm"
+                               style="background: #0a1930; border: none; font-size: clamp(0.95rem, 3vw, 1.1rem); transition: all 0.2s ease; white-space: normal; word-break: break-word;">
+                                Start Managing Your Relationships
                                 <i class="bi bi-arrow-right ms-2"></i>
                             </a>
-                            <a href="{% url 'account:login' %}" 
-                               class="btn btn-outline-secondary px-4 py-3 rounded-3 d-inline-flex align-items-center justify-content-center w-100 w-sm-auto"
-                               style="border-color: #cbd5e1; color: #475569; font-weight: 400; font-size: clamp(0.9rem, 2.5vw, 1rem); transition: all 0.2s ease;">
-                                Sign in to your account
-                            </a>
                         </div>
                         
-                        <!-- Trust Indicator -->
-                        <p class="small text-muted mt-4" style="color: #94a3b8 !important; font-size: clamp(0.75rem, 2vw, 0.875rem);">
-                            <i class="bi bi-shield-check me-1"></i>
-                            Free forever. No credit card required.
+                        <!-- Trust Builder -->
+                        <p class="text-muted" style="font-size: clamp(0.8rem, 2.5vw, 0.9rem);">
+                            <i class="bi bi-clock-history me-1"></i> Free to use • No spam • Takes 30 seconds to get started
                         </p>
+                        
+                        <!-- Small Social Proof (Early Users) -->
+                        <div class="d-flex align-items-center gap-3 mt-4 pt-2 flex-wrap">
+                            <div class="d-flex">
+                                <i class="bi bi-star-fill" style="color: #fbbf24; font-size: clamp(0.9rem, 2.5vw, 1rem);"></i>
+                                <i class="bi bi-star-fill" style="color: #fbbf24; font-size: clamp(0.9rem, 2.5vw, 1rem);"></i>
+                                <i class="bi bi-star-fill" style="color: #fbbf24; font-size: clamp(0.9rem, 2.5vw, 1rem);"></i>
+                                <i class="bi bi-star-fill" style="color: #fbbf24; font-size: clamp(0.9rem, 2.5vw, 1rem);"></i>
+                                <i class="bi bi-star-fill" style="color: #fbbf24; font-size: clamp(0.9rem, 2.5vw, 1rem);"></i>
+                            </div>
+                            <span class="small fw-medium" style="color: #0a1930; font-size: clamp(0.8rem, 2.5vw, 0.9rem);">Early users love the memory system</span>
+                        </div>
                     </div>
                 </div>
                 
-                <!-- Right Column - Visual (Always visible on all screens) -->
+                <!-- Right Column - Product Dashboard Preview (Not Abstract Graphics) -->
                 <div class="col-12 col-lg-6 mt-4 mt-lg-0">
-                    <div class="position-relative">
-                        <!-- Decorative Background -->
-                        <div class="position-absolute top-50 start-50 translate-middle d-none d-md-block" 
-                             style="width: min(400px, 80vw); height: min(400px, 80vw); background: radial-gradient(circle, rgba(59,130,246,0.05) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; z-index: 0;">
-                        </div>
+                    <div class="position-relative d-flex justify-content-center">
+                        <!-- Background Glow -->
+                        <div class="position-absolute" style="width: 100%; height: 100%; background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, rgba(255,255,255,0) 70%); z-index: 0;"></div>
                         
-                        <!-- Main Card -->
-                        <div class="bg-white rounded-4 p-3 p-md-4 position-relative" 
-                             style="border: 1px solid #e2e8f0; box-shadow: 0 20px 40px -20px rgba(0,0,0,0.1); z-index: 1; max-width: 100%;">
+                        <!-- Dashboard UI Mockup -->
+                        <div class="bg-white rounded-4 p-3 p-md-4 position-relative shadow-lg" 
+                             style="border: 1px solid #e2e8f0; max-width: 100%; width: 100%; z-index: 2; background: #ffffff;">
                             
-                            <!-- Mock Dashboard Header -->
-                            <div class="d-flex align-items-center justify-content-between mb-3 mb-md-4">
-                                <div>
-                                    <div class="bg-light rounded-3" style="width: min(120px, 30vw); height: 8px;"></div>
-                                    <div class="bg-light rounded-3 mt-2" style="width: min(80px, 20vw); height: 6px;"></div>
+                            <!-- App Header Mock -->
+                            <div class="d-flex align-items-center justify-content-between mb-3 mb-md-4 pb-2 border-bottom">
+                                <div class="d-flex align-items-center gap-2">
+                                    <img src="{% static 'images/circoapp_logo.jpg' %}" alt="Circo" style="width: 30px; height: 30px; border-radius: 8px;">
+                                    <span class="fw-bold d-flex align-items-center" style="color: #0a1930; font-size: clamp(0.9rem, 2.5vw, 1rem);">
+                                        Circ
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <circle cx="12" cy="12" r="10" fill="#3b82f6"/>
+                                        </svg>
+                                        Dashboard
+                                    </span>
                                 </div>
-                                <div class="rounded-circle" style="width: clamp(28px, 8vw, 32px); height: clamp(28px, 8vw, 32px); background: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%);"></div>
+                                <div class="rounded-circle" style="width: 32px; height: 32px; background: #3b82f6;"></div>
                             </div>
                             
-                            <!-- Mock Stats -->
-                            <div class="row g-2 g-md-3 mb-3 mb-md-4">
-                                <div class="col-4">
-                                    <div class="bg-light rounded-3 p-2 p-md-3" style="background: #f8fafc !important;">
-                                        <div class="small text-muted mb-1" style="font-size: clamp(0.65rem, 2vw, 0.75rem);">Connections</div>
-                                        <div class="fw-bold" style="color: #1e293b; font-size: clamp(1rem, 3vw, 1.25rem);">142</div>
-                                    </div>
-                                </div>
-                                <div class="col-4">
-                                    <div class="bg-light rounded-3 p-2 p-md-3" style="background: #f8fafc !important;">
-                                        <div class="small text-muted mb-1" style="font-size: clamp(0.65rem, 2vw, 0.75rem);">Events</div>
-                                        <div class="fw-bold" style="color: #1e293b; font-size: clamp(1rem, 3vw, 1.25rem);">8</div>
-                                    </div>
-                                </div>
-                                <div class="col-4">
-                                    <div class="bg-light rounded-3 p-2 p-md-3" style="background: #f8fafc !important;">
-                                        <div class="small text-muted mb-1" style="font-size: clamp(0.65rem, 2vw, 0.75rem);">Reconnect</div>
-                                        <div class="fw-bold" style="color: #1e293b; font-size: clamp(1rem, 3vw, 1.25rem);">3</div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Mock Contact List -->
-                            <div class="vstack gap-2 gap-md-3">
-                                <!-- Contact 1 -->
-                                <div class="d-flex align-items-center gap-2 gap-md-3 flex-wrap flex-md-nowrap">
-                                    <div class="rounded-circle flex-shrink-0" style="width: clamp(32px, 8vw, 40px); height: clamp(32px, 8vw, 40px); background: #64748b;"></div>
-                                    <div class="flex-grow-1">
-                                        <div class="fw-medium" style="color: #1e293b; font-size: clamp(0.85rem, 2.5vw, 1rem);">Sarah Chen</div>
-                                        <div class="small text-muted text-truncate" style="font-size: clamp(0.7rem, 2vw, 0.8rem);">Last contact: 3 days ago</div>
-                                    </div>
-                                    <div class="badge rounded-pill px-2 px-md-3 py-1 py-md-2" style="background: #10b981; color: white; font-size: clamp(0.65rem, 2vw, 0.75rem);">Connected</div>
+                            <!-- Reconnect Radar (Key Feature Visual) -->
+                            <div class="mb-3 mb-md-4">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="bi bi-bell-fill" style="color: #3b82f6; font-size: clamp(0.9rem, 2.5vw, 1rem);"></i>
+                                    <span class="fw-semibold small text-uppercase" style="color: #64748b; letter-spacing: 0.5px; font-size: clamp(0.65rem, 2vw, 0.75rem);">Reconnect Radar</span>
                                 </div>
                                 
-                                <!-- Contact 2 -->
-                                <div class="d-flex align-items-center gap-2 gap-md-3 flex-wrap flex-md-nowrap">
-                                    <div class="rounded-circle flex-shrink-0" style="width: clamp(32px, 8vw, 40px); height: clamp(32px, 8vw, 40px); background: #64748b;"></div>
-                                    <div class="flex-grow-1">
-                                        <div class="fw-medium" style="color: #1e293b; font-size: clamp(0.85rem, 2.5vw, 1rem);">Marcus Rivera</div>
-                                        <div class="small text-muted text-truncate" style="font-size: clamp(0.7rem, 2vw, 0.8rem);">Birthday next week</div>
+                                <!-- Alert Item 1 -->
+                                <div class="bg-light p-2 p-md-3 rounded-3 mb-2 d-flex align-items-center gap-2 gap-md-3 flex-wrap flex-md-nowrap" style="background: #f8fafc !important; border-left: 4px solid #3b82f6;">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px; background: #e0e7ff; color: #3b82f6; font-weight: bold; font-size: 0.9rem;">JD</div>
+                                    <div class="flex-grow-1 min-width-0">
+                                        <div class="fw-bold text-truncate" style="color: #0a1930; font-size: clamp(0.85rem, 2.5vw, 0.95rem);">James Donovan</div>
+                                        <div class="small text-muted text-truncate" style="font-size: clamp(0.7rem, 2vw, 0.8rem);">Met at Tech Summit · 14 days ago</div>
                                     </div>
-                                    <div class="badge rounded-pill px-2 px-md-3 py-1 py-md-2" style="background: #fef3c7; color: #92400e; font-size: clamp(0.65rem, 2vw, 0.75rem);">🎂 Soon</div>
+                                    <span class="badge bg-white text-dark rounded-pill px-2 px-md-3 py-1 py-md-2 shadow-sm flex-shrink-0" style="font-size: clamp(0.65rem, 2vw, 0.75rem);">Remind me</span>
                                 </div>
                                 
-                                <!-- Contact 3 -->
-                                <div class="d-flex align-items-center gap-2 gap-md-3 flex-wrap flex-md-nowrap">
-                                    <div class="rounded-circle flex-shrink-0" style="width: clamp(32px, 8vw, 40px); height: clamp(32px, 8vw, 40px); background: #64748b;"></div>
-                                    <div class="flex-grow-1">
-                                        <div class="fw-medium" style="color: #1e293b; font-size: clamp(0.85rem, 2.5vw, 1rem);">Dr. Emily Watson</div>
-                                        <div class="small text-muted text-truncate" style="font-size: clamp(0.7rem, 2vw, 0.8rem);">Meeting tomorrow</div>
+                                <!-- Alert Item 2 -->
+                                <div class="bg-light p-2 p-md-3 rounded-3 d-flex align-items-center gap-2 gap-md-3 flex-wrap flex-md-nowrap" style="background: #f8fafc !important; border-left: 4px solid #f59e0b;">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px; background: #fef3c7; color: #b45309; font-weight: bold; font-size: 0.9rem;">MC</div>
+                                    <div class="flex-grow-1 min-width-0">
+                                        <div class="fw-bold text-truncate" style="color: #0a1930; font-size: clamp(0.85rem, 2.5vw, 0.95rem);">Maria Chen</div>
+                                        <div class="small text-muted text-truncate" style="font-size: clamp(0.7rem, 2vw, 0.8rem);">Alumni Network · Last contact 30d ago</div>
                                     </div>
-                                    <div class="badge rounded-pill px-2 px-md-3 py-1 py-md-2" style="background: #f1f5f9; color: #475569; font-size: clamp(0.65rem, 2vw, 0.75rem);">Pending</div>
+                                    <span class="badge bg-white text-dark rounded-pill px-2 px-md-3 py-1 py-md-2 shadow-sm flex-shrink-0" style="font-size: clamp(0.65rem, 2vw, 0.75rem);">Reconnect</span>
                                 </div>
                             </div>
                             
-                            <!-- Decorative Dots -->
-                            <div class="mt-3 mt-md-4 pt-1 pt-md-2">
-                                <div class="d-flex gap-1 justify-content-center">
-                                    <div class="rounded-circle" style="width: clamp(4px, 1.5vw, 6px); height: clamp(4px, 1.5vw, 6px); background: #cbd5e1;"></div>
-                                    <div class="rounded-circle" style="width: clamp(4px, 1.5vw, 6px); height: clamp(4px, 1.5vw, 6px); background: #94a3b8;"></div>
-                                    <div class="rounded-circle" style="width: clamp(4px, 1.5vw, 6px); height: clamp(4px, 1.5vw, 6px); background: #64748b;"></div>
+                            <!-- Quick Stats -->
+                            <div class="row g-2 text-center">
+                                <div class="col-4">
+                                    <div class="p-2">
+                                        <div class="fw-bold fs-5" style="color: #0a1930; font-size: clamp(1rem, 3vw, 1.25rem);">28</div>
+                                        <div class="small text-muted" style="font-size: clamp(0.65rem, 2vw, 0.75rem);">People</div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Floating Elements - Responsive positioning -->
-                        <div class="position-absolute top-0 end-0 translate-middle-x d-none d-sm-block" style="z-index: 2;">
-                            <div class="bg-white rounded-3 p-2 p-md-3 shadow-sm" style="border: 1px solid #e2e8f0;">
-                                <div class="d-flex align-items-center gap-1 gap-md-2">
-                                    <i class="bi bi-star-fill" style="color: #fbbf24; font-size: clamp(0.75rem, 2vw, 0.9rem);"></i>
-                                    <span class="small fw-medium" style="color: #1e293b; font-size: clamp(0.7rem, 2vw, 0.875rem);">4.9 rating</span>
+                                <div class="col-4">
+                                    <div class="p-2">
+                                        <div class="fw-bold fs-5" style="color: #0a1930; font-size: clamp(1rem, 3vw, 1.25rem);">4</div>
+                                        <div class="small text-muted" style="font-size: clamp(0.65rem, 2vw, 0.75rem);">Reminders</div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                        
-                        <div class="position-absolute bottom-0 start-0 translate-middle-x d-none d-sm-block" style="z-index: 2;">
-                            <div class="bg-white rounded-3 p-2 p-md-3 shadow-sm" style="border: 1px solid #e2e8f0;">
-                                <div class="d-flex align-items-center gap-1 gap-md-2">
-                                    <i class="bi bi-emoji-smile" style="color: #10b981; font-size: clamp(0.75rem, 2vw, 0.9rem);"></i>
-                                    <span class="small fw-medium" style="color: #1e293b; font-size: clamp(0.7rem, 2vw, 0.875rem);">2k+ happy users</span>
+                                <div class="col-4">
+                                    <div class="p-2">
+                                        <div class="fw-bold fs-5" style="color: #0a1930; font-size: clamp(1rem, 3vw, 1.25rem);">12</div>
+                                        <div class="small text-muted" style="font-size: clamp(0.65rem, 2vw, 0.75rem);">Notes</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -221,110 +154,359 @@
                 </div>
             </div>
             
-            <!-- Mobile-only stats card (visible below sm breakpoint) -->
-            <div class="row d-sm-none mt-3">
-                <div class="col-12">
-                    <div class="bg-white rounded-4 p-3" style="border: 1px solid #e2e8f0;">
-                        <div class="d-flex justify-content-around text-center">
-                            <div>
-                                <div class="fw-bold fs-5" style="color: #1e293b;">4.9</div>
-                                <div class="small text-muted">
-                                    <i class="bi bi-star-fill" style="color: #fbbf24; font-size: 0.7rem;"></i> Rating
+            <!-- ==================== SECTION 2: THE PROBLEM (Pain Points) ==================== -->
+            <div class="row justify-content-center my-4 my-md-5 py-3 py-md-4">
+                <div class="col-12 col-lg-8 text-center">
+                    <span class="badge rounded-pill px-3 py-2 mb-3" style="background: #f1f5f9; color: #475569; font-weight: 500; font-size: clamp(0.7rem, 2.5vw, 0.85rem);">The Problem</span>
+                    <h2 class="fw-bold mb-3 mb-md-4" style="color: #0a1930; font-size: clamp(1.6rem, 5vw, 2.5rem);">You meet great people every day.</h2>
+                    <p class="lead mb-4 mb-md-5" style="color: #475569; max-width: 700px; margin-left: auto; margin-right: auto; font-size: clamp(1rem, 3vw, 1.25rem);">
+                        But after a few weeks...
+                    </p>
+                    
+                    <div class="row g-3 g-md-4">
+                        <div class="col-md-4">
+                            <div class="bg-white p-3 p-md-4 rounded-4 h-100" style="border: 1px solid #e2e8f0;">
+                                <div class="display-4 mb-2" style="font-size: clamp(2rem, 6vw, 3rem);">🤔</div>
+                                <h5 class="fw-bold" style="color: #0a1930; font-size: clamp(1rem, 2.5vw, 1.2rem);">You forget where you met</h5>
+                                <p class="small text-muted" style="font-size: clamp(0.8rem, 2.5vw, 0.9rem);">Was it the conference? The coffee shop? The context fades.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="bg-white p-3 p-md-4 rounded-4 h-100" style="border: 1px solid #e2e8f0;">
+                                <div class="display-4 mb-2" style="font-size: clamp(2rem, 6vw, 3rem);">📉</div>
+                                <h5 class="fw-bold" style="color: #0a1930; font-size: clamp(1rem, 2.5vw, 1.2rem);">You forget what they do</h5>
+                                <p class="small text-muted" style="font-size: clamp(0.8rem, 2.5vw, 0.9rem);">Names stay in your phone, but the valuable details disappear.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="bg-white p-3 p-md-4 rounded-4 h-100" style="border: 1px solid #e2e8f0;">
+                                <div class="display-4 mb-2" style="font-size: clamp(2rem, 6vw, 3rem);">⏳</div>
+                                <h5 class="fw-bold" style="color: #0a1930; font-size: clamp(1rem, 2.5vw, 1.2rem);">You lose touch</h5>
+                                <p class="small text-muted" style="font-size: clamp(0.8rem, 2.5vw, 0.9rem);">Months pass. "I should have reached out earlier" becomes the norm.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 mt-md-5 p-3 p-md-4 bg-light rounded-4" style="background: #f8fafc !important;">
+                        <p class="fw-medium mb-0" style="color: #0a1930; font-size: clamp(1rem, 3vw, 1.2rem);">
+                            Your phone stores contacts.<br>
+                            <span class="text-muted">But it doesn't help you remember <strong>relationships</strong>.</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ==================== SECTION 3: THE SOLUTION (Relationship Memory System) ==================== -->
+            <div class="row justify-content-center my-4 my-md-5 py-3 py-md-4">
+                <div class="col-12 col-lg-10">
+                    <div class="bg-white rounded-4 rounded-md-5 p-3 p-md-5 shadow-sm" style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 1px solid #e2e8f0;">
+                        <div class="row align-items-center">
+                            <div class="col-lg-6 mb-4 mb-lg-0">
+                                <span class="badge rounded-pill px-3 py-2 mb-3" style="background: #3b82f6; color: white; font-size: clamp(0.7rem, 2.5vw, 0.85rem);">The Solution</span>
+                                <h2 class="fw-bold mb-3" style="color: #0a1930; font-size: clamp(1.6rem, 5vw, 2.5rem);">Meet your Relationship Memory System</h2>
+                                <p class="lead" style="color: #475569; font-size: clamp(1rem, 3vw, 1.25rem);">
+                                    Circ
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin: 0 2px;">
+                                        <circle cx="12" cy="12" r="10" fill="#3b82f6"/>
+                                    </svg>
+                                    helps you keep track of people that matter.
+                                </p>
+                                <p style="color: #64748b; font-size: clamp(0.95rem, 2.5vw, 1.1rem);">
+                                    Add notes, remember context, and never lose touch again.
+                                </p>
+                                <div class="mt-4">
+                                    <a href="{% url 'account:register' %}" class="btn btn-dark px-4 py-3 rounded-3 fw-bold d-inline-flex align-items-center" style="background: #0a1930; font-size: clamp(0.9rem, 2.5vw, 1rem);">
+                                        Try Circ
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin: 0 4px;">
+                                            <circle cx="12" cy="12" r="10" fill="#3b82f6"/>
+                                        </svg>
+                                        Now <i class="bi bi-arrow-right ms-2"></i>
+                                    </a>
                                 </div>
                             </div>
-                            <div>
-                                <div class="fw-bold fs-5" style="color: #1e293b;">2k+</div>
-                                <div class="small text-muted">Happy Users</div>
+                            <div class="col-lg-6">
+                                <div class="bg-white p-3 p-md-4 rounded-4 shadow-sm" style="border: 1px solid #cbd5e1;">
+                                    <div class="d-flex align-items-center gap-2 gap-md-3 mb-3">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 44px; height: 44px; background: #0a1930; color: white; font-weight: bold;">SJ</div>
+                                        <div class="min-width-0">
+                                            <div class="fw-bold text-truncate" style="font-size: clamp(0.9rem, 2.5vw, 1rem);">Sarah Johnson</div>
+                                            <div class="small text-muted text-truncate" style="font-size: clamp(0.75rem, 2vw, 0.85rem);">Met at Design Conf · UX Researcher</div>
+                                        </div>
+                                    </div>
+                                    <div class="bg-light p-3 rounded-3" style="background: #f1f5f9 !important;">
+                                        <i class="bi bi-pin-angle-fill me-1" style="color: #3b82f6;"></i>
+                                        <span class="small fst-italic" style="font-size: clamp(0.8rem, 2.5vw, 0.9rem);">"Interested in AI tools. Follow up in 2 weeks about the project."</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            
+            <!-- ==================== SECTION 4: HOW IT WORKS (3 Core Features) ==================== -->
+            <div class="row my-4 my-md-5 py-3 py-md-4 g-3 g-md-4">
+                <div class="col-12 text-center mb-3">
+                    <h2 class="fw-bold d-flex align-items-center justify-content-center flex-wrap" style="color: #0a1930; font-size: clamp(1.6rem, 5vw, 2.5rem);">
+                        How Circ
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin: 0 4px;">
+                            <circle cx="12" cy="12" r="10" fill="#3b82f6"/>
+                        </svg>
+                        works
+                    </h2>
+                    <p class="text-muted" style="font-size: clamp(0.9rem, 2.5vw, 1rem);">Three simple pillars to stay connected effortlessly.</p>
+                </div>
+                
+                <!-- 1️⃣ Relationship Memory -->
+                <div class="col-md-4">
+                    <div class="bg-white p-3 p-md-4 rounded-4 h-100" style="border-top: 4px solid #3b82f6; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 44px; height: 44px; background: #e0e7ff; color: #3b82f6;">
+                            <i class="bi bi-journal-bookmark-fill fs-5"></i>
+                        </div>
+                        <h4 class="fw-bold mb-2" style="color: #0a1930; font-size: clamp(1.1rem, 3vw, 1.3rem);">1️⃣ Relationship Memory</h4>
+                        <p class="text-muted" style="font-size: clamp(0.85rem, 2.5vw, 0.95rem);">Remember people beyond just their name. Store <strong>where you met</strong>, what you discussed, and what matters about them.</p>
+                    </div>
+                </div>
+                
+                <!-- 2️⃣ Reconnect Reminders -->
+                <div class="col-md-4">
+                    <div class="bg-white p-3 p-md-4 rounded-4 h-100" style="border-top: 4px solid #f59e0b; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 44px; height: 44px; background: #fef3c7; color: #b45309;">
+                            <i class="bi bi-bell-fill fs-5"></i>
+                        </div>
+                        <h4 class="fw-bold mb-2" style="color: #0a1930; font-size: clamp(1.1rem, 3vw, 1.3rem);">2️⃣ Reconnect Radar</h4>
+                        <p class="text-muted" style="font-size: clamp(0.85rem, 2.5vw, 0.95rem);">
+                            Circ
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle;">
+                                <circle cx="12" cy="12" r="10" fill="#3b82f6"/>
+                            </svg>
+                            <strong>reminds you when it's time to reconnect</strong>. No more "I should have reached out earlier."
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- 3️⃣ School & Alumni Networks -->
+                <div class="col-md-4">
+                    <div class="bg-white p-3 p-md-4 rounded-4 h-100" style="border-top: 4px solid #10b981; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 44px; height: 44px; background: #d1fae5; color: #065f46;">
+                            <i class="bi bi-people-fill fs-5"></i>
+                        </div>
+                        <h4 class="fw-bold mb-2" style="color: #0a1930; font-size: clamp(1.1rem, 3vw, 1.3rem);">3️⃣ Alumni Connections</h4>
+                        <p class="text-muted" style="font-size: clamp(0.85rem, 2.5vw, 0.95rem);">Reconnect with classmates and alumni easily. Your network is <strong>closer than you think</strong>.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ==================== SECTION 5: SOCIAL PROOF & USE CASES ==================== -->
+            <div class="row my-4 my-md-5 py-3 py-md-4 align-items-center g-4">
+                <div class="col-lg-5 mb-3 mb-lg-0">
+                    <div class="bg-dark text-white p-3 p-md-5 rounded-4" style="background: #0a1930 !important;">
+                        <i class="bi bi-quote fs-1 opacity-50"></i>
+                        <p class="fs-5 fw-light mb-4" style="font-size: clamp(1rem, 3vw, 1.25rem);">"This helps me remember people I would have forgotten. I didn't realize how useful this is until I tried it."</p>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-circle bg-light flex-shrink-0" style="width: 36px; height: 36px;"></div>
+                            <div>
+                                <div class="fw-bold d-flex align-items-center" style="font-size: clamp(0.9rem, 2.5vw, 1rem);">
+                                    Early Circ
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin: 0 2px;">
+                                        <circle cx="12" cy="12" r="10" fill="#3b82f6"/>
+                                    </svg>
+                                    User
+                                </div>
+                                <div class="small opacity-75" style="font-size: clamp(0.75rem, 2vw, 0.85rem);">Entrepreneur</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="ps-lg-4">
+                        <h3 class="fw-bold mb-3 mb-md-4" style="color: #0a1930; font-size: clamp(1.3rem, 4vw, 1.8rem);">Perfect for:</h3>
+                        <div class="row g-3">
+                            <div class="col-12 col-sm-6"><i class="bi bi-check-circle-fill me-2" style="color: #3b82f6;"></i> <span style="font-size: clamp(0.9rem, 2.5vw, 1rem);">Students tracking classmates</span></div>
+                            <div class="col-12 col-sm-6"><i class="bi bi-check-circle-fill me-2" style="color: #3b82f6;"></i> <span style="font-size: clamp(0.9rem, 2.5vw, 1rem);">Professionals networking</span></div>
+                            <div class="col-12 col-sm-6"><i class="bi bi-check-circle-fill me-2" style="color: #3b82f6;"></i> <span style="font-size: clamp(0.9rem, 2.5vw, 1rem);">Entrepreneurs meeting new people</span></div>
+                            <div class="col-12 col-sm-6"><i class="bi bi-check-circle-fill me-2" style="color: #3b82f6;"></i> <span style="font-size: clamp(0.9rem, 2.5vw, 1rem);">Anyone who wants to stay connected</span></div>
+                        </div>
+                        <div class="mt-4 pt-2">
+                            <a href="{% url 'account:register' %}" class="btn btn-outline-dark px-4 py-3 rounded-3 fw-bold d-inline-flex align-items-center" style="font-size: clamp(0.9rem, 2.5vw, 1rem);">
+                                See if Circ
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin: 0 3px;">
+                                    <circle cx="12" cy="12" r="10" fill="#3b82f6"/>
+                                </svg>
+                                is right for you <i class="bi bi-arrow-right ms-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ==================== SECTION 7: FINAL CTA ==================== -->
+            <div class="row my-4 my-md-5 py-3 py-md-4">
+                <div class="col-12 text-center">
+                    <div class="bg-light p-3 p-md-5 rounded-4 rounded-md-5" style="background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%); border: 1px solid #e2e8f0;">
+                        <h2 class="display-5 fw-bold mb-3" style="color: #0a1930; font-size: clamp(1.5rem, 5vw, 2.5rem);">Start building better relationships today.</h2>
+                        <p class="lead mb-4" style="color: #475569; font-size: clamp(1rem, 3vw, 1.25rem);">It takes less than a minute to get started.</p>
+                        <a href="{% url 'account:register' %}" class="btn btn-primary btn-lg px-4 px-md-5 py-3 py-md-4 rounded-4 fw-bold shadow d-inline-flex align-items-center" style="background: #0a1930; border: none; font-size: clamp(1rem, 3vw, 1.25rem); white-space: normal; word-break: break-word;">
+                            Try Circ
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin: 0 5px;">
+                                <circle cx="12" cy="12" r="10" fill="#3b82f6"/>
+                            </svg>
+                            Now
+                        </a>
+                        <p class="text-muted mt-4 mb-0 small" style="font-size: clamp(0.75rem, 2.5vw, 0.85rem);">
+                            <i class="bi bi-shield-check"></i> No credit card required. Start for free.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
         </div>
     </div>
 </div>
 
 <style>
-    /* Mobile Responsiveness */
-    @media (max-width: 576px) {
-        .container-fluid {
-            padding-left: 0.75rem !important;
-            padding-right: 0.75rem !important;
-        }
-        
-        .btn {
-            padding: 0.75rem 1rem !important;
-            white-space: normal;
-            word-break: break-word;
-        }
-        
-        .gap-2 {
-            gap: 0.5rem !important;
-        }
-        
-        .badge {
-            white-space: normal;
-            word-break: break-word;
-        }
-    }
+    /* ==================== MOBILE RESPONSIVENESS FIXES ==================== */
     
-    @media (min-width: 577px) and (max-width: 768px) {
-        .container-fluid {
-            padding-left: 1rem !important;
-            padding-right: 1rem !important;
-        }
-    }
-    
-    /* Button hover effects */
-    .btn:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-    
-    .btn-outline-secondary:hover {
-        background: #f8fafc;
-        border-color: #94a3b8 !important;
-    }
-    
-    /* Smooth transitions */
-    .bg-white {
-        transition: all 0.3s ease;
-    }
-    
-    /* Prevent overflow */
+    /* Base mobile optimizations */
     * {
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    body {
+        background: #ffffff;
+        font-family: system-ui, -apple-system, 'Inter', 'Segoe UI', Roboto, sans-serif;
+        overflow-x: hidden;
+        width: 100%;
+    }
+    
+    /* Container fluid full width on mobile */
+    .container-fluid {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+        width: 100%;
         max-width: 100%;
     }
     
-    img, svg, video, canvas, audio, iframe, embed, object {
+    /* Ensure images don't overflow */
+    img {
         max-width: 100%;
         height: auto;
     }
     
-    /* Custom width utilities */
-    .w-sm-auto {
-        width: auto !important;
+    /* SVG circle alignment helper */
+    svg {
+        vertical-align: middle;
+        flex-shrink: 0;
     }
     
-    @media (max-width: 576px) {
-        .w-sm-auto {
-            width: 100% !important;
+    /* Better touch targets for mobile */
+    @media (max-width: 768px) {
+        .btn, .badge, [role="button"] {
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .btn-lg {
+            padding: 12px 20px !important;
+        }
+        
+        /* Stack columns properly */
+        .row {
+            margin-left: -12px;
+            margin-right: -12px;
+        }
+        
+        [class*="col-"] {
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+        
+        /* Reduce section spacing */
+        .my-4, .my-md-5 {
+            margin-top: 1.5rem !important;
+            margin-bottom: 1.5rem !important;
+        }
+        
+        .py-4, .py-md-5 {
+            padding-top: 1.5rem !important;
+            padding-bottom: 1.5rem !important;
+        }
+        
+        /* Ensure text doesn't overflow */
+        h1, h2, h3, h4, h5, h6, p {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+        }
+        
+        /* Flex wrap on mobile */
+        .d-flex {
+            flex-wrap: wrap;
+        }
+        
+        /* Full width buttons on very small screens */
+        @media (max-width: 576px) {
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .w-sm-100 {
+                width: 100% !important;
+            }
         }
     }
     
-    /* Text truncation for mobile */
+    /* Tablet optimizations */
+    @media (min-width: 768px) and (max-width: 991px) {
+        .container-fluid {
+            padding-left: 20px !important;
+            padding-right: 20px !important;
+        }
+    }
+    
+    /* Prevent horizontal scroll */
+    html, body {
+        max-width: 100%;
+        overflow-x: hidden;
+        position: relative;
+    }
+    
+    /* Button hover effects */
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+    }
+    
+    .btn-outline-dark:hover {
+        background: #0a1930;
+        color: white !important;
+    }
+    
+    /* Rounded corners consistency */
+    .rounded-4 {
+        border-radius: 1rem !important;
+    }
+    
+    @media (max-width: 576px) {
+        .rounded-4 {
+            border-radius: 0.75rem !important;
+        }
+    }
+    
+    /* Text truncation utility */
     .text-truncate {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
     }
     
-    /* Flexible images */
-    .rounded-circle {
-        object-fit: cover;
+    .min-width-0 {
+        min-width: 0;
     }
     
-    /* Gradient text fallback */
+    /* Custom gradient fallback */
     @supports not (-webkit-background-clip: text) {
         .display-4 span {
             background: none !important;
@@ -332,36 +514,7 @@
             color: #3b82f6;
         }
     }
-    
-    /* Better touch targets for mobile */
-    @media (max-width: 768px) {
-        .btn, .dropdown-item, [data-bs-toggle="modal"] {
-            min-height: 44px;
-            display: flex;
-            align-items: center;
-        }
-    }
-    
-    /* Responsive spacing */
-    .row {
-        --bs-gutter-x: 1rem;
-    }
-    
-    @media (min-width: 768px) {
-        .row {
-            --bs-gutter-x: 1.5rem;
-        }
-    }
-    
-    @media (min-width: 992px) {
-        .row {
-            --bs-gutter-x: 2rem;
-        }
-    }
 </style>
 
-<!-- Add Bootstrap Icons if not already in base template -->
-{% block extra_css %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-{% endblock %}
 {% endblock %}
