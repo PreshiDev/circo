@@ -36,8 +36,33 @@
                       hx-target="#message"
                       hx-swap="innerHTML"
                       hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                      hx-indicator="#registerBtn">
+                      hx-indicator="#registerBtn"
+                      hx-encoding="multipart/form-data">
                     {% csrf_token %}
+                    
+                    <!-- Profile Picture Upload with Preview -->
+                    <div class="text-center mb-4">
+                        <div class="position-relative d-inline-block" style="cursor: pointer;" onclick="document.getElementById('profile_picture').click()">
+                            <div class="rounded-circle overflow-hidden" 
+                                 style="width: 120px; height: 120px; border: 3px dashed #e2e8f0; background: #f8fafc;">
+                                <img id="profilePicturePreview" 
+                                     src="" 
+                                     alt="Profile Preview" 
+                                     style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                                <div id="profilePicturePlaceholder" 
+                                     class="d-flex flex-column align-items-center justify-content-center h-100">
+                                    <i class="bi bi-camera" style="font-size: 2rem; color: #94a3b8;"></i>
+                                    <span style="font-size: 0.8rem; color: #94a3b8;">Add Photo</span>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="file" 
+                               id="profile_picture" 
+                               name="profile_picture" 
+                               accept="image/*" 
+                               style="display: none;"
+                               onchange="previewProfilePicture(event)">
+                    </div>
                     
                     <!-- Full Name Field -->
                     <div class="mb-3">
@@ -85,6 +110,38 @@
                                    id="phone_number" 
                                    name="phone_number"
                                    placeholder="+1 (555) 123-4567"
+                                   style="border-color: #e2e8f0;">
+                        </div>
+                    </div>
+                    
+                    <!-- School Attended Field -->
+                    <div class="mb-3">
+                        <label class="form-label" for="school_attended">School Attended</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0" style="border-color: #e2e8f0;">
+                                <i class="bi bi-building" style="color: #64748b;"></i>
+                            </span>
+                            <input type="text" 
+                                   class="form-control border-start-0 ps-0" 
+                                   id="school_attended" 
+                                   name="school_attended"
+                                   placeholder="University of Technology"
+                                   style="border-color: #e2e8f0;">
+                        </div>
+                    </div>
+                    
+                    <!-- Profession Field -->
+                    <div class="mb-3">
+                        <label class="form-label" for="profession">Profession</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0" style="border-color: #e2e8f0;">
+                                <i class="bi bi-briefcase" style="color: #64748b;"></i>
+                            </span>
+                            <input type="text" 
+                                   class="form-control border-start-0 ps-0" 
+                                   id="profession" 
+                                   name="profession"
+                                   placeholder="Software Engineer"
                                    style="border-color: #e2e8f0;">
                         </div>
                     </div>
@@ -171,6 +228,16 @@
     
     .input-group:focus-within .btn-outline-secondary {
         border-color: #1e293b !important;
+    }
+    
+    /* Profile picture preview hover effect */
+    .profile-preview-container:hover .rounded-circle {
+        border-color: #3b82f6 !important;
+        background: #f0f4ff !important;
+    }
+    
+    .profile-preview-container:hover i {
+        color: #3b82f6 !important;
     }
     
     /* Button hover effects */
@@ -272,6 +339,43 @@ function togglePasswordVisibility() {
         passwordInput.type = 'password';
         toggleIcon.classList.remove('bi-eye-slash');
         toggleIcon.classList.add('bi-eye');
+    }
+}
+
+// Profile picture preview function
+function previewProfilePicture(event) {
+    const file = event.target.files[0];
+    const preview = document.getElementById('profilePicturePreview');
+    const placeholder = document.getElementById('profilePicturePlaceholder');
+    
+    if (file) {
+        // Check file type
+        if (!file.type.startsWith('image/')) {
+            alert('Please select an image file');
+            event.target.value = '';
+            return;
+        }
+        
+        // Check file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Image size should be less than 5MB');
+            event.target.value = '';
+            return;
+        }
+        
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+            placeholder.style.display = 'none';
+        }
+        
+        reader.readAsDataURL(file);
+    } else {
+        preview.src = '';
+        preview.style.display = 'none';
+        placeholder.style.display = 'flex';
     }
 }
 

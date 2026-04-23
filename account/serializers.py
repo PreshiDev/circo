@@ -4,10 +4,14 @@ from django.contrib.auth import authenticate
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
+    profile_picture = serializers.ImageField(required=False)
+    school_attended = serializers.CharField(required=False, allow_blank=True)
+    profession = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = User
-        fields = ['email', 'full_name', 'phone_number', 'password']
+        fields = ['email', 'full_name', 'phone_number', 'school_attended', 
+                 'profession', 'profile_picture', 'password']
 
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)

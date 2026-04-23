@@ -89,27 +89,27 @@ WSGI_APPLICATION = 'circo.wsgi.application'
 #     }
 # }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'circo',
-        'USER': 'circo_user',
-        'PASSWORD': 'hpozV7AfgGVWWQ3OdZKjPZrDJt8plv0J',
-        'HOST': 'dpg-d7jbsohkh4rs73fjih30-a',
-        'PORT': '5432',
-    }
-}
-
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'upkqvqgd_circo',
-#         'USER': 'upkqvqgd_circoapp',
-#         'PASSWORD': 'relationship6000',
-#         'HOST': 'localhost',
+#         'NAME': 'circo',
+#         'USER': 'circo_user',
+#         'PASSWORD': 'hpozV7AfgGVWWQ3OdZKjPZrDJt8plv0J',
+#         'HOST': 'dpg-d7jbsohkh4rs73fjih30-a',
 #         'PORT': '5432',
 #     }
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'upkqvqgd_circo',
+        'USER': 'upkqvqgd_circoapp',
+        'PASSWORD': 'relationship6000',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators

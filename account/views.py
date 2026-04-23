@@ -6,7 +6,20 @@ from .serializers import RegisterSerializer, LoginSerializer
 from django.contrib.auth import login
 from django.utils import timezone
 from rest_framework.views import APIView
-
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework import status
+from .models import Contact, Event, User
+from django.db.models import Q
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from datetime import timedelta
+from django.http import HttpResponseRedirect
+from django.contrib.auth import logout
+from .serializers import ProfileUpdateSerializer, PasswordChangeSerializer
+from .utils import send_dashboard_email  # ✅ reuse shared logic
+from .alumni_detector import detect_alumni, extract_school_name
+from .alumni_detector import detect_alumni
 
 def home_view(request):
     return render(request, "account/index.html")
@@ -49,6 +62,7 @@ def detect_alumni(text):
 # ✅ API REGISTER
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def create(self, request, *args, **kwargs):
         print(f"[DEBUG] RegisterView.create called")
@@ -67,13 +81,22 @@ class RegisterView(generics.CreateAPIView):
             
             user = serializer.save()
             print(f"[DEBUG] User created - ID: {user.id}, Email: {user.email}, Name: {user.full_name}")
+            
+            # Generate profile picture URL if exists
+            profile_picture_url = None
+            if user.profile_picture:
+                profile_picture_url = request.build_absolute_uri(user.profile_picture.url)
 
             response_data = {
                 "message": "User registered successfully",
                 "user": {
                     "id": user.id,
                     "email": user.email,
-                    "full_name": user.full_name
+                    "full_name": user.full_name,
+                    "phone_number": user.phone_number,
+                    "school_attended": user.school_attended,
+                    "profession": user.profession,
+                    "profile_picture": profile_picture_url
                 }
             }
             print(f"[DEBUG] Returning response: {response_data}")
@@ -109,28 +132,12 @@ class LoginView(APIView):
             }
         }, status=status.HTTP_200_OK)
 
-    
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from django.db.models import Q
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from django.utils import timezone
-from datetime import timedelta
-
-from .models import Contact, Event
 
 
 # =========================
 # 🔥 API DASHBOARD VIEW
 # =========================
 # views.py - Updated DashboardAPIView
-
-from .utils import send_dashboard_email  # ✅ reuse shared logic
-
-
 class DashboardAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -157,26 +164,110 @@ class DashboardAPIView(APIView):
             user=user
         ).order_by('-created_at')[:10]
 
-        # 🎓 ALUMNI
-        alumni_contacts = Contact.objects.filter(
+        # 🎓 ALUMNI - Auto-discover users with same school
+        user_school = user.school_attended
+        auto_alumni = []
+        
+        if user_school:
+            # Find all users with the same school (excluding the current user)
+            same_school_users = User.objects.filter(
+                school_attended__iexact=user_school
+            ).exclude(
+                id=user.id
+            ).values('id', 'full_name', 'email', 'phone_number', 'profession', 'profile_picture')
+            
+            for alumni_user in same_school_users:
+                # Check if already saved as a contact
+                existing_contact = Contact.objects.filter(
+                    user=user,
+                    email=alumni_user['email']
+                ).first()
+                
+                alumni_entry = {
+                    "id": alumni_user['id'],
+                    "name": alumni_user['full_name'],
+                    "email": alumni_user['email'],
+                    "phone_number": alumni_user.get('phone_number', ''),
+                    "profession": alumni_user.get('profession', ''),
+                    "school": user_school,
+                    "type": "Auto-discovered Alumni",
+                    "is_contact": existing_contact is not None,
+                    "contact_id": existing_contact.id if existing_contact else None,
+                    "profile_picture": alumni_user.get('profile_picture'),
+                    "has_interacted": existing_contact.has_interacted_before() if existing_contact else False,
+                    "needs_reconnect": existing_contact.needs_reconnect() if existing_contact else False,
+                    "last_interaction": existing_contact.last_interaction if existing_contact else None,
+                    "interaction_count": existing_contact.interaction_count if existing_contact else 0
+                }
+                auto_alumni.append(alumni_entry)
+
+        # 🎓 MANUAL ALUMNI CONTACTS
+        manual_alumni = Contact.objects.filter(
             user=user,
             is_alumni=True
         ).order_by('name')
 
-        # Format alumni data
-        alumni_data = []
-        for contact in alumni_contacts:
-            alumni_data.append({
+        manual_alumni_data = []
+        for contact in manual_alumni:
+            manual_alumni_data.append({
                 "id": contact.id,
                 "name": contact.name,
+                "email": contact.email,
+                "phone_number": contact.phone_number,
                 "type": contact.alumni_type or "Alumni",
+                "school": contact.school or user_school,
+                "is_auto": False,
                 "has_interacted": contact.has_interacted_before(),
                 "needs_reconnect": contact.needs_reconnect(),
                 "last_interaction": contact.last_interaction,
                 "interaction_count": contact.interaction_count
             })
 
-        # ✅ SEND EMAIL (same logic as template view)
+        # 👥 CONTACTS BY MEETING CONTEXT
+        all_contacts = Contact.objects.filter(user=user)
+        
+        # Categorize by meeting context
+        context_categories = {
+            "wedding": [],
+            "birthday": [],
+            "conference": [],
+            "coffee": [],
+            "party": [],
+            "work": [],
+            "school": [],
+            "networking": [],
+            "other": []
+        }
+        
+        for contact in all_contacts:
+            context = (contact.meeting_context or "").lower()
+            contact_data = {
+                "id": contact.id,
+                "name": contact.name,
+                "email": contact.email,
+                "phone_number": contact.phone_number,
+                "meeting_context": contact.meeting_context,
+                "school": contact.school,
+                "created_at": contact.created_at,
+                "last_interaction": contact.last_interaction,
+                "interaction_count": contact.interaction_count
+            }
+            
+            # Categorize based on keywords
+            categorized = False
+            for category in context_categories.keys():
+                if category in context:
+                    context_categories[category].append(contact_data)
+                    categorized = True
+                    break
+            
+            if not categorized:
+                context_categories["other"].append(contact_data)
+        
+        # Remove empty categories
+        context_categories = {k: v for k, v in context_categories.items() if v}
+
+        # ✅ SEND EMAIL
         send_dashboard_email(user, reconnect_contacts, upcoming_events, today)
 
         return Response({
@@ -190,7 +281,6 @@ class DashboardAPIView(APIView):
                     )
                 } for c in reconnect_contacts
             ],
-
             "upcoming_events": [
                 {
                     "id": e.id,
@@ -202,7 +292,6 @@ class DashboardAPIView(APIView):
                     "event_type": e.event_type
                 } for e in upcoming_events
             ],
-
             "recent_contacts": [
                 {
                     "id": c.id,
@@ -211,22 +300,17 @@ class DashboardAPIView(APIView):
                     "created_at": c.created_at
                 } for c in recent_contacts
             ],
-
-            "alumni": alumni_data
+            "auto_alumni": auto_alumni,
+            "manual_alumni": manual_alumni_data,
+            "context_categories": context_categories,
+            "user_school": user_school
         })
-    
 
 
 # =========================
 # 🧠 TEMPLATE DASHBOARD VIEW
 # =========================
 # views.py - Updated dashboard_view
-
-# views.py - Updated dashboard_view
-
-from .utils import send_dashboard_email  # ✅ import helper
-
-
 @login_required
 def dashboard_view(request):
     user = request.user
@@ -251,18 +335,82 @@ def dashboard_view(request):
         user=user
     ).order_by('-created_at')[:10]
 
-    # Alumni contacts
-    alumni_contacts = Contact.objects.filter(
+    # Auto-discovered alumni (same school as user)
+    user_school = user.school_attended
+    auto_alumni = []
+    
+    if user_school:
+        same_school_users = User.objects.filter(
+            school_attended__iexact=user_school
+        ).exclude(id=user.id)
+        
+        for alumni_user in same_school_users[:3]:  # Show only 3 on main page
+            existing_contact = Contact.objects.filter(
+                user=user,
+                email=alumni_user.email
+            ).first()
+            
+            auto_alumni.append({
+                'user': alumni_user,
+                'is_contact': existing_contact is not None,
+                'contact': existing_contact
+            })
+
+    # Manual alumni contacts - Group by school
+    manual_alumni_contacts = Contact.objects.filter(
         user=user,
         is_alumni=True
-    ).order_by('name')
+    ).order_by('school', 'name')
 
-    # All contacts
-    all_contacts = Contact.objects.filter(
-        user=user
-    ).order_by('name')
+    # Simple dict: key=school_name, value=list of contacts
+    alumni_by_school = {}
+    for contact in manual_alumni_contacts:
+        school_name = contact.school or "Other Schools"
+        if school_name not in alumni_by_school:
+            alumni_by_school[school_name] = []
+        alumni_by_school[school_name].append(contact)
 
-    # ✅ SEND EMAIL (same logic reused)
+    # All contacts for event form
+    all_contacts = Contact.objects.filter(user=user).order_by('name')
+
+    # Categorize contacts by meeting context (excluding alumni contacts)
+    all_user_contacts = Contact.objects.filter(user=user)
+    
+    context_categories = {}
+    for contact in all_user_contacts:
+        if contact.is_alumni:
+            continue
+            
+        context = (contact.meeting_context or "Other").strip()
+        context_lower = context.lower()
+        
+        if any(word in context_lower for word in ['wedding', 'marriage', 'bride', 'groom']):
+            category = '💒 Weddings'
+        elif any(word in context_lower for word in ['birthday', 'bday', 'born day']):
+            category = '🎂 Birthdays'
+        elif any(word in context_lower for word in ['conference', 'summit', 'meetup', 'tech']):
+            category = '🏢 Conferences'
+        elif any(word in context_lower for word in ['coffee', 'cafe', 'tea', 'lunch', 'dinner', 'restaurant']):
+            category = '☕ Coffee & Dining'
+        elif any(word in context_lower for word in ['party', 'celebration', 'club', 'bar', 'night']):
+            category = '🎉 Parties & Social'
+        elif any(word in context_lower for word in ['work', 'office', 'colleague', 'coworker']):
+            category = '💼 Work'
+        elif any(word in context_lower for word in ['networking', 'business', 'professional']):
+            category = '🤝 Networking'
+        elif any(word in context_lower for word in ['gym', 'fitness', 'sport', 'game', 'match']):
+            category = '⚽ Sports & Fitness'
+        elif any(word in context_lower for word in ['travel', 'trip', 'vacation', 'holiday']):
+            category = '✈️ Travel'
+        elif any(word in context_lower for word in ['church', 'mosque', 'temple', 'religious', 'worship']):
+            category = '⛪ Religious'
+        else:
+            category = '📍 Other Places'
+        
+        if category not in context_categories:
+            context_categories[category] = []
+        context_categories[category].append(contact)
+
     send_dashboard_email(user, reconnect_contacts, upcoming_events, today)
 
     return render(request, "account/dashboard.html", {
@@ -270,20 +418,14 @@ def dashboard_view(request):
         "reconnect_contacts": reconnect_contacts,
         "upcoming_events": upcoming_events,
         "recent_contacts": recent_contacts,
-        "alumni_contacts": alumni_contacts,
+        "auto_alumni": auto_alumni,
+        "alumni_by_school": alumni_by_school,  # Simple dict: {school_name: [contact_list]}
         "all_contacts": all_contacts,
+        "context_categories": context_categories,
+        "user_school": user_school,
         "today": today,
     })
 
-
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from django.utils import timezone
-from rest_framework import status
-
-from .models import Contact, Event
 
 
 class CreateContactAPIView(APIView):
@@ -291,54 +433,61 @@ class CreateContactAPIView(APIView):
 
     def post(self, request):
         user = request.user
-
-        name = request.data.get("name")
-        phone_number = request.data.get("phone_number")
-        email = request.data.get("email")
-        notes = request.data.get("notes")
-        meeting_context = request.data.get("meeting_context")
-
-        # Validation
+        
+        name = request.data.get('name')
+        phone_number = request.data.get('phone_number')
+        email = request.data.get('email', '')
+        notes = request.data.get('notes', '')
+        meeting_context = request.data.get('meeting_context', '')
+        
         if not name or not phone_number:
             return Response(
-                {"error": "Name and phone number are required"},
+                {"error": "Name and phone number are required"}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
-
-        # Alumni detection
-        is_alumni, alumni_type = detect_alumni(meeting_context)
-
-        # Create contact only - NO automatic event creation
+        
+        # ✅ SAFETY: Use try/except and unpack safely
+        try:
+            result = detect_alumni(meeting_context)
+            if len(result) == 3:
+                is_alumni, alumni_type, detected_school = result
+            elif len(result) == 2:
+                is_alumni, alumni_type = result
+                detected_school = None
+            else:
+                is_alumni, alumni_type, detected_school = False, None, None
+        except Exception as e:
+            print(f"[ERROR] detect_alumni failed: {e}")
+            is_alumni, alumni_type, detected_school = False, None, None
+        
+        # Use detected school name, or keep the meeting context as school if no specific name found
+        school_name = detected_school or (meeting_context if is_alumni else '')
+        
         contact = Contact.objects.create(
             user=user,
             name=name,
             phone_number=phone_number,
             email=email,
             notes=notes,
+            school=school_name,
+            meeting_context=meeting_context,
             is_alumni=is_alumni,
             alumni_type=alumni_type
         )
-
-        # Optional: Store meeting context in notes if provided
-        if meeting_context and notes:
-            contact.notes = f"{notes}\n\nInitial meeting context: {meeting_context}"
-            contact.save()
-        elif meeting_context:
-            contact.notes = f"Initial meeting context: {meeting_context}"
-            contact.save()
-
+        
         return Response({
-            "message": "Contact added successfully",
+            "message": "Contact created successfully",
             "contact": {
-                "id": contact.id, 
+                "id": contact.id,
                 "name": contact.name,
                 "phone_number": contact.phone_number,
-                "email": contact.email
-            },
-            "alumni_detected": is_alumni,
-            "alumni_type": alumni_type
+                "email": contact.email,
+                "school": contact.school,
+                "meeting_context": contact.meeting_context,
+                "is_alumni": contact.is_alumni,
+                "alumni_type": contact.alumni_type
+            }
         }, status=status.HTTP_201_CREATED)
-    
 
 
 # Bulk Contact API View
@@ -380,8 +529,9 @@ class BulkImportContactsAPIView(APIView):
                 skipped_count += 1
                 continue
             
-            # Alumni detection
-            is_alumni, alumni_type = detect_alumni(meeting_context)
+            # Auto-detect alumni from meeting context
+            is_alumni, alumni_type, detected_school = detect_alumni(meeting_context)
+            school_name = detected_school or (meeting_context if is_alumni else '')
             
             try:
                 contact = Contact.objects.create(
@@ -389,7 +539,9 @@ class BulkImportContactsAPIView(APIView):
                     name=name,
                     phone_number=phone_number,
                     email=email,
-                    notes=f"{notes}\n\nInitial meeting context: {meeting_context}" if meeting_context else notes,
+                    notes=notes,
+                    school=school_name,
+                    meeting_context=meeting_context,
                     is_alumni=is_alumni,
                     alumni_type=alumni_type
                 )
@@ -404,10 +556,9 @@ class BulkImportContactsAPIView(APIView):
             "errors": errors
         }, status=status.HTTP_201_CREATED)
     
-    
+
 
 # event creation API
-
 class CreateEventAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -475,15 +626,6 @@ class RecordInteractionAPIView(APIView):
         })
     
 
-# views.py
-from rest_framework import generics, status
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from django.contrib.auth import logout
-from django.utils import timezone
-from .serializers import ProfileUpdateSerializer, PasswordChangeSerializer
-
 
 class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
@@ -533,6 +675,7 @@ class UpdateProfileView(APIView):
     permission_classes = [IsAuthenticated]
     
     def post(self, request):
+        """Handle profile picture upload"""
         user = request.user
         
         if 'profile_picture' not in request.FILES:
@@ -574,6 +717,41 @@ class UpdateProfileView(APIView):
             "message": "Profile picture updated successfully",
             "profile_picture": user.profile_picture.url
         }, status=status.HTTP_200_OK)
+    
+    def put(self, request):
+        """Handle profile info update (name, email, phone, school, profession)"""
+        user = request.user
+        
+        # Get fields from request
+        full_name = request.data.get('full_name', user.full_name)
+        email = request.data.get('email', user.email)
+        phone_number = request.data.get('phone_number', user.phone_number)
+        school_attended = request.data.get('school_attended', user.school_attended)
+        profession = request.data.get('profession', user.profession)
+        
+        # Update user fields
+        user.full_name = full_name
+        user.email = email
+        user.phone_number = phone_number
+        user.school_attended = school_attended
+        user.profession = profession
+        user.save()
+        
+        return Response({
+            "message": "Profile updated successfully",
+            "user": {
+                "id": user.id,
+                "full_name": user.full_name,
+                "email": user.email,
+                "phone_number": user.phone_number,
+                "school_attended": user.school_attended,
+                "profession": user.profession
+            }
+        }, status=status.HTTP_200_OK)
+    
+    def patch(self, request):
+        """Handle partial profile updates (same as PUT)"""
+        return self.put(request)
 
 
 
@@ -597,10 +775,6 @@ class ChangePasswordView(APIView):
 
 
 # views.py
-from django.shortcuts import redirect
-from django.http import HttpResponseRedirect
-
-
 class LogoutView(APIView):
     """Logout that handles both API and browser requests"""
     permission_classes = [AllowAny]
@@ -634,7 +808,6 @@ class LogoutView(APIView):
         return self.post(request)
     
 
-# views.py - Add these API views
 
 class PaginatedReconnectAPIView(APIView):
     permission_classes = [IsAuthenticated]

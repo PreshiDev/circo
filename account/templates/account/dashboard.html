@@ -4,7 +4,7 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<div class="container-fluid px-4 py-4" style="background: #f8fafc; min-height: 100vh;">
+<div class="container-fluid px-4 py-4" style="background: var(--circo-bg-primary); min-height: 100vh;">
 
     <!-- HEADER -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5">
@@ -13,16 +13,16 @@
             <img src="{{ user.profile_picture.url }}" 
                  alt="{{ user.full_name }}" 
                  class="rounded-circle me-3"
-                 style="width: 60px; height: 60px; object-fit: cover; border: 2px solid #e2e8f0;">
+                 style="width: 60px; height: 60px; object-fit: cover; border: 2px solid var(--circo-border);">
             {% else %}
             <div class="rounded-circle me-3 d-flex align-items-center justify-content-center"
-                 style="width: 60px; height: 60px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 24px; font-weight: 500; border: 2px solid #e2e8f0;">
+                 style="width: 60px; height: 60px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 24px; font-weight: 500; border: 2px solid var(--circo-border);">
                 {{ user.full_name|slice:":1"|upper }}
             </div>
             {% endif %}
             <div>
-                <h2 class="fw-light mb-1" style="color: #1e293b; font-size: clamp(1.25rem, 4vw, 2rem);">Welcome back, {{ user.full_name }}</h2>
-                <p class="text-secondary mb-0" style="font-size: 0.9rem; letter-spacing: 0.3px;">
+                <h2 class="fw-light mb-1" style="color: var(--circo-text-primary); font-size: clamp(1.25rem, 4vw, 2rem);">Welcome back, {{ user.full_name }}</h2>
+                <p class="text-secondary mb-0" style="color: var(--circo-text-muted) !important; font-size: 0.9rem; letter-spacing: 0.3px;">
                     {{ user.email }} • Member since {{ user.date_joined|date:"F Y" }}
                 </p>
             </div>
@@ -30,30 +30,55 @@
         
         <div class="d-flex gap-2">
             <button class="btn btn-outline-dark px-4 py-2 rounded-3" 
-                    style="border-color: #cbd5e1; color: #334155; font-weight: 400; font-size: 0.9rem;"
+                    style="border-color: var(--circo-border); color: var(--circo-text-secondary); font-weight: 400; font-size: 0.9rem;"
                     onclick="openImportModal()">
                 📱 Import Contacts
             </button>
             <button class="btn btn-dark px-4 py-2 rounded-3" 
-                    style="background: #1e293b; border: none; font-weight: 400; font-size: 0.9rem;"
+                    style="background: var(--circo-btn-dark-bg); border: none; font-weight: 400; font-size: 0.9rem;"
                     data-bs-toggle="modal" data-bs-target="#addContactModal">
                 + Add Person
             </button>
         </div>
     </div>
 
+    <!-- 🔍 GLOBAL SEARCH -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="rounded-4 p-3 p-md-4" style="background: var(--circo-bg-secondary); border: 1px solid var(--circo-border);">
+                <div class="d-flex align-items-center mb-3">
+                    <span class="me-2 fs-5">🔍</span>
+                    <h6 class="fw-semibold mb-0 text-uppercase tracking-wide" style="color: var(--circo-text-muted); font-size: 0.8rem; letter-spacing: 0.5px;">Search Contacts</h6>
+                </div>
+                <div class="input-group">
+                    <span class="input-group-text" style="background: var(--circo-bg-tertiary); border: 1px solid var(--circo-border); color: var(--circo-text-muted);">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" 
+                           class="form-control" 
+                           id="globalSearchInput" 
+                           placeholder="Search by name, school, profession, meeting context..."
+                           style="background: var(--circo-bg-tertiary); border: 1px solid var(--circo-border); color: var(--circo-text-primary);"
+                           onkeyup="performGlobalSearch()">
+                </div>
+                <div id="globalSearchResults" class="mt-3" style="display: none; max-height: 400px; overflow-y: auto;">
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 🔔 RECONNECT -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="bg-white rounded-4 p-3 p-md-4" style="border: 1px solid #e2e8f0;">
+            <div class="rounded-4 p-3 p-md-4" style="background: var(--circo-bg-secondary); border: 1px solid var(--circo-border);">
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <div class="d-flex align-items-center">
                         <span class="me-2 fs-5">🔔</span>
-                        <h6 class="fw-semibold mb-0 text-uppercase tracking-wide" style="color: #64748b; font-size: 0.8rem; letter-spacing: 0.5px;">Reconnect Now</h6>
+                        <h6 class="fw-semibold mb-0 text-uppercase tracking-wide" style="color: var(--circo-text-muted); font-size: 0.8rem; letter-spacing: 0.5px;">Reconnect Now</h6>
                     </div>
                     {% if reconnect_contacts %}
                     <button class="btn btn-link btn-sm text-decoration-none" 
-                            style="color: #64748b; font-size: 0.75rem;"
+                            style="color: var(--circo-text-muted); font-size: 0.75rem;"
                             onclick="openFullListModal('reconnect')">
                         View All →
                     </button>
@@ -63,11 +88,11 @@
                 <div class="vstack gap-1">
                     {% for contact in reconnect_contacts|slice:":5" %}
                     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3" 
-                         style="border-bottom: 1px solid #f1f5f9;">
+                         style="border-bottom: 1px solid var(--circo-border);">
                         <div class="d-flex align-items-center mb-2 mb-md-0">
                             <div class="me-3">
                                 <button class="btn btn-link p-0 text-decoration-none" 
-                                        style="color: #64748b;"
+                                        style="color: var(--circo-text-muted);"
                                         onclick="viewProfile({{ contact.id }})"
                                         title="View Profile">
                                     <div class="rounded-circle d-flex align-items-center justify-content-center"
@@ -77,33 +102,33 @@
                                 </button>
                             </div>
                             <div>
-                                <p class="fw-medium mb-1" style="color: #0f172a;">
+                                <p class="fw-medium mb-1" style="color: var(--circo-text-primary);">
                                     <button class="btn btn-link p-0 text-decoration-none" 
-                                            style="color: #0f172a; font-weight: 500;"
+                                            style="color: var(--circo-text-primary); font-weight: 500;"
                                             onclick="viewProfile({{ contact.id }})">
                                         {{ contact.name }}
                                     </button>
                                 </p>
-                                <small style="color: #94a3b8; font-size: 0.8rem;">
+                                <small style="color: var(--circo-text-muted); font-size: 0.8rem;">
                                     Last interaction: {{ contact.last_interaction|default:"Never" }}
                                 </small>
                             </div>
                         </div>
                         <div class="d-flex gap-2">
                             <button class="btn btn-outline-secondary btn-sm rounded-3 px-3" 
-                                    style="border-color: #cbd5e1; color: #64748b; font-size: 0.75rem;"
+                                    style="border-color: var(--circo-border); color: var(--circo-text-muted); font-size: 0.75rem;"
                                     onclick="viewProfile({{ contact.id }})">
                                 View
                             </button>
                             <button class="btn btn-outline-dark btn-sm rounded-3 px-3" 
-                                    style="border-color: #cbd5e1; color: #334155; font-size: 0.8rem;"
+                                    style="border-color: var(--circo-border); color: var(--circo-text-secondary); font-size: 0.8rem;"
                                     onclick="recordInteraction({{ contact.id }})">
                                 Reconnect
                             </button>
                         </div>
                     </div>
                     {% empty %}
-                    <p class="text-muted text-center py-4" style="color: #94a3b8 !important;">No reconnect needed 🎉</p>
+                    <p class="text-muted text-center py-4" style="color: var(--circo-text-muted) !important;">No reconnect needed 🎉</p>
                     {% endfor %}
                 </div>
             </div>
@@ -113,16 +138,16 @@
     <!-- 🎂 EVENTS & 📍 RECENT CONTACTS -->
     <div class="row g-4 mb-4">
         <div class="col-md-6">
-            <div class="bg-white rounded-4 p-3 p-md-4 h-100" style="border: 1px solid #e2e8f0;">
+            <div class="rounded-4 p-3 p-md-4 h-100" style="background: var(--circo-bg-secondary); border: 1px solid var(--circo-border);">
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <div class="d-flex align-items-center">
                         <span class="me-2 fs-5">🎂</span>
-                        <h6 class="fw-semibold mb-0 text-uppercase tracking-wide" style="color: #64748b; font-size: 0.8rem; letter-spacing: 0.5px;">Upcoming Events</h6>
+                        <h6 class="fw-semibold mb-0 text-uppercase tracking-wide" style="color: var(--circo-text-muted); font-size: 0.8rem; letter-spacing: 0.5px;">Upcoming Events</h6>
                     </div>
                     <div>
                         {% if upcoming_events %}
                         <button class="btn btn-link btn-sm text-decoration-none me-2" 
-                                style="color: #64748b; font-size: 0.75rem;"
+                                style="color: var(--circo-text-muted); font-size: 0.75rem;"
                                 onclick="openFullListModal('events')">
                             View All →
                         </button>
@@ -138,11 +163,11 @@
                 <div class="vstack gap-1">
                     {% for event in upcoming_events|slice:":5" %}
                     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3" 
-                        style="border-bottom: 1px solid #f1f5f9;">
+                        style="border-bottom: 1px solid var(--circo-border);">
                         <div class="d-flex align-items-center mb-2 mb-md-0">
                             <div class="me-3">
                                 <button class="btn btn-link p-0 text-decoration-none" 
-                                        style="color: #64748b;"
+                                        style="color: var(--circo-text-muted);"
                                         onclick="viewProfile({{ event.contact.id }})"
                                         title="View Profile">
                                     <div class="rounded-circle d-flex align-items-center justify-content-center"
@@ -152,14 +177,14 @@
                                 </button>
                             </div>
                             <div>
-                                <p class="fw-medium mb-1" style="color: #0f172a;">
+                                <p class="fw-medium mb-1" style="color: var(--circo-text-primary);">
                                     <button class="btn btn-link p-0 text-decoration-none" 
-                                            style="color: #0f172a; font-weight: 500;"
+                                            style="color: var(--circo-text-primary); font-weight: 500;"
                                             onclick="viewProfile({{ event.contact.id }})">
                                         {{ event.contact.name }}
                                     </button>
                                 </p>
-                                <small style="color: #94a3b8; font-size: 0.8rem;">{{ event.title }}</small>
+                                <small style="color: var(--circo-text-muted); font-size: 0.8rem;">{{ event.title }}</small>
                             </div>
                         </div>
                         <div class="text-md-end">
@@ -172,7 +197,7 @@
                             {% elif event.date == tomorrow %}
                                 <small class="d-block text-warning" style="font-size: 0.7rem;">Tomorrow</small>
                             {% else %}
-                                <small class="d-block text-muted" style="font-size: 0.7rem;">
+                                <small class="d-block" style="color: var(--circo-text-muted); font-size: 0.7rem;">
                                     In {{ event.date|timeuntil }}
                                 </small>
                             {% endif %}
@@ -180,7 +205,7 @@
                     </div>
                     {% empty %}
                     <div class="text-center py-4">
-                        <p class="text-muted mb-3" style="color: #94a3b8 !important;">No upcoming events</p>
+                        <p class="text-muted mb-3" style="color: var(--circo-text-muted) !important;">No upcoming events</p>
                         <button class="btn btn-primary btn-sm rounded-3 px-4" 
                                 data-bs-toggle="modal" data-bs-target="#addEventModal">
                             + Create Your First Event
@@ -192,15 +217,15 @@
         </div>
 
         <div class="col-md-6">
-            <div class="bg-white rounded-4 p-3 p-md-4 h-100" style="border: 1px solid #e2e8f0;">
+            <div class="rounded-4 p-3 p-md-4 h-100" style="background: var(--circo-bg-secondary); border: 1px solid var(--circo-border);">
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <div class="d-flex align-items-center">
                         <span class="me-2 fs-5">📍</span>
-                        <h6 class="fw-semibold mb-0 text-uppercase tracking-wide" style="color: #64748b; font-size: 0.8rem; letter-spacing: 0.5px;">Recently Added</h6>
+                        <h6 class="fw-semibold mb-0 text-uppercase tracking-wide" style="color: var(--circo-text-muted); font-size: 0.8rem; letter-spacing: 0.5px;">Recently Added</h6>
                     </div>
                     {% if recent_contacts %}
                     <button class="btn btn-link btn-sm text-decoration-none" 
-                            style="color: #64748b; font-size: 0.75rem;"
+                            style="color: var(--circo-text-muted); font-size: 0.75rem;"
                             onclick="openFullListModal('recent')">
                         View All →
                     </button>
@@ -210,11 +235,11 @@
                 <div class="vstack gap-1">
                     {% for contact in recent_contacts|slice:":5" %}
                     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3" 
-                        style="border-bottom: 1px solid #f1f5f9;">
+                        style="border-bottom: 1px solid var(--circo-border);">
                         <div class="d-flex align-items-center mb-2 mb-md-0">
                             <div class="me-3">
                                 <button class="btn btn-link p-0 text-decoration-none" 
-                                        style="color: #64748b;"
+                                        style="color: var(--circo-text-muted);"
                                         onclick="viewProfile({{ contact.id }})"
                                         title="View Profile">
                                     <div class="rounded-circle d-flex align-items-center justify-content-center"
@@ -224,131 +249,321 @@
                                 </button>
                             </div>
                             <div>
-                                <p class="fw-medium mb-1" style="color: #0f172a;">
+                                <p class="fw-medium mb-1" style="color: var(--circo-text-primary);">
                                     <button class="btn btn-link p-0 text-decoration-none" 
-                                            style="color: #0f172a; font-weight: 500;"
+                                            style="color: var(--circo-text-primary); font-weight: 500;"
                                             onclick="viewProfile({{ contact.id }})">
                                         {{ contact.name }}
                                     </button>
                                 </p>
-                                <small style="color: #94a3b8; font-size: 0.8rem;">
+                                <small style="color: var(--circo-text-muted); font-size: 0.8rem;">
                                     Added {{ contact.created_at|date:"M d, Y" }}
                                 </small>
                             </div>
                         </div>
                         <div class="d-flex gap-2">
                             <button class="btn btn-outline-secondary btn-sm rounded-3 px-3" 
-                                    style="border-color: #cbd5e1; color: #64748b; font-size: 0.75rem;"
+                                    style="border-color: var(--circo-border); color: var(--circo-text-muted); font-size: 0.75rem;"
                                     onclick="viewProfile({{ contact.id }})">
                                 View
                             </button>
                             <button class="btn btn-link btn-sm text-decoration-none" 
-                                    style="color: #475569; font-size: 0.8rem;"
+                                    style="color: var(--circo-text-secondary); font-size: 0.8rem;"
                                     onclick="recordInteraction({{ contact.id }})">
                                 Log Interaction →
                             </button>
                         </div>
                     </div>
                     {% empty %}
-                    <p class="text-muted text-center py-4" style="color: #94a3b8 !important;">No recent contacts</p>
+                    <p class="text-muted text-center py-4" style="color: var(--circo-text-muted) !important;">No recent contacts</p>
                     {% endfor %}
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 🎓 ALUMNI -->
-    <div class="row">
+    <!-- 🎓 ALUMNI NETWORK -->
+    <div class="row mb-4">
         <div class="col-12">
-            <div class="bg-white rounded-4 p-3 p-md-4" style="border: 1px solid #e2e8f0;">
+            <div class="rounded-4 p-3 p-md-4" style="background: var(--circo-bg-secondary); border: 1px solid var(--circo-border);">
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <div class="d-flex align-items-center">
                         <span class="me-2 fs-5">🎓</span>
-                        <h6 class="fw-semibold mb-0 text-uppercase tracking-wide" style="color: #64748b; font-size: 0.8rem; letter-spacing: 0.5px;">Alumni Network</h6>
+                        <h6 class="fw-semibold mb-0 text-uppercase tracking-wide" style="color: var(--circo-text-muted); font-size: 0.8rem; letter-spacing: 0.5px;">
+                            Alumni Network
+                        </h6>
                     </div>
-                    {% if alumni_contacts %}
+                    {% if auto_alumni or alumni_by_school %}
                     <button class="btn btn-link btn-sm text-decoration-none" 
-                            style="color: #64748b; font-size: 0.75rem;"
+                            style="color: var(--circo-text-muted); font-size: 0.75rem;"
                             onclick="openFullListModal('alumni')">
-                        View All →
+                        View All Alumni →
                     </button>
                     {% endif %}
                 </div>
 
-                <div class="vstack gap-1">
-                    {% for contact in alumni_contacts|slice:":5" %}
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3" 
-                        style="border-bottom: 1px solid #f1f5f9;">
-                        <div class="d-flex align-items-center mb-2 mb-md-0">
-                            <div class="me-3">
-                                <button class="btn btn-link p-0 text-decoration-none" 
-                                        style="color: #64748b;"
-                                        onclick="viewProfile({{ contact.id }})"
-                                        title="View Profile">
-                                    <div class="rounded-circle d-flex align-items-center justify-content-center"
-                                         style="width: 40px; height: 40px; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; font-size: 16px; font-weight: 500;">
-                                        {{ contact.name|slice:":1"|upper }}
-                                    </div>
-                                </button>
+                {% if user_school and auto_alumni %}
+                <!-- Auto-discovered Alumni from User's School -->
+                <div class="mb-4">
+                    <div class="rounded-3 p-3 mb-3" style="background: var(--circo-bg-tertiary); border-left: 4px solid #3b82f6;">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-mortarboard-fill me-2" style="font-size: 1.2rem; color: #3b82f6;"></i>
+                                <span style="color: var(--circo-text-secondary); font-size: 0.9rem;">
+                                    <strong>{{ user_school }}</strong> <span class="badge rounded-pill ms-2" style="background: #dbeafe; color: #1e40af; font-size: 0.7rem;">Your School</span>
+                                </span>
                             </div>
-                            <div>
-                                <p class="fw-medium mb-1" style="color: #0f172a;">
-                                    <button class="btn btn-link p-0 text-decoration-none" 
-                                            style="color: #0f172a; font-weight: 500;"
-                                            onclick="viewProfile({{ contact.id }})">
-                                        {{ contact.name }}
-                                    </button>
-                                </p>
-                                <small style="color: #94a3b8; font-size: 0.8rem;">
-                                    {{ contact.alumni_type|default:"Alumni" }}
-                                    {% if contact.last_interaction %}
-                                        • Last interaction: {{ contact.last_interaction|date:"M d, Y" }}
-                                    {% endif %}
-                                </small>
-                            </div>
+                            <span class="badge rounded-pill" style="background: #dbeafe; color: #1e40af; font-size: 0.75rem;">
+                                {{ auto_alumni|length }} alumni
+                            </span>
                         </div>
-                        
-                        <div class="d-flex gap-2">
-                            <button class="btn btn-outline-secondary btn-sm rounded-3 px-3" 
-                                    style="border-color: #cbd5e1; color: #64748b; font-size: 0.75rem;"
-                                    onclick="viewProfile({{ contact.id }})">
-                                View
-                            </button>
-                            {% if not contact.has_interacted_before %}
+                    </div>
+
+                    <div class="vstack gap-1">
+                        {% for alumni in auto_alumni %}
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3" 
+                             style="border-bottom: 1px solid var(--circo-border);">
+                            <div class="d-flex align-items-center mb-2 mb-md-0">
+                                <div class="me-3 position-relative">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                         style="width: 40px; height: 40px; 
+                                                {% if alumni.user.profile_picture %}
+                                                background-image: url('{{ alumni.user.profile_picture.url }}'); background-size: cover; background-position: center;
+                                                {% else %}
+                                                background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+                                                {% endif %}
+                                                color: white; font-size: 16px; font-weight: 500; cursor: pointer;"
+                                         onclick="viewAlumniProfile('{{ alumni.user.id }}')">
+                                        {% if not alumni.user.profile_picture %}
+                                            {{ alumni.user.full_name|slice:":1"|upper }}
+                                        {% endif %}
+                                    </div>
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" 
+                                          style="background: #3b82f6; font-size: 0.6rem;">
+                                        <i class="bi bi-star-fill"></i>
+                                    </span>
+                                </div>
+                                <div>
+                                    <p class="fw-medium mb-1" style="color: var(--circo-text-primary); cursor: pointer;" onclick="viewAlumniProfile('{{ alumni.user.id }}')">
+                                        {{ alumni.user.full_name }}
+                                    </p>
+                                    <small style="color: var(--circo-text-muted); font-size: 0.8rem;">
+                                        {% if alumni.user.profession %}
+                                        <span class="badge rounded-pill me-2" style="background: #e0e7ff; color: #3730a3; font-size: 0.7rem;">
+                                            <i class="bi bi-briefcase"></i> {{ alumni.user.profession }}
+                                        </span>
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-outline-secondary btn-sm rounded-3 px-3" 
+                                        style="border-color: var(--circo-border); color: var(--circo-text-muted); font-size: 0.75rem;"
+                                        onclick="viewAlumniProfile('{{ alumni.user.id }}')">
+                                    View
+                                </button>
+                                {% if not alumni.is_contact %}
                                 <button class="btn btn-sm rounded-3 px-3" 
                                         style="background: #3b82f6; color: white; font-size: 0.8rem;"
-                                        onclick="recordInteraction({{ contact.id }})">
-                                    Connect
+                                        onclick="saveAlumniContact('{{ alumni.user.id }}', '{{ alumni.user.full_name|escapejs }}', '{{ alumni.user.email|default:'' }}', '{{ alumni.user.phone_number|default:'' }}')">
+                                    <i class="bi bi-person-plus"></i> Add
                                 </button>
-                            {% elif contact.needs_reconnect %}
+                                {% elif alumni.contact.needs_reconnect %}
                                 <button class="btn btn-sm rounded-3 px-3" 
                                         style="background: #f59e0b; color: white; font-size: 0.8rem;"
-                                        onclick="recordInteraction({{ contact.id }})">
+                                        onclick="recordInteraction({{ alumni.contact.id }})">
                                     Reconnect
                                 </button>
-                            {% else %}
+                                {% else %}
                                 <button class="btn btn-sm rounded-3 px-3" 
                                         style="background: #10b981; color: white; font-size: 0.8rem; cursor: default;"
                                         disabled>
-                                    ✓ Connected
+                                    <i class="bi bi-check-circle"></i> Connected
                                 </button>
-                            {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% if auto_alumni|length > 3 %}
+                    <div class="text-center mt-3">
+                        <button class="btn btn-link btn-sm text-decoration-none" 
+                                style="color: var(--circo-text-muted); font-size: 0.8rem;"
+                                onclick="openFullListModal('alumni')">
+                            View all auto-discovered alumni from {{ user_school }} →
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Manual Alumni Contacts Grouped by School -->
+                {% for school_name, contacts in alumni_by_school.items %}
+                <div class="mb-4">
+                    <div class="rounded-3 p-3 mb-3" style="background: var(--circo-bg-tertiary); border-left: 4px solid #8b5cf6;">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-building me-2" style="font-size: 1.2rem; color: #8b5cf6;"></i>
+                                <span style="color: var(--circo-text-secondary); font-size: 0.9rem;">
+                                    <strong>{{ school_name }}</strong>
+                                    {% if school_name == user_school %}
+                                    <span class="badge rounded-pill ms-2" style="background: #dbeafe; color: #1e40af; font-size: 0.7rem;">Your School</span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <span class="badge rounded-pill" style="background: #ede9fe; color: #5b21b6; font-size: 0.75rem;">
+                                {{ contacts|length }} contact{{ contacts|length|pluralize }}
+                            </span>
                         </div>
                     </div>
-                    {% empty %}
-                    <p class="text-muted text-center py-4" style="color: #94a3b8 !important;">No alumni contacts yet</p>
-                    {% endfor %}
+
+                    <div class="row g-3">
+                        {% for contact in contacts|slice:":6" %}
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <div class="rounded-3 p-3 h-100" style="background: var(--circo-bg-tertiary); cursor: pointer; transition: transform 0.2s ease;"
+                                 onclick="viewProfile({{ contact.id }})"
+                                 onmouseover="this.style.transform='translateY(-2px)'"
+                                 onmouseout="this.style.transform='translateY(0)'">
+                                <div class="d-flex align-items-center">
+                                    <div class="me-3">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                             style="width: 40px; height: 40px; background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: white; font-size: 16px; font-weight: 500;">
+                                            {{ contact.name|slice:":1"|upper }}
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1 min-width-0">
+                                        <p class="fw-medium mb-1 text-truncate" style="color: var(--circo-text-primary); font-size: 0.9rem;">
+                                            {{ contact.name }}
+                                        </p>
+                                        <div class="d-flex flex-wrap gap-1">
+                                            <span class="badge rounded-pill" style="background: #fce7f3; color: #9d174d; font-size: 0.65rem;">
+                                                <i class="bi bi-person-badge"></i> {{ contact.alumni_type|default:"Alumni" }}
+                                            </span>
+                                            {% if contact.meeting_context and contact.meeting_context != "Alumni Network" %}
+                                            <span class="badge rounded-pill" style="background: #e0e7ff; color: #3730a3; font-size: 0.65rem;">
+                                                <i class="bi bi-geo-alt"></i> {{ contact.meeting_context }}
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        {% if not contact.has_interacted_before %}
+                                        <span class="badge bg-warning rounded-pill" style="font-size: 0.6rem;">New</span>
+                                        {% elif contact.needs_reconnect %}
+                                        <span class="badge bg-info rounded-pill" style="font-size: 0.6rem;">Reconnect</span>
+                                        {% else %}
+                                        <span class="badge bg-success rounded-pill" style="font-size: 0.6rem;">Active</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% if contacts|length > 6 %}
+                    <div class="text-center mt-3">
+                        <button class="btn btn-link btn-sm text-decoration-none" 
+                                style="color: var(--circo-text-muted); font-size: 0.8rem;"
+                                onclick="openFullListModal('alumni')">
+                            View all {{ contacts|length }} alumni from {{ school_name }} →
+                        </button>
+                    </div>
+                    {% endif %}
                 </div>
+                {% endfor %}
+
+                {% if not auto_alumni and not alumni_by_school %}
+                <div class="text-center py-4">
+                    <p class="text-muted mb-3" style="color: var(--circo-text-muted) !important;">
+                        No alumni contacts yet. 
+                        {% if not user_school %}
+                        <a href="#" onclick="openEditProfileModal()" style="color: #3b82f6;">Add your school</a> to discover alumni.
+                        {% else %}
+                        Add contacts with school-related meeting contexts to see them here.
+                        {% endif %}
+                    </p>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
 
+    <!-- 👥 CONTACTS BY MEETING CONTEXT -->
+    {% for category, contacts in context_categories.items %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="rounded-4 p-3 p-md-4" style="background: var(--circo-bg-secondary); border: 1px solid var(--circo-border);">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="d-flex align-items-center">
+                        <span class="me-2 fs-5">{{ category|slice:":2" }}</span>
+                        <h6 class="fw-semibold mb-0 text-uppercase tracking-wide" style="color: var(--circo-text-muted); font-size: 0.8rem; letter-spacing: 0.5px;">
+                            {{ category }}
+                        </h6>
+                    </div>
+                    <span class="badge rounded-pill" style="background: var(--circo-bg-tertiary); color: var(--circo-text-muted); font-size: 0.75rem;">
+                        {{ contacts|length }} contact{{ contacts|length|pluralize }}
+                    </span>
+                </div>
+
+                <div class="row g-3">
+                    {% for contact in contacts|slice:":6" %}
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <div class="rounded-3 p-3" style="background: var(--circo-bg-tertiary); cursor: pointer; transition: transform 0.2s ease;"
+                             onclick="viewProfile({{ contact.id }})"
+                             onmouseover="this.style.transform='translateY(-2px)'"
+                             onmouseout="this.style.transform='translateY(0)'">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                         style="width: 40px; height: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 16px; font-weight: 500;">
+                                        {{ contact.name|slice:":1"|upper }}
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1 min-width-0">
+                                    <p class="fw-medium mb-1 text-truncate" style="color: var(--circo-text-primary); font-size: 0.9rem;">
+                                        {{ contact.name }}
+                                    </p>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        {% if contact.school %}
+                                        <span class="badge rounded-pill" style="background: #dbeafe; color: #1e40af; font-size: 0.65rem;">
+                                            <i class="bi bi-mortarboard"></i> {{ contact.school }}
+                                        </span>
+                                        {% endif %}
+                                        {% if contact.meeting_context %}
+                                        <span class="badge rounded-pill" style="background: #e0e7ff; color: #3730a3; font-size: 0.65rem;">
+                                            <i class="bi bi-geo-alt"></i> {{ contact.meeting_context }}
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div>
+                                    <i class="bi bi-chevron-right" style="color: var(--circo-text-muted);"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if contacts|length > 6 %}
+                <div class="text-center mt-3">
+                    <button class="btn btn-link btn-sm text-decoration-none" 
+                            style="color: var(--circo-text-muted); font-size: 0.8rem;"
+                            onclick="openFullListModal('recent')">
+                        View all {{ contacts|length }} contacts in {{ category }} →
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
     <!-- ================= CONTACT PROFILE MODAL ================= -->
     <div class="modal fade" id="contactProfileModal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
-            <div class="modal-content border-0 rounded-4">
-                <div class="modal-header border-0 px-4 pt-4 pb-2">
-                    <h5 class="modal-title fw-medium" style="color: #1e293b;" id="contactProfileModalTitle">Contact Profile</h5>
+            <div class="modal-content border-0 rounded-4" style="background: var(--circo-bg-secondary);">
+                <div class="modal-header border-0 px-4 pt-4 pb-2" style="border-bottom: 1px solid var(--circo-border);">
+                    <h5 class="modal-title fw-medium" style="color: var(--circo-text-primary);" id="contactProfileModalTitle">Contact Profile</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body px-4 pb-4" id="contactProfileModalBody">
@@ -358,9 +573,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer border-0 px-4 pb-4 pt-0">
-                    <button type="button" class="btn btn-outline-secondary rounded-3 px-4" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary rounded-3 px-4" id="contactProfileRecordInteractionBtn">Record Interaction</button>
+                <div class="modal-footer border-0 px-4 pb-4 pt-0" style="border-top: 1px solid var(--circo-border);">
+                    <button type="button" class="btn btn-outline-secondary rounded-3 px-4" data-bs-dismiss="modal" style="border-color: var(--circo-border); color: var(--circo-text-muted);">Close</button>
+                    <button type="button" class="btn btn-dark rounded-3 px-4" id="contactProfileRecordInteractionBtn" style="background: var(--circo-btn-dark-bg);">Record Interaction</button>
                 </div>
             </div>
         </div>
@@ -369,9 +584,9 @@
     <!-- ================= ADD CONTACT MODAL ================= -->
     <div class="modal fade" id="addContactModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 rounded-4">
-                <div class="modal-header border-0 px-4 pt-4 pb-2">
-                    <h5 class="modal-title fw-medium" style="color: #1e293b;">Add New Person</h5>
+            <div class="modal-content border-0 rounded-4" style="background: var(--circo-bg-secondary);">
+                <div class="modal-header border-0 px-4 pt-4 pb-2" style="border-bottom: 1px solid var(--circo-border);">
+                    <h5 class="modal-title fw-medium" style="color: var(--circo-text-primary);">Add New Person</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
@@ -380,42 +595,51 @@
 
                     <form id="contactForm">
                         <div class="mb-3">
-                            <label class="form-label small fw-medium text-secondary text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Full Name</label>
-                            <input type="text" class="form-control bg-light border-0 rounded-3 py-2" 
-                                   id="name" placeholder="John Doe" required
-                                   style="background: #f8fafc !important;">
+                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted); font-size: 0.7rem; letter-spacing: 0.5px;">Full Name</label>
+                            <input type="text" class="form-control rounded-3 py-2" 
+                                id="name" placeholder="John Doe" required
+                                style="background: var(--circo-bg-tertiary); border: 1px solid var(--circo-border); color: var(--circo-text-primary);">
                         </div>
                         
                         <div class="mb-3">
-                            <label class="form-label small fw-medium text-secondary text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Phone Number</label>
-                            <input type="tel" class="form-control bg-light border-0 rounded-3 py-2" 
-                                   id="phone_number" placeholder="+1 (555) 123-4567" required
-                                   style="background: #f8fafc !important;">
+                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted); font-size: 0.7rem; letter-spacing: 0.5px;">Phone Number</label>
+                            <input type="tel" class="form-control rounded-3 py-2" 
+                                id="phone_number" placeholder="+1 (555) 123-4567" required
+                                style="background: var(--circo-bg-tertiary); border: 1px solid var(--circo-border); color: var(--circo-text-primary);">
                         </div>
                         
                         <div class="mb-3">
-                            <label class="form-label small fw-medium text-secondary text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Email</label>
-                            <input type="email" class="form-control bg-light border-0 rounded-3 py-2" 
-                                   id="email" placeholder="john@example.com"
-                                   style="background: #f8fafc !important;">
+                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted); font-size: 0.7rem; letter-spacing: 0.5px;">Email</label>
+                            <input type="email" class="form-control rounded-3 py-2" 
+                                id="email" placeholder="john@example.com"
+                                style="background: var(--circo-bg-tertiary); border: 1px solid var(--circo-border); color: var(--circo-text-primary);">
                         </div>
                         
                         <div class="mb-3">
-                            <label class="form-label small fw-medium text-secondary text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Notes</label>
-                            <textarea class="form-control bg-light border-0 rounded-3 py-2" 
-                                      id="notes" rows="2" placeholder="Add any additional notes..."
-                                      style="background: #f8fafc !important;"></textarea>
+                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted); font-size: 0.7rem; letter-spacing: 0.5px;">Notes</label>
+                            <textarea class="form-control rounded-3 py-2" 
+                                    id="notes" rows="2" placeholder="Add any additional notes..."
+                                    style="background: var(--circo-bg-tertiary); border: 1px solid var(--circo-border); color: var(--circo-text-primary);"></textarea>
                         </div>
                         
-                        <div class="mb-4">
-                            <label class="form-label small fw-medium text-secondary text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Meeting Context</label>
-                            <input type="text" class="form-control bg-light border-0 rounded-3 py-2" 
-                                   id="meeting_context" placeholder="Conference, Coffee, etc."
-                                   style="background: #f8fafc !important;">
+                        <div class="mb-3">
+                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted); font-size: 0.7rem; letter-spacing: 0.5px;">
+                                Meeting Context 
+                                <span class="text-muted" style="font-size: 0.6rem;">(where you met this person)</span>
+                            </label>
+                            <input type="text" class="form-control rounded-3 py-2" 
+                                id="meeting_context" 
+                                placeholder="e.g., University of Lagos, Wedding, Coffee shop, Work..."
+                                style="background: var(--circo-bg-tertiary); border: 1px solid var(--circo-border); color: var(--circo-text-primary);">
+                            <small class="text-muted mt-1" style="font-size: 0.65rem; color: var(--circo-text-muted) !important;">
+                                <i class="bi bi-info-circle"></i> 
+                                Examples: "University of Ibadan", "Lagos Business School", "ABC Secondary School", 
+                                "Wedding", "Coffee at Starbucks", "Work colleague"
+                            </small>
                         </div>
 
                         <button type="submit" class="btn btn-dark w-100 rounded-3 py-2" 
-                                style="background: #1e293b; border: none; font-weight: 400;">
+                                style="background: var(--circo-btn-dark-bg); border: none; font-weight: 400;">
                             Save Contact
                         </button>
                     </form>
@@ -427,9 +651,9 @@
     <!-- ================= IMPORT CONTACTS MODAL ================= -->
     <div class="modal fade" id="importContactsModal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
-            <div class="modal-content border-0 rounded-4">
-                <div class="modal-header border-0 px-4 pt-4 pb-2">
-                    <h5 class="modal-title fw-medium" style="color: #1e293b;">
+            <div class="modal-content border-0 rounded-4" style="background: var(--circo-bg-secondary);">
+                <div class="modal-header border-0 px-4 pt-4 pb-2" style="border-bottom: 1px solid var(--circo-border);">
+                    <h5 class="modal-title fw-medium" style="color: var(--circo-text-primary);">
                         <span class="me-2">📱</span>Import Contacts from Phone
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -438,75 +662,68 @@
                 <div class="modal-body px-4 pb-4">
                     <div id="importMessage"></div>
                     
-                    <!-- Import Options -->
                     <div class="mb-4">
                         <div class="d-grid gap-3">
                             <button class="btn btn-outline-primary rounded-3 py-3" onclick="requestContactPermission()">
                                 <span class="me-2">📋</span>Select Contacts to Import
                             </button>
-                            <button class="btn btn-outline-secondary rounded-3 py-3" onclick="importAllContacts()">
+                            <button class="btn btn-outline-secondary rounded-3 py-3" onclick="importAllContacts()" style="border-color: var(--circo-border); color: var(--circo-text-secondary);">
                                 <span class="me-2">📱</span>Import All Contacts
                             </button>
                         </div>
-                        <p class="text-muted small mt-3 mb-0 text-center">
+                        <p class="text-muted small mt-3 mb-0 text-center" style="color: var(--circo-text-muted) !important;">
                             Your contacts are processed locally. We only save the ones you choose to import.
                         </p>
                     </div>
 
-                    <!-- Contact List Container -->
                     <div id="contactListContainer" style="display: none;">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="fw-medium mb-0" style="color: #1e293b;">Select Contacts</h6>
+                            <h6 class="fw-medium mb-0" style="color: var(--circo-text-primary);">Select Contacts</h6>
                             <div>
-                                <button class="btn btn-link btn-sm text-decoration-none me-2" onclick="selectAllContacts()">
+                                <button class="btn btn-link btn-sm text-decoration-none me-2" onclick="selectAllContacts()" style="color: var(--circo-text-muted);">
                                     Select All
                                 </button>
-                                <button class="btn btn-link btn-sm text-decoration-none" onclick="deselectAllContacts()">
+                                <button class="btn btn-link btn-sm text-decoration-none" onclick="deselectAllContacts()" style="color: var(--circo-text-muted);">
                                     Deselect All
                                 </button>
                             </div>
                         </div>
                         
-                        <!-- Search Box -->
                         <div class="mb-3">
                             <input type="text" 
-                                   class="form-control bg-light border-0 rounded-3 py-2" 
+                                   class="form-control rounded-3 py-2" 
                                    id="contactSearchInput" 
                                    placeholder="Search contacts..."
                                    onkeyup="filterContacts()"
-                                   style="background: #f8fafc !important;">
+                                   style="background: var(--circo-bg-tertiary); border: 1px solid var(--circo-border); color: var(--circo-text-primary);">
                         </div>
                         
-                        <!-- Contact List -->
                         <div id="contactSelectList" class="mb-3" style="max-height: 400px; overflow-y: auto;">
-                            <!-- Contacts will be populated here -->
                         </div>
                         
-                        <!-- Selected Count and Import Button -->
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-muted small">
+                            <span class="text-muted small" style="color: var(--circo-text-muted) !important;">
                                 Selected: <span id="selectedCount">0</span> contacts
                             </span>
                             <div>
-                                <button class="btn btn-outline-secondary rounded-3 px-4 me-2" onclick="backToImportOptions()">
+                                <button class="btn btn-outline-secondary rounded-3 px-4 me-2" onclick="backToImportOptions()" style="border-color: var(--circo-border); color: var(--circo-text-muted);">
                                     Back
                                 </button>
-                                <button class="btn btn-dark rounded-3 px-4" onclick="importSelectedContacts()" id="importSelectedBtn" disabled>
+                                <button class="btn btn-dark rounded-3 px-4" onclick="importSelectedContacts()" id="importSelectedBtn" disabled style="background: var(--circo-btn-dark-bg);">
                                     Import Selected
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Import Progress -->
                     <div id="importProgress" style="display: none;">
                         <div class="text-center py-4">
                             <div class="spinner-border text-primary mb-3" role="status"></div>
-                            <h6 class="mb-2">Importing Contacts...</h6>
-                            <p class="text-muted small mb-0">
+                            <h6 class="mb-2" style="color: var(--circo-text-primary);">Importing Contacts...</h6>
+                            <p class="text-muted small mb-0" style="color: var(--circo-text-muted) !important;">
                                 <span id="importedCount">0</span> / <span id="totalToImport">0</span> contacts imported
                             </p>
-                            <div class="progress mt-3" style="height: 6px;">
+                            <div class="progress mt-3" style="height: 6px; background: var(--circo-bg-tertiary);">
                                 <div id="importProgressBar" class="progress-bar bg-primary" role="progressbar" style="width: 0%"></div>
                             </div>
                         </div>
@@ -519,9 +736,9 @@
     <!-- ================= ADD EVENT MODAL ================= -->
     <div class="modal fade" id="addEventModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 rounded-4">
-                <div class="modal-header border-0 px-4 pt-4 pb-2">
-                    <h5 class="modal-title fw-medium" style="color: #1e293b;">Add New Event</h5>
+            <div class="modal-content border-0 rounded-4" style="background: var(--circo-bg-secondary);">
+                <div class="modal-header border-0 px-4 pt-4 pb-2" style="border-bottom: 1px solid var(--circo-border);">
+                    <h5 class="modal-title fw-medium" style="color: var(--circo-text-primary);">Add New Event</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
@@ -530,10 +747,10 @@
 
                     <form id="eventForm">
                         <div class="mb-3">
-                            <label class="form-label small fw-medium text-secondary text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Select Contact</label>
-                            <select class="form-select bg-light border-0 rounded-3 py-2" 
+                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted); font-size: 0.7rem; letter-spacing: 0.5px;">Select Contact</label>
+                            <select class="form-select rounded-3 py-2" 
                                     id="event_contact" required
-                                    style="background: #f8fafc !important;">
+                                    style="background: var(--circo-bg-tertiary); border: 1px solid var(--circo-border); color: var(--circo-text-primary);">
                                 <option value="">Choose a contact...</option>
                                 {% for contact in all_contacts %}
                                 <option value="{{ contact.id }}">{{ contact.name }}</option>
@@ -542,17 +759,17 @@
                         </div>
                         
                         <div class="mb-3">
-                            <label class="form-label small fw-medium text-secondary text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Event Title</label>
-                            <input type="text" class="form-control bg-light border-0 rounded-3 py-2" 
+                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted); font-size: 0.7rem; letter-spacing: 0.5px;">Event Title</label>
+                            <input type="text" class="form-control rounded-3 py-2" 
                                 id="event_title" placeholder="Birthday, Anniversary, etc." required
-                                style="background: #f8fafc !important;">
+                                style="background: var(--circo-bg-tertiary); border: 1px solid var(--circo-border); color: var(--circo-text-primary);">
                         </div>
                         
                         <div class="mb-3">
-                            <label class="form-label small fw-medium text-secondary text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Event Type</label>
-                            <select class="form-select bg-light border-0 rounded-3 py-2" 
+                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted); font-size: 0.7rem; letter-spacing: 0.5px;">Event Type</label>
+                            <select class="form-select rounded-3 py-2" 
                                     id="event_type"
-                                    style="background: #f8fafc !important;">
+                                    style="background: var(--circo-bg-tertiary); border: 1px solid var(--circo-border); color: var(--circo-text-primary);">
                                 <option value="birthday">Birthday</option>
                                 <option value="wedding">Wedding</option>
                                 <option value="anniversary">Anniversary</option>
@@ -561,18 +778,18 @@
                         </div>
                         
                         <div class="mb-3">
-                            <label class="form-label small fw-medium text-secondary text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Event Date</label>
-                            <input type="date" class="form-control bg-light border-0 rounded-3 py-2" 
+                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted); font-size: 0.7rem; letter-spacing: 0.5px;">Event Date</label>
+                            <input type="date" class="form-control rounded-3 py-2" 
                                 id="event_date" required
                                 min="{{ today|date:'Y-m-d' }}"
-                                style="background: #f8fafc !important;">
+                                style="background: var(--circo-bg-tertiary); border: 1px solid var(--circo-border); color: var(--circo-text-primary);">
                         </div>
                         
                         <div class="mb-4">
-                            <label class="form-label small fw-medium text-secondary text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Reminder (days before)</label>
-                            <select class="form-select bg-light border-0 rounded-3 py-2" 
+                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted); font-size: 0.7rem; letter-spacing: 0.5px;">Reminder (days before)</label>
+                            <select class="form-select rounded-3 py-2" 
                                     id="event_reminder"
-                                    style="background: #f8fafc !important;">
+                                    style="background: var(--circo-bg-tertiary); border: 1px solid var(--circo-border); color: var(--circo-text-primary);">
                                 <option value="1">1 day before</option>
                                 <option value="3">3 days before</option>
                                 <option value="7">1 week before</option>
@@ -582,7 +799,7 @@
                         </div>
 
                         <button type="submit" class="btn btn-dark w-100 rounded-3 py-2" 
-                                style="background: #1e293b; border: none; font-weight: 400;">
+                                style="background: var(--circo-btn-dark-bg); border: none; font-weight: 400;">
                             Create Event
                         </button>
                     </form>
@@ -594,9 +811,9 @@
     <!-- ================= FULL LIST MODAL ================= -->
     <div class="modal fade" id="fullListModal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
-            <div class="modal-content border-0 rounded-4">
-                <div class="modal-header border-0 px-4 pt-4 pb-2">
-                    <h5 class="modal-title fw-medium" style="color: #1e293b;" id="modalTitle">Full List</h5>
+            <div class="modal-content border-0 rounded-4" style="background: var(--circo-bg-secondary);">
+                <div class="modal-header border-0 px-4 pt-4 pb-2" style="border-bottom: 1px solid var(--circo-border);">
+                    <h5 class="modal-title fw-medium" style="color: var(--circo-text-primary);" id="modalTitle">Full List</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body px-4 pb-4" id="modalBody">
@@ -606,8 +823,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer border-0 px-4 pb-4 pt-0" id="modalFooter">
-                    <!-- Pagination will be loaded here -->
+                <div class="modal-footer border-0 px-4 pb-4 pt-0" id="modalFooter" style="border-top: 1px solid var(--circo-border);">
                 </div>
             </div>
         </div>
@@ -625,18 +841,9 @@
         transition: opacity 0.2s ease;
     }
     
-    .bg-white {
-        transition: box-shadow 0.2s ease;
-    }
-    
-    .bg-white:hover {
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-    }
-    
     .form-control:focus, .form-select:focus {
         outline: none;
-        box-shadow: 0 0 0 2px rgba(30, 41, 59, 0.1);
-        background: #ffffff !important;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
     }
 
     @keyframes slideIn {
@@ -662,20 +869,22 @@
     }
     
     .pagination .page-link {
-        color: #1e293b;
+        color: var(--circo-text-secondary);
         border: none;
         padding: 0.5rem 0.75rem;
         margin: 0 0.25rem;
         border-radius: 0.5rem !important;
+        background: var(--circo-bg-tertiary);
     }
     
     .pagination .page-item.active .page-link {
-        background-color: #1e293b;
+        background-color: #3b82f6;
         color: white;
     }
     
     .pagination .page-link:hover {
-        background-color: #f1f5f9;
+        background-color: var(--circo-bg-tertiary);
+        opacity: 0.8;
     }
     
     .profile-avatar-large {
@@ -691,18 +900,18 @@
         margin: 0 auto;
     }
     
-    /* Contact selection styles */
     .contact-select-item {
         transition: background-color 0.2s ease;
         cursor: pointer;
+        color: var(--circo-text-secondary);
     }
     
     .contact-select-item:hover {
-        background-color: #f8fafc;
+        background: var(--circo-bg-tertiary) !important;
     }
     
     .contact-select-item.selected {
-        background-color: #e0f2fe;
+        background: rgba(59, 130, 246, 0.1) !important;
         border-left: 3px solid #3b82f6;
     }
     
@@ -710,6 +919,48 @@
         width: 20px;
         height: 20px;
         cursor: pointer;
+    }
+    
+    /* Dark mode specific styles */
+    [data-bs-theme="dark"] .btn-outline-dark {
+        color: var(--circo-text-primary) !important;
+        border-color: var(--circo-border) !important;
+    }
+    
+    [data-bs-theme="dark"] .btn-dark {
+        background: #3b82f6 !important;
+        border-color: #3b82f6 !important;
+    }
+    
+    [data-bs-theme="dark"] .badge {
+        border: 1px solid var(--circo-border);
+    }
+    
+    [data-bs-theme="dark"] .modal-content {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    [data-bs-theme="dark"] .dropdown-menu {
+        background: var(--circo-bg-secondary) !important;
+        border-color: var(--circo-border) !important;
+    }
+    
+    [data-bs-theme="dark"] .dropdown-item {
+        color: var(--circo-text-secondary) !important;
+    }
+    
+    [data-bs-theme="dark"] .dropdown-item:hover {
+        background: var(--circo-bg-tertiary) !important;
+    }
+    
+    /* Search results animation */
+    #globalSearchResults {
+        animation: fadeIn 0.2s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
     
     /* Mobile responsive styles */
@@ -734,15 +985,6 @@
             padding-right: 1rem !important;
         }
         
-        .btn {
-            white-space: nowrap;
-        }
-        
-        .badge {
-            white-space: normal;
-            word-break: break-word;
-        }
-        
         h2 {
             font-size: 1.5rem !important;
         }
@@ -757,10 +999,6 @@
         .vstack.gap-1 > div {
             padding-top: 0.75rem !important;
             padding-bottom: 0.75rem !important;
-        }
-        
-        .d-flex.gap-2 {
-            margin-top: 0.5rem;
         }
     }
 </style>
@@ -803,6 +1041,144 @@ function getCookie(name) {
 
 const csrftoken = getCookie('csrftoken');
 
+// ================= GLOBAL SEARCH =================
+function performGlobalSearch() {
+    const searchTerm = document.getElementById('globalSearchInput').value.toLowerCase().trim();
+    const resultsContainer = document.getElementById('globalSearchResults');
+    
+    if (searchTerm.length < 2) {
+        resultsContainer.style.display = 'none';
+        return;
+    }
+    
+    buildSearchableContactList();
+    
+    const searchResults = [];
+    const contactElements = document.querySelectorAll('[data-contact-name]');
+    
+    contactElements.forEach(el => {
+        const name = (el.dataset.contactName || '').toLowerCase();
+        const school = (el.dataset.contactSchool || '').toLowerCase();
+        const profession = (el.dataset.contactProfession || '').toLowerCase();
+        const context = (el.dataset.contactContext || '').toLowerCase();
+        const contactId = el.dataset.contactId;
+        
+        if (name.includes(searchTerm) || 
+            school.includes(searchTerm) || 
+            profession.includes(searchTerm) || 
+            context.includes(searchTerm)) {
+            
+            if (!searchResults.find(r => r.id === contactId)) {
+                searchResults.push({
+                    id: contactId,
+                    name: el.dataset.contactName,
+                    school: el.dataset.contactSchool,
+                    profession: el.dataset.contactProfession,
+                    context: el.dataset.contactContext,
+                    type: el.dataset.contactType || 'contact'
+                });
+            }
+        }
+    });
+    
+    if (searchResults.length > 0) {
+        resultsContainer.innerHTML = `
+            <div class="rounded-3 p-2" style="background: var(--circo-bg-tertiary);">
+                <small class="text-muted d-block mb-2 px-2" style="color: var(--circo-text-muted) !important;">
+                    Found ${searchResults.length} result${searchResults.length > 1 ? 's' : ''}
+                </small>
+                ${searchResults.slice(0, 10).map(result => `
+                    <div class="rounded-3 p-3 mb-1" style="background: var(--circo-bg-secondary); cursor: pointer;"
+                         onclick="${result.type === 'alumni' ? `viewAlumniProfile('${result.id}')` : `viewProfile(${result.id})`}">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center me-3"
+                                     style="width: 36px; height: 36px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 14px; font-weight: 500;">
+                                    ${result.name.charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                    <p class="fw-medium mb-0" style="color: var(--circo-text-primary); font-size: 0.9rem;">${result.name}</p>
+                                    <div class="d-flex flex-wrap gap-1 mt-1">
+                                        ${result.school ? `<span class="badge rounded-pill" style="background: #dbeafe; color: #1e40af; font-size: 0.6rem;"><i class="bi bi-mortarboard"></i> ${result.school}</span>` : ''}
+                                        ${result.profession ? `<span class="badge rounded-pill" style="background: #e0e7ff; color: #3730a3; font-size: 0.6rem;"><i class="bi bi-briefcase"></i> ${result.profession}</span>` : ''}
+                                        ${result.context ? `<span class="badge rounded-pill" style="background: #fce7f3; color: #9d174d; font-size: 0.6rem;"><i class="bi bi-geo-alt"></i> ${result.context}</span>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <i class="bi bi-chevron-right" style="color: var(--circo-text-muted);"></i>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+                ${searchResults.length > 10 ? `<small class="text-muted d-block text-center mt-2" style="color: var(--circo-text-muted) !important;">Showing 10 of ${searchResults.length} results. Refine your search.</small>` : ''}
+            </div>
+        `;
+        resultsContainer.style.display = 'block';
+    } else {
+        resultsContainer.innerHTML = `
+            <div class="text-center py-3 text-muted" style="color: var(--circo-text-muted) !important;">
+                No results found for "${searchTerm}"
+            </div>
+        `;
+        resultsContainer.style.display = 'block';
+    }
+}
+
+function buildSearchableContactList() {
+    const contactCards = document.querySelectorAll('.vstack.gap-1 > div, .row.g-3 > div');
+    
+    contactCards.forEach(card => {
+        const nameEl = card.querySelector('p.fw-medium, .fw-medium');
+        const name = nameEl ? nameEl.textContent.trim() : '';
+        
+        const badges = card.querySelectorAll('.badge');
+        let school = '';
+        let profession = '';
+        let context = '';
+        
+        badges.forEach(badge => {
+            const text = badge.textContent.trim();
+            if (badge.querySelector('.bi-mortarboard')) {
+                school = text;
+            } else if (badge.querySelector('.bi-briefcase')) {
+                profession = text;
+            } else if (badge.querySelector('.bi-geo-alt')) {
+                context = text;
+            }
+        });
+        
+        const onclickAttr = card.getAttribute('onclick') || '';
+        const idMatch = onclickAttr.match(/viewProfile\((\d+)\)/) || onclickAttr.match(/viewAlumniProfile\('(\d+)'\)/);
+        const contactId = idMatch ? idMatch[1] : '';
+        const isAlumni = onclickAttr.includes('viewAlumniProfile');
+        
+        if (name && contactId) {
+            card.dataset.contactName = name;
+            card.dataset.contactSchool = school;
+            card.dataset.contactProfession = profession;
+            card.dataset.contactContext = context;
+            card.dataset.contactId = contactId;
+            card.dataset.contactType = isAlumni ? 'alumni' : 'contact';
+        }
+    });
+    
+    document.querySelectorAll('[onclick*="viewProfile"], [onclick*="viewAlumniProfile"]').forEach(el => {
+        const onclickAttr = el.getAttribute('onclick') || '';
+        const idMatch = onclickAttr.match(/viewProfile\((\d+)\)/) || onclickAttr.match(/viewAlumniProfile\('(\d+)'\)/);
+        if (idMatch) {
+            el.dataset.contactId = idMatch[1];
+            el.dataset.contactName = el.textContent.trim();
+            el.dataset.contactType = onclickAttr.includes('viewAlumniProfile') ? 'alumni' : 'contact';
+        }
+    });
+}
+
+function openEditProfileModal() {
+    const modal = new bootstrap.Modal(document.getElementById('circoEditProfileModal'));
+    modal.show();
+}
+
 // ================= CONTACT IMPORT FUNCTIONS =================
 function openImportModal() {
     const modal = new bootstrap.Modal(document.getElementById('importContactsModal'));
@@ -844,12 +1220,11 @@ async function requestContactPermission() {
             return;
         }
         
-        // Process selected contacts
         allPhoneContacts = contacts.map(contact => ({
             name: contact.name || 'Unknown',
             phone: contact.tel && contact.tel.length > 0 ? contact.tel[0] : '',
             email: contact.email && contact.email.length > 0 ? contact.email[0] : ''
-        })).filter(c => c.phone); // Only keep contacts with phone numbers
+        })).filter(c => c.phone);
         
         filteredPhoneContacts = [...allPhoneContacts];
         displayContactList();
@@ -861,18 +1236,15 @@ async function requestContactPermission() {
 }
 
 async function importAllContacts() {
-    // Show progress
     document.querySelector('#importContactsModal .modal-body > div:first-of-type').style.display = 'none';
     document.getElementById('contactListContainer').style.display = 'none';
     document.getElementById('importProgress').style.display = 'block';
     
     try {
         if ('contacts' in navigator && 'getAll' in navigator.contacts) {
-            // Use getAll if available
             const contacts = await navigator.contacts.getAll(['name', 'tel', 'email']);
             await processBulkImport(contacts);
         } else {
-            // Fallback: ask user to select all contacts manually
             const props = ['name', 'tel', 'email'];
             const opts = {multiple: true};
             
@@ -933,13 +1305,11 @@ async function processBulkImport(contacts) {
             console.error('Batch import error:', error);
         }
         
-        // Update progress
         document.getElementById('importedCount').textContent = imported;
         const progress = (imported / validContacts.length) * 100;
         document.getElementById('importProgressBar').style.width = progress + '%';
     }
     
-    // Complete
     setTimeout(() => {
         const modal = bootstrap.Modal.getInstance(document.getElementById('importContactsModal'));
         modal.hide();
@@ -990,11 +1360,11 @@ function displayContactList() {
                              style="width: 32px; height: 32px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 14px;">
                             ${contact.name ? contact.name.charAt(0).toUpperCase() : '?'}
                         </div>
-                        <strong style="color: #0f172a;">${contact.name || 'Unknown'}</strong>
+                        <strong>${contact.name || 'Unknown'}</strong>
                     </div>
                     <div class="ms-5 ps-2">
-                        <small style="color: #64748b;">📱 ${contact.phone}</small>
-                        ${contact.email ? `<br><small style="color: #64748b;">✉️ ${contact.email}</small>` : ''}
+                        <small>📱 ${contact.phone}</small>
+                        ${contact.email ? `<br><small>✉️ ${contact.email}</small>` : ''}
                     </div>
                 </div>
             </div>
@@ -1073,7 +1443,6 @@ function updateSelectedCount() {
 async function importSelectedContacts() {
     if (selectedContactIds.size === 0) return;
     
-    // Get selected contacts
     const selectedContacts = [];
     filteredPhoneContacts.forEach((contact, index) => {
         const contactId = `contact_${index}_${contact.phone.replace(/\D/g, '')}`;
@@ -1088,14 +1457,12 @@ async function importSelectedContacts() {
         }
     });
     
-    // Hide contact list, show progress
     document.getElementById('contactListContainer').style.display = 'none';
     document.getElementById('importProgress').style.display = 'block';
     document.getElementById('totalToImport').textContent = selectedContacts.length;
     
     let imported = 0;
     
-    // Import contacts one by one
     for (let i = 0; i < selectedContacts.length; i++) {
         const contact = selectedContacts[i];
         
@@ -1116,13 +1483,11 @@ async function importSelectedContacts() {
             console.error('Import error:', error);
         }
         
-        // Update progress
         document.getElementById('importedCount').textContent = imported;
         const progress = ((i + 1) / selectedContacts.length) * 100;
         document.getElementById('importProgressBar').style.width = progress + '%';
     }
     
-    // Complete
     setTimeout(() => {
         const modal = bootstrap.Modal.getInstance(document.getElementById('importContactsModal'));
         modal.hide();
@@ -1150,7 +1515,7 @@ async function viewProfile(contactId) {
     modalBody.innerHTML = `
         <div class="text-center py-5">
             <div class="spinner-border text-primary" role="status"></div>
-            <p class="mt-3 text-muted">Loading contact details...</p>
+            <p class="mt-3" style="color: var(--circo-text-muted);">Loading contact details...</p>
         </div>
     `;
     
@@ -1193,49 +1558,79 @@ async function viewProfile(contactId) {
                     <div class="profile-avatar-large" style="background: ${gradient};">
                         ${c.name ? c.name.charAt(0).toUpperCase() : '?'}
                     </div>
-                    <h4 class="mt-3 mb-2">${c.name || ''}</h4>
+                    <h4 class="mt-3 mb-2" style="color: var(--circo-text-primary);">${c.name || ''}</h4>
                     ${statusBadge}
                 </div>
                 
                 <div class="row mb-4">
                     <div class="col-12 col-md-6">
                         <div class="mb-3">
-                            <label class="form-label small fw-medium text-secondary text-uppercase">Phone</label>
-                            <p class="mb-0">${c.phone_number || 'Not provided'}</p>
+                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted);">Phone</label>
+                            <p style="color: var(--circo-text-secondary);">${c.phone_number || 'Not provided'}</p>
                         </div>
                     </div>
                     <div class="col-12 col-md-6">
                         <div class="mb-3">
-                            <label class="form-label small fw-medium text-secondary text-uppercase">Email</label>
-                            <p class="mb-0">${c.email || 'Not provided'}</p>
+                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted);">Email</label>
+                            <p style="color: var(--circo-text-secondary);">${c.email || 'Not provided'}</p>
                         </div>
                     </div>
                 </div>
+                
+                ${c.school ? `
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="mb-3">
+                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted);">School</label>
+                            <p style="color: var(--circo-text-secondary);">
+                                <span class="badge rounded-pill" style="background: #dbeafe; color: #1e40af;">
+                                    <i class="bi bi-mortarboard"></i> ${c.school}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+                
+                ${c.meeting_context ? `
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="mb-3">
+                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted);">Meeting Context</label>
+                            <p style="color: var(--circo-text-secondary);">
+                                <span class="badge rounded-pill" style="background: #e0e7ff; color: #3730a3;">
+                                    <i class="bi bi-geo-alt"></i> ${c.meeting_context}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
                 
                 <div class="row mb-4">
                     <div class="col-12 col-md-6">
                         <div class="mb-3">
-                            <label class="form-label small fw-medium text-secondary text-uppercase">Added</label>
-                            <p class="mb-0">${c.created_at ? new Date(c.created_at).toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'}) : 'Unknown'}</p>
+                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted);">Added</label>
+                            <p style="color: var(--circo-text-secondary);">${c.created_at ? new Date(c.created_at).toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'}) : 'Unknown'}</p>
                         </div>
                     </div>
                     <div class="col-12 col-md-6">
                         <div class="mb-3">
-                            <label class="form-label small fw-medium text-secondary text-uppercase">Last Interaction</label>
-                            <p class="mb-0">${c.last_interaction ? new Date(c.last_interaction).toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'}) : 'Never'}</p>
+                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted);">Last Interaction</label>
+                            <p style="color: var(--circo-text-secondary);">${c.last_interaction ? new Date(c.last_interaction).toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'}) : 'Never'}</p>
                         </div>
                     </div>
                 </div>
                 
                 <div class="mb-4">
-                    <label class="form-label small fw-medium text-secondary text-uppercase">Notes</label>
-                    <p class="mb-0">${c.notes || 'No notes'}</p>
+                    <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted);">Notes</label>
+                    <p style="color: var(--circo-text-secondary);">${c.notes || 'No notes'}</p>
                 </div>
                 
                 ${c.is_alumni ? `
                 <div class="mb-4">
-                    <label class="form-label small fw-medium text-secondary text-uppercase">Alumni Information</label>
-                    <p class="mb-0">
+                    <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted);">Alumni Information</label>
+                    <p>
                         <span class="badge bg-primary me-2">Alumni</span>
                         ${c.alumni_type || ''}
                     </p>
@@ -1244,14 +1639,14 @@ async function viewProfile(contactId) {
                 
                 ${data.events && data.events.length > 0 ? `
                 <div class="mb-4">
-                    <label class="form-label small fw-medium text-secondary text-uppercase">Events</label>
+                    <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted);">Events</label>
                     <div class="list-group">
                         ${data.events.map(event => `
-                            <div class="list-group-item border-0 bg-light mb-2 rounded-3">
+                            <div class="list-group-item border-0 mb-2 rounded-3" style="background: var(--circo-bg-tertiary);">
                                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
                                     <div class="mb-2 mb-md-0">
-                                        <strong>${event.title}</strong>
-                                        <small class="d-block text-muted">${event.event_type}</small>
+                                        <strong style="color: var(--circo-text-primary);">${event.title}</strong>
+                                        <small class="d-block" style="color: var(--circo-text-muted);">${event.event_type}</small>
                                     </div>
                                     <span class="badge ${event.is_past ? 'bg-secondary' : 'bg-warning'} align-self-start align-self-md-center">
                                         ${new Date(event.date).toLocaleDateString()}
@@ -1264,24 +1659,24 @@ async function viewProfile(contactId) {
                 ` : ''}
                 
                 <div class="mb-3">
-                    <label class="form-label small fw-medium text-secondary text-uppercase">Statistics</label>
+                    <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted);">Statistics</label>
                     <div class="row g-2">
                         <div class="col-4">
-                            <div class="bg-light rounded-3 p-3 text-center">
-                                <h3 class="mb-0">${c.interaction_count || 0}</h3>
-                                <small class="text-muted">Interactions</small>
+                            <div class="rounded-3 p-3 text-center" style="background: var(--circo-bg-tertiary);">
+                                <h3 class="mb-0" style="color: var(--circo-text-primary);">${c.interaction_count || 0}</h3>
+                                <small style="color: var(--circo-text-muted);">Interactions</small>
                             </div>
                         </div>
                         <div class="col-4">
-                            <div class="bg-light rounded-3 p-3 text-center">
-                                <h3 class="mb-0">${data.events ? data.events.length : 0}</h3>
-                                <small class="text-muted">Events</small>
+                            <div class="rounded-3 p-3 text-center" style="background: var(--circo-bg-tertiary);">
+                                <h3 class="mb-0" style="color: var(--circo-text-primary);">${data.events ? data.events.length : 0}</h3>
+                                <small style="color: var(--circo-text-muted);">Events</small>
                             </div>
                         </div>
                         <div class="col-4">
-                            <div class="bg-light rounded-3 p-3 text-center">
-                                <h3 class="mb-0">${c.is_alumni ? '🎓' : '👤'}</h3>
-                                <small class="text-muted">Type</small>
+                            <div class="rounded-3 p-3 text-center" style="background: var(--circo-bg-tertiary);">
+                                <h3 class="mb-0" style="color: var(--circo-text-primary);">${c.is_alumni ? '🎓' : '👤'}</h3>
+                                <small style="color: var(--circo-text-muted);">Type</small>
                             </div>
                         </div>
                     </div>
@@ -1304,6 +1699,139 @@ async function viewProfile(contactId) {
     }
 }
 
+// ================= VIEW ALUMNI PROFILE =================
+async function viewAlumniProfile(userId) {
+    const modalElement = document.getElementById('contactProfileModal');
+    const modal = new bootstrap.Modal(modalElement);
+    const modalBody = document.getElementById('contactProfileModalBody');
+    const modalTitle = document.getElementById('contactProfileModalTitle');
+    
+    modalTitle.textContent = 'Loading...';
+    modalBody.innerHTML = `
+        <div class="text-center py-5">
+            <div class="spinner-border" role="status" style="color: #3b82f6;"></div>
+            <p class="mt-3" style="color: var(--circo-text-muted);">Loading alumni details...</p>
+        </div>
+    `;
+    
+    modal.show();
+    
+    try {
+        const response = await fetch(`/api/alumni-profile/${userId}/`);
+        const data = await response.json();
+        
+        if (data.user) {
+            const u = data.user;
+            modalTitle.textContent = u.full_name;
+            
+            const html = `
+                <div class="text-center mb-4">
+                    <div class="profile-avatar-large" style="
+                        ${u.profile_picture ? `background-image: url('${u.profile_picture}'); background-size: cover; background-position: center;` : 'background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);'};
+                        display: flex; align-items: center; justify-content: center; color: white;">
+                        ${!u.profile_picture ? u.full_name.charAt(0).toUpperCase() : ''}
+                    </div>
+                    <h4 class="mt-3 mb-2" style="color: var(--circo-text-primary);">${u.full_name}</h4>
+                    <span class="badge rounded-pill" style="background: #dbeafe; color: #1e40af;">
+                        <i class="bi bi-mortarboard"></i> ${u.school_attended || 'Alumni'}
+                    </span>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-12 col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted);">Email</label>
+                            <p style="color: var(--circo-text-secondary);">${u.email || 'Not provided'}</p>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted);">Phone</label>
+                            <p style="color: var(--circo-text-secondary);">${u.phone_number || 'Not provided'}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-12 col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted);">School</label>
+                            <p style="color: var(--circo-text-secondary);">
+                                <span class="badge rounded-pill" style="background: #dbeafe; color: #1e40af;">
+                                    <i class="bi bi-mortarboard"></i> ${u.school_attended || 'Not specified'}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted);">Profession</label>
+                            <p style="color: var(--circo-text-secondary);">
+                                <span class="badge rounded-pill" style="background: #e0e7ff; color: #3730a3;">
+                                    <i class="bi bi-briefcase"></i> ${u.profession || 'Not specified'}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="rounded-3 p-3 mb-4" style="background: var(--circo-bg-tertiary);">
+                    <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted);">Quick Actions</label>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button class="btn btn-sm rounded-3" style="background: #3b82f6; color: white;"
+                                onclick="saveAlumniContact('${u.id}', '${u.full_name.replace(/'/g, "\\'")}', '${u.email || ''}', '${u.phone_number || ''}')">
+                            <i class="bi bi-person-plus me-1"></i> Save as Contact
+                        </button>
+                        ${u.email ? `
+                        <a href="mailto:${u.email}" class="btn btn-sm btn-outline-secondary rounded-3" style="border-color: var(--circo-border); color: var(--circo-text-muted);">
+                            <i class="bi bi-envelope me-1"></i> Send Email
+                        </a>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+            
+            modalBody.innerHTML = html;
+        }
+    } catch (error) {
+        modalBody.innerHTML = `<div class="alert alert-danger">Error loading alumni profile</div>`;
+    }
+}
+
+// ================= SAVE ALUMNI AS CONTACT =================
+async function saveAlumniContact(userId, name, email, phone) {
+    try {
+        const response = await fetch(contactUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({
+                name: name,
+                email: email,
+                phone_number: phone,
+                is_alumni: true,
+                alumni_type: 'Auto-discovered',
+                meeting_context: 'Alumni Network',
+                school: '{{ user_school }}',
+                notes: 'Auto-discovered alumni from {{ user_school }}'
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            showToast('Alumni saved as contact!', 'success');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast(data.error || 'Failed to save contact', 'error');
+        }
+    } catch (error) {
+        showToast('Network error occurred', 'error');
+    }
+}
+
 // ================= ADD CONTACT FORM =================
 document.getElementById("contactForm").addEventListener("submit", async function(e) {
     e.preventDefault();
@@ -1314,6 +1842,8 @@ document.getElementById("contactForm").addEventListener("submit", async function
     submitBtn.textContent = 'Saving...';
 
     try {
+        const meetingContext = document.getElementById("meeting_context").value;
+        
         const res = await fetch(contactUrl, {
             method: "POST",
             headers: {
@@ -1325,7 +1855,8 @@ document.getElementById("contactForm").addEventListener("submit", async function
                 phone_number: document.getElementById("phone_number").value,
                 email: document.getElementById("email").value,
                 notes: document.getElementById("notes").value,
-                meeting_context: document.getElementById("meeting_context").value
+                meeting_context: meetingContext
+                // No is_alumni or alumni_type - these are auto-detected
             })
         });
 
@@ -1353,6 +1884,31 @@ document.addEventListener('DOMContentLoaded', function() {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         dateInput.value = tomorrow.toISOString().split('T')[0];
+    }
+    
+    // Initialize search
+    setTimeout(buildSearchableContactList, 500);
+    
+    // Search input focus handler
+    const searchInput = document.getElementById('globalSearchInput');
+    if (searchInput) {
+        searchInput.addEventListener('focus', function() {
+            if (this.value.trim().length >= 2) {
+                performGlobalSearch();
+            }
+        });
+    }
+});
+
+// Close search results when clicking outside
+document.addEventListener('click', function(e) {
+    const searchContainer = document.getElementById('globalSearchResults');
+    const searchInput = document.getElementById('globalSearchInput');
+    
+    if (searchContainer && searchInput) {
+        if (!searchContainer.contains(e.target) && e.target !== searchInput) {
+            searchContainer.style.display = 'none';
+        }
     }
 });
 
@@ -1475,7 +2031,7 @@ function renderReconnectContent(contacts) {
     
     return contacts.map(contact => `
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3" 
-             style="border-bottom: 1px solid #f1f5f9;">
+             style="border-bottom: 1px solid var(--circo-border);">
             <div class="d-flex align-items-center mb-2 mb-md-0">
                 <div class="me-3" onclick="viewProfile(${contact.id})" style="cursor: pointer;">
                     <div class="rounded-circle d-flex align-items-center justify-content-center"
@@ -1484,8 +2040,8 @@ function renderReconnectContent(contacts) {
                     </div>
                 </div>
                 <div>
-                    <p class="fw-medium mb-1" style="color: #0f172a; cursor: pointer;" onclick="viewProfile(${contact.id})">${contact.name}</p>
-                    <small style="color: #94a3b8; font-size: 0.8rem;">
+                    <p class="fw-medium mb-1" style="color: var(--circo-text-primary); cursor: pointer;" onclick="viewProfile(${contact.id})">${contact.name}</p>
+                    <small style="color: var(--circo-text-muted); font-size: 0.8rem;">
                         ${contact.phone_number || 'No phone'} • ${contact.email || 'No email'}<br>
                         Last interaction: ${contact.last_interaction || 'Never'}
                         ${contact.days_since ? `(${contact.days_since} days ago)` : ''}
@@ -1494,12 +2050,12 @@ function renderReconnectContent(contacts) {
             </div>
             <div class="d-flex gap-2">
                 <button class="btn btn-outline-secondary btn-sm rounded-3 px-3" 
-                        style="border-color: #cbd5e1; color: #64748b; font-size: 0.75rem;"
+                        style="border-color: var(--circo-border); color: var(--circo-text-muted); font-size: 0.75rem;"
                         onclick="viewProfile(${contact.id})">
                     View
                 </button>
                 <button class="btn btn-outline-dark btn-sm rounded-3 px-3" 
-                        style="border-color: #cbd5e1; color: #334155; font-size: 0.8rem;"
+                        style="border-color: var(--circo-border); color: var(--circo-text-secondary); font-size: 0.8rem;"
                         onclick="recordInteractionFromModal(${contact.id})">
                     Reconnect
                 </button>
@@ -1513,7 +2069,7 @@ function renderEventsContent(events) {
     
     return events.map(event => `
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3" 
-             style="border-bottom: 1px solid #f1f5f9;">
+             style="border-bottom: 1px solid var(--circo-border);">
             <div class="d-flex align-items-center mb-2 mb-md-0">
                 <div class="me-3" onclick="viewProfile(${event.contact_id})" style="cursor: pointer;">
                     <div class="rounded-circle d-flex align-items-center justify-content-center"
@@ -1522,8 +2078,8 @@ function renderEventsContent(events) {
                     </div>
                 </div>
                 <div>
-                    <p class="fw-medium mb-1" style="color: #0f172a; cursor: pointer;" onclick="viewProfile(${event.contact_id})">${event.contact_name}</p>
-                    <small style="color: #94a3b8; font-size: 0.8rem;">
+                    <p class="fw-medium mb-1" style="color: var(--circo-text-primary); cursor: pointer;" onclick="viewProfile(${event.contact_id})">${event.contact_name}</p>
+                    <small style="color: var(--circo-text-muted); font-size: 0.8rem;">
                         ${event.title} • ${event.event_type}
                     </small>
                 </div>
@@ -1536,8 +2092,8 @@ function renderEventsContent(events) {
                     ${new Date(event.date).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}
                 </span>
                 ${!event.is_past && event.days_until !== null ? `
-                    <small class="d-block ${event.days_until === 0 ? 'text-success' : event.days_until === 1 ? 'text-warning' : 'text-muted'}" 
-                           style="font-size: 0.7rem;">
+                    <small class="d-block ${event.days_until === 0 ? 'text-success' : event.days_until === 1 ? 'text-warning' : ''}" 
+                           style="color: var(--circo-text-muted); font-size: 0.7rem;">
                         ${event.days_until === 0 ? 'Today!' : event.days_until === 1 ? 'Tomorrow' : `In ${event.days_until} days`}
                     </small>
                 ` : ''}
@@ -1551,7 +2107,7 @@ function renderRecentContent(contacts) {
     
     return contacts.map(contact => `
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3" 
-             style="border-bottom: 1px solid #f1f5f9;">
+             style="border-bottom: 1px solid var(--circo-border);">
             <div class="d-flex align-items-center mb-2 mb-md-0">
                 <div class="me-3" onclick="viewProfile(${contact.id})" style="cursor: pointer;">
                     <div class="rounded-circle d-flex align-items-center justify-content-center"
@@ -1560,8 +2116,8 @@ function renderRecentContent(contacts) {
                     </div>
                 </div>
                 <div>
-                    <p class="fw-medium mb-1" style="color: #0f172a; cursor: pointer;" onclick="viewProfile(${contact.id})">${contact.name}</p>
-                    <small style="color: #94a3b8; font-size: 0.8rem;">
+                    <p class="fw-medium mb-1" style="color: var(--circo-text-primary); cursor: pointer;" onclick="viewProfile(${contact.id})">${contact.name}</p>
+                    <small style="color: var(--circo-text-muted); font-size: 0.8rem;">
                         ${contact.phone_number || 'No phone'} • ${contact.email || 'No email'}<br>
                         Added ${new Date(contact.created_at).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}
                     </small>
@@ -1569,12 +2125,12 @@ function renderRecentContent(contacts) {
             </div>
             <div class="d-flex gap-2">
                 <button class="btn btn-outline-secondary btn-sm rounded-3 px-3" 
-                        style="border-color: #cbd5e1; color: #64748b; font-size: 0.75rem;"
+                        style="border-color: var(--circo-border); color: var(--circo-text-muted); font-size: 0.75rem;"
                         onclick="viewProfile(${contact.id})">
                     View
                 </button>
                 <button class="btn btn-link btn-sm text-decoration-none" 
-                        style="color: #475569; font-size: 0.8rem;"
+                        style="color: var(--circo-text-secondary); font-size: 0.8rem;"
                         onclick="recordInteractionFromModal(${contact.id})">
                     Log Interaction →
                 </button>
@@ -1610,7 +2166,7 @@ function renderAlumniContent(contacts) {
         
         return `
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3" 
-                 style="border-bottom: 1px solid #f1f5f9;">
+                 style="border-bottom: 1px solid var(--circo-border);">
                 <div class="d-flex align-items-center mb-2 mb-md-0">
                     <div class="me-3" onclick="viewProfile(${contact.id})" style="cursor: pointer;">
                         <div class="rounded-circle d-flex align-items-center justify-content-center"
@@ -1619,8 +2175,8 @@ function renderAlumniContent(contacts) {
                         </div>
                     </div>
                     <div>
-                        <p class="fw-medium mb-1" style="color: #0f172a; cursor: pointer;" onclick="viewProfile(${contact.id})">${contact.name}</p>
-                        <small style="color: #94a3b8; font-size: 0.8rem;">
+                        <p class="fw-medium mb-1" style="color: var(--circo-text-primary); cursor: pointer;" onclick="viewProfile(${contact.id})">${contact.name}</p>
+                        <small style="color: var(--circo-text-muted); font-size: 0.8rem;">
                             ${contact.alumni_type || 'Alumni'} • 
                             ${contact.phone_number || 'No phone'}<br>
                             Interactions: ${contact.interaction_count || 0}
@@ -1630,7 +2186,7 @@ function renderAlumniContent(contacts) {
                 </div>
                 <div class="d-flex gap-2">
                     <button class="btn btn-outline-secondary btn-sm rounded-3 px-3" 
-                            style="border-color: #cbd5e1; color: #64748b; font-size: 0.75rem;"
+                            style="border-color: var(--circo-border); color: var(--circo-text-muted); font-size: 0.75rem;"
                             onclick="viewProfile(${contact.id})">
                         View
                     </button>

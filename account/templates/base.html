@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
@@ -58,6 +58,190 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
+    <!-- Dark/Light Mode Styles -->
+    <style id="circo-theme-styles">
+        /* Light Mode (Default) */
+        [data-bs-theme="light"] {
+            --circo-bg-primary: #f8fafc;
+            --circo-bg-secondary: #ffffff;
+            --circo-bg-tertiary: #f1f5f9;
+            --circo-text-primary: #0f172a;
+            --circo-text-secondary: #1e293b;
+            --circo-text-muted: #64748b;
+            --circo-border: #e2e8f0;
+            --circo-input-bg: #ffffff;
+            --circo-modal-bg: #ffffff;
+            --circo-nav-bg: #ffffff;
+            --circo-dropdown-bg: #ffffff;
+            --circo-dropdown-hover: #f8fafc;
+            --circo-btn-dark-bg: #1e293b;
+            --circo-btn-dark-text: #ffffff;
+            --circo-card-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+            --circo-avatar-gradient: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%);
+        }
+        
+        /* Dark Mode */
+        [data-bs-theme="dark"] {
+            --circo-bg-primary: #0f172a;
+            --circo-bg-secondary: #1e293b;
+            --circo-bg-tertiary: #334155;
+            --circo-text-primary: #f1f5f9;
+            --circo-text-secondary: #e2e8f0;
+            --circo-text-muted: #94a3b8;
+            --circo-border: #334155;
+            --circo-input-bg: #1e293b;
+            --circo-modal-bg: #1e293b;
+            --circo-nav-bg: #1e293b;
+            --circo-dropdown-bg: #1e293b;
+            --circo-dropdown-hover: #334155;
+            --circo-btn-dark-bg: #3b82f6;
+            --circo-btn-dark-text: #ffffff;
+            --circo-card-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            --circo-avatar-gradient: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+        }
+        
+        /* Apply theme variables */
+        body {
+            background: var(--circo-bg-primary) !important;
+            color: var(--circo-text-secondary) !important;
+        }
+        
+        .circo-navbar {
+            background: var(--circo-nav-bg) !important;
+            border-bottom: 1px solid var(--circo-border) !important;
+        }
+        
+        .circo-navbar-brand {
+            color: var(--circo-text-primary) !important;
+        }
+        
+        .circo-user-name {
+            color: var(--circo-text-secondary) !important;
+        }
+        
+        .circo-user-menu-btn:hover {
+            background: var(--circo-dropdown-hover) !important;
+        }
+        
+        .circo-modal-content {
+            background: var(--circo-modal-bg) !important;
+        }
+        
+        .modal-title {
+            color: var(--circo-text-primary) !important;
+        }
+        
+        .circo-modal-header {
+            border-bottom: 1px solid var(--circo-border) !important;
+        }
+        
+        .circo-modal-footer {
+            border-top: 1px solid var(--circo-border) !important;
+        }
+        
+        .circo-dropdown-menu {
+            background: var(--circo-dropdown-bg) !important;
+            border: 1px solid var(--circo-border) !important;
+        }
+        
+        .circo-dropdown-item {
+            color: var(--circo-text-secondary) !important;
+        }
+        
+        .circo-dropdown-item:hover {
+            background: var(--circo-dropdown-hover) !important;
+            color: var(--circo-text-primary) !important;
+        }
+        
+        .circo-dropdown-header {
+            border-bottom: 1px solid var(--circo-border) !important;
+        }
+        
+        .circo-dropdown-divider {
+            border-color: var(--circo-border) !important;
+        }
+        
+        .circo-form-control {
+            background: var(--circo-input-bg) !important;
+            border-color: var(--circo-border) !important;
+            color: var(--circo-text-secondary) !important;
+        }
+        
+        .circo-form-control:focus {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+        }
+        
+        .circo-form-label {
+            color: var(--circo-text-muted) !important;
+        }
+        
+        .input-group-text {
+            background: var(--circo-input-bg) !important;
+            border-color: var(--circo-border) !important;
+            color: var(--circo-text-muted) !important;
+        }
+        
+        .bg-white {
+            background: var(--circo-bg-secondary) !important;
+        }
+        
+        .bg-light {
+            background: var(--circo-bg-tertiary) !important;
+        }
+        
+        .text-muted {
+            color: var(--circo-text-muted) !important;
+        }
+        
+        .btn-dark {
+            background: var(--circo-btn-dark-bg) !important;
+            border-color: var(--circo-btn-dark-bg) !important;
+            color: var(--circo-btn-dark-text) !important;
+        }
+        
+        .btn-outline-secondary {
+            color: var(--circo-text-muted) !important;
+            border-color: var(--circo-border) !important;
+        }
+        
+        .btn-outline-secondary:hover {
+            background: var(--circo-bg-tertiary) !important;
+            color: var(--circo-text-primary) !important;
+        }
+        
+        .btn-close {
+            filter: var(--circo-text-muted);
+        }
+        
+        [data-bs-theme="dark"] .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+        
+        .nav-tabs .nav-link {
+            color: var(--circo-text-muted) !important;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: #3b82f6 !important;
+            background: transparent !important;
+            border-color: var(--circo-border) var(--circo-border) transparent !important;
+        }
+        
+        /* Dark mode specific overrides */
+        [data-bs-theme="dark"] .modal-content {
+            box-shadow: var(--circo-card-shadow) !important;
+        }
+        
+        [data-bs-theme="dark"] .dropdown-menu {
+            box-shadow: var(--circo-card-shadow) !important;
+        }
+        
+        [data-bs-theme="dark"] .circo-user-avatar {
+            border-color: var(--circo-border) !important;
+        }
+    </style>
+
     <!-- ISOLATED BASE STYLES - Won't affect child templates that override -->
     <style>
         /* Base Template Specific Styles - All scoped to avoid affecting child content */
@@ -71,11 +255,9 @@
         }
         
         .circo-base-body {
-            background: #f8fafc;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            color: #1e293b;
             line-height: 1.5;
             overflow-x: hidden;
             margin: 0;
@@ -98,6 +280,10 @@
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.2s ease, visibility 0.2s ease;
+        }
+        
+        [data-bs-theme="dark"] #circoGlobalLoader {
+            background: rgba(15, 23, 42, 0.98) !important;
         }
         
         #circoGlobalLoader.active {
@@ -138,10 +324,19 @@
             margin: 0 auto 1.5rem;
         }
         
+        [data-bs-theme="dark"] .circo-loader-spinner {
+            border-color: #334155;
+            border-top-color: #3b82f6;
+        }
+        
         .circo-loader-text {
             color: #64748b;
             font-size: 0.9rem;
             letter-spacing: 0.5px;
+        }
+        
+        [data-bs-theme="dark"] .circo-loader-text {
+            color: #94a3b8;
         }
         
         @keyframes circoSpin {
@@ -155,8 +350,6 @@
         
         /* Navigation - Isolated with specific class */
         .circo-navbar {
-            background: #ffffff !important;
-            border-bottom: 1px solid #e2e8f0;
             padding: 0.75rem 0;
         }
         
@@ -179,7 +372,6 @@
             font-weight: 500;
             font-size: clamp(1rem, 4vw, 1.25rem);
             letter-spacing: -0.02em;
-            color: #0f172a !important;
             text-decoration: none;
         }
         
@@ -194,10 +386,7 @@
             background: transparent;
             transition: all 0.2s ease;
             cursor: pointer;
-        }
-        
-        .circo-user-menu-btn:hover {
-            background: #f1f5f9;
+            color: var(--circo-text-secondary);
         }
         
         .circo-user-avatar {
@@ -232,17 +421,9 @@
             }
         }
         
-        .circo-user-name {
-            color: #1e293b;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-        
         /* Dropdown Menu */
         .circo-dropdown-menu {
-            border: 1px solid #e2e8f0;
             border-radius: 12px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
             padding: 8px;
             min-width: 260px;
             max-width: 90vw;
@@ -257,14 +438,12 @@
         
         .circo-dropdown-header {
             padding: 12px 12px 8px 12px;
-            border-bottom: 1px solid #f1f5f9;
             margin-bottom: 8px;
         }
         
         .circo-dropdown-item {
             padding: 10px 12px;
             border-radius: 8px;
-            color: #334155;
             font-size: 0.875rem;
             display: flex;
             align-items: center;
@@ -273,21 +452,10 @@
             text-decoration: none;
         }
         
-        .circo-dropdown-item:hover {
-            background: #f8fafc;
-            color: #0f172a;
-        }
-        
         .circo-dropdown-item i {
             font-size: 1.1rem;
-            color: #64748b;
             width: 20px;
             flex-shrink: 0;
-        }
-        
-        .circo-dropdown-divider {
-            margin: 8px 0;
-            border-color: #f1f5f9;
         }
         
         /* Modal Styling */
@@ -297,7 +465,6 @@
         }
         
         .circo-modal-header {
-            border-bottom: 1px solid #f1f5f9;
             padding: 16px 20px;
         }
         
@@ -318,7 +485,6 @@
         }
         
         .circo-modal-footer {
-            border-top: 1px solid #f1f5f9;
             padding: 16px 20px;
         }
         
@@ -397,7 +563,6 @@
         
         /* Form Styling */
         .circo-form-label {
-            color: #475569;
             font-size: 0.75rem;
             font-weight: 500;
             text-transform: uppercase;
@@ -412,18 +577,10 @@
         }
         
         .circo-form-control {
-            border: 1px solid #e2e8f0;
             border-radius: 8px;
             padding: 10px 12px;
             font-size: 0.9rem;
-            background: #ffffff;
             transition: all 0.2s ease;
-        }
-        
-        .circo-form-control:focus {
-            border-color: #1e293b;
-            box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.1);
-            outline: none;
         }
         
         /* Password Strength */
@@ -435,10 +592,66 @@
             overflow: hidden;
         }
         
+        [data-bs-theme="dark"] .circo-password-strength {
+            background: #334155;
+        }
+        
         .circo-password-bar {
             height: 100%;
             width: 0%;
             transition: width 0.3s ease, background 0.3s ease;
+        }
+        
+        /* Theme Toggle Switch */
+        .theme-toggle-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: var(--circo-bg-tertiary);
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .theme-toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--circo-text-secondary);
+            font-weight: 500;
+        }
+        
+        .theme-toggle-switch {
+            position: relative;
+            width: 52px;
+            height: 28px;
+            background: #cbd5e1;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            border: none;
+            padding: 0;
+        }
+        
+        [data-bs-theme="dark"] .theme-toggle-switch {
+            background: #3b82f6;
+        }
+        
+        .theme-toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        
+        [data-bs-theme="dark"] .theme-toggle-switch::after {
+            transform: translateX(24px);
         }
         
         /* Mobile Optimizations */
@@ -473,9 +686,17 @@
             background: #f1f5f9;
         }
         
+        [data-bs-theme="dark"] .circo-custom-scroll::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        
         .circo-custom-scroll::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 4px;
+        }
+        
+        [data-bs-theme="dark"] .circo-custom-scroll::-webkit-scrollbar-thumb {
+            background: #475569;
         }
         
         /* Main content area - minimal styling to avoid interference */
@@ -488,7 +709,7 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body class="circo-base-body">
-    <!-- Global Loading Screen - Fixed navigation detection -->
+    <!-- Global Loading Screen -->
     <div id="circoGlobalLoader">
         <div class="circo-loader-content">
             <div class="circo-loader-logo">
@@ -499,13 +720,13 @@
         </div>
     </div>
 
-    <!-- Navigation - Wrapped in isolated container -->
+    <!-- Navigation -->
     <nav class="circo-navbar">
         <div class="circo-nav-container">
             <div>
                 <span class="circo-navbar-brand">
                     <span style="font-weight: 600;">Circo</span>
-                    <span class="d-none d-sm-inline" style="font-weight: 300; color: #64748b; margin-left: 4px;">· relationship intelligence</span>
+                    <span class="d-none d-sm-inline" style="font-weight: 300; margin-left: 4px;">· relationship intelligence</span>
                 </span>
             </div>
             
@@ -513,7 +734,7 @@
                 {% if user.is_authenticated %}
                     <div class="dropdown">
                         <button class="circo-user-menu-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <div class="circo-user-avatar" id="circoNavbarAvatar" style="{% if user.profile_picture %}background-image: url('{{ user.profile_picture.url }}'); background-size: cover; background-position: center;{% else %}background: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%);{% endif %}">
+                            <div class="circo-user-avatar" id="circoNavbarAvatar" style="{% if user.profile_picture %}background-image: url('{{ user.profile_picture.url }}'); background-size: cover; background-position: center;{% else %}background: var(--circo-avatar-gradient);{% endif %}">
                                 {% if not user.profile_picture %}
                                     {{ user.full_name|slice:":1"|upper }}
                                 {% endif %}
@@ -524,14 +745,14 @@
                         <ul class="dropdown-menu circo-dropdown-menu dropdown-menu-end">
                             <li class="circo-dropdown-header">
                                 <div class="d-flex align-items-center gap-3">
-                                    <div class="circo-user-avatar" style="width: 48px; height: 48px; font-size: 1.2rem; {% if user.profile_picture %}background-image: url('{{ user.profile_picture.url }}'); background-size: cover; background-position: center;{% else %}background: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%);{% endif %}">
+                                    <div class="circo-user-avatar" style="width: 48px; height: 48px; font-size: 1.2rem; {% if user.profile_picture %}background-image: url('{{ user.profile_picture.url }}'); background-size: cover; background-position: center;{% else %}background: var(--circo-avatar-gradient);{% endif %}">
                                         {% if not user.profile_picture %}
                                             {{ user.full_name|slice:":1"|upper }}
                                         {% endif %}
                                     </div>
                                     <div class="overflow-hidden">
-                                        <div class="fw-semibold text-truncate" style="color: #0f172a; margin-bottom: 2px;">{{ user.full_name }}</div>
-                                        <div class="small text-truncate" style="color: #64748b; font-size: 0.8rem;">{{ user.email|default:"No email" }}</div>
+                                        <div class="fw-semibold text-truncate" style="color: var(--circo-text-primary); margin-bottom: 2px;">{{ user.full_name }}</div>
+                                        <div class="small text-truncate" style="color: var(--circo-text-muted); font-size: 0.8rem;">{{ user.email|default:"No email" }}</div>
                                     </div>
                                 </div>
                             </li>
@@ -588,18 +809,18 @@
         </div>
     </nav>
 
-    <!-- View Profile Modal -->
+    <!-- View Profile Modal (Updated with school and profession) -->
     <div class="modal fade" id="circoProfileModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content circo-modal-content">
                 <div class="modal-header circo-modal-header">
-                    <h5 class="modal-title fw-medium" style="color: #1e293b;">Profile</h5>
+                    <h5 class="modal-title fw-medium">Profile</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 
                 <div class="modal-body circo-modal-body text-center">
                     <div class="circo-profile-wrapper" onclick="circoTriggerProfileUpload()">
-                        <div class="circo-profile-large" id="circoProfileModalAvatar" style="{% if user.profile_picture %}background-image: url('{{ user.profile_picture.url }}'); background-size: cover; background-position: center;{% else %}background: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%);{% endif %}">
+                        <div class="circo-profile-large" id="circoProfileModalAvatar" style="{% if user.profile_picture %}background-image: url('{{ user.profile_picture.url }}'); background-size: cover; background-position: center;{% else %}background: var(--circo-avatar-gradient);{% endif %}">
                             {% if not user.profile_picture %}
                                 {{ user.full_name|slice:":1"|upper }}
                             {% endif %}
@@ -614,22 +835,30 @@
                     
                     <input type="file" id="circoProfilePictureInput" accept="image/*" style="display: none;">
                     
-                    <h4 class="mb-1 text-break" style="color: #0f172a;">{{ user.full_name }}</h4>
+                    <h4 class="mb-1 text-break">{{ user.full_name }}</h4>
                     <p class="text-muted mb-3 text-break" style="font-size: 0.9rem;">{{ user.email|default:"No email provided" }}</p>
                     
-                    <div class="bg-light rounded-3 p-3 mt-3" style="background: #f8fafc !important;">
+                    <div class="rounded-3 p-3 mt-3" style="background: var(--circo-bg-tertiary) !important;">
                         <div class="row text-start g-2">
                             <div class="col-12 col-sm-6 mb-2">
                                 <small class="d-block text-muted" style="font-size: 0.75rem;">Member Since</small>
-                                <span style="color: #334155; font-size: 0.9rem;">{{ user.date_joined|date:"M d, Y"|default:"N/A" }}</span>
+                                <span style="font-size: 0.9rem;">{{ user.date_joined|date:"M d, Y"|default:"N/A" }}</span>
                             </div>
                             <div class="col-12 col-sm-6 mb-2">
                                 <small class="d-block text-muted" style="font-size: 0.75rem;">Last Login</small>
-                                <span style="color: #334155; font-size: 0.9rem;">{{ user.last_login|date:"M d, Y"|default:"N/A" }}</span>
+                                <span style="font-size: 0.9rem;">{{ user.last_login|date:"M d, Y"|default:"N/A" }}</span>
+                            </div>
+                            <div class="col-12 col-sm-6 mb-2">
+                                <small class="d-block text-muted" style="font-size: 0.75rem;">Phone Number</small>
+                                <span style="font-size: 0.9rem;">{{ user.phone_number|default:"Not provided" }}</span>
+                            </div>
+                            <div class="col-12 col-sm-6 mb-2">
+                                <small class="d-block text-muted" style="font-size: 0.75rem;">School Attended</small>
+                                <span style="font-size: 0.9rem;">{{ user.school_attended|default:"Not provided" }}</span>
                             </div>
                             <div class="col-12">
-                                <small class="d-block text-muted" style="font-size: 0.75rem;">Phone Number</small>
-                                <span style="color: #334155; font-size: 0.9rem;">{{ user.phone_number|default:"Not provided" }}</span>
+                                <small class="d-block text-muted" style="font-size: 0.75rem;">Profession</small>
+                                <span style="font-size: 0.9rem;">{{ user.profession|default:"Not provided" }}</span>
                             </div>
                         </div>
                     </div>
@@ -645,12 +874,12 @@
         </div>
     </div>
 
-    <!-- Edit Profile Modal -->
+    <!-- Edit Profile Modal (Updated with school and profession) -->
     <div class="modal fade" id="circoEditProfileModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content circo-modal-content">
                 <div class="modal-header circo-modal-header">
-                    <h5 class="modal-title fw-medium" style="color: #1e293b;">Edit Profile</h5>
+                    <h5 class="modal-title fw-medium">Edit Profile</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 
@@ -660,7 +889,7 @@
                         
                         <div class="text-center mb-4">
                             <div class="circo-profile-wrapper" onclick="circoTriggerProfileUpload()">
-                                <div class="circo-profile-large" id="circoEditModalAvatar" style="{% if user.profile_picture %}background-image: url('{{ user.profile_picture.url }}'); background-size: cover; background-position: center;{% else %}background: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%);{% endif %}">
+                                <div class="circo-profile-large" id="circoEditModalAvatar" style="{% if user.profile_picture %}background-image: url('{{ user.profile_picture.url }}'); background-size: cover; background-position: center;{% else %}background: var(--circo-avatar-gradient);{% endif %}">
                                     {% if not user.profile_picture %}
                                         {{ user.full_name|slice:":1"|upper }}
                                     {% endif %}
@@ -688,6 +917,16 @@
                             <label class="circo-form-label">Phone Number</label>
                             <input type="tel" class="form-control circo-form-control" id="circoEditPhone" value="{{ user.phone_number|default:'' }}" placeholder="+1 (555) 123-4567">
                         </div>
+                        
+                        <div class="mb-3">
+                            <label class="circo-form-label">School Attended</label>
+                            <input type="text" class="form-control circo-form-control" id="circoEditSchool" value="{{ user.school_attended|default:'' }}" placeholder="University of Technology">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="circo-form-label">Profession</label>
+                            <input type="text" class="form-control circo-form-control" id="circoEditProfession" value="{{ user.profession|default:'' }}" placeholder="Software Engineer">
+                        </div>
                     </div>
                     
                     <div class="modal-footer circo-modal-footer">
@@ -699,17 +938,27 @@
         </div>
     </div>
 
-    <!-- Settings Modal -->
+    <!-- Settings Modal (Updated with Dark/Light Mode Toggle) -->
     <div class="modal fade" id="circoSettingsModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content circo-modal-content">
                 <div class="modal-header circo-modal-header">
-                    <h5 class="modal-title fw-medium" style="color: #1e293b;">Settings</h5>
+                    <h5 class="modal-title fw-medium">Settings</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 
                 <div class="modal-body circo-modal-body">
                     <div id="circoSettingsMessage"></div>
+                    
+                    <!-- Theme Toggle Section -->
+                    <div class="theme-toggle-wrapper mb-4">
+                        <div class="theme-toggle-label">
+                            <i class="bi bi-moon-stars" id="themeIconDark" style="font-size: 1.2rem;"></i>
+                            <i class="bi bi-sun" id="themeIconLight" style="font-size: 1.2rem; display: none;"></i>
+                            <span>Dark Mode</span>
+                        </div>
+                        <button class="theme-toggle-switch" id="themeToggleBtn" onclick="Circo.toggleTheme()" type="button"></button>
+                    </div>
                     
                     <ul class="nav nav-tabs mb-3" id="circoSettingsTabs" role="tablist">
                         <li class="nav-item" role="presentation">
@@ -781,7 +1030,7 @@
         </div>
     </div>
 
-    <!-- Main Content Area - Isolated from base styles -->
+    <!-- Main Content Area -->
     <main class="circo-main-content">
         {% block content %}{% endblock %}
     </main>
@@ -792,16 +1041,14 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     
     <script>
-        // Namespaced Circo application to avoid global conflicts
+        // Namespaced Circo application
         const Circo = (function() {
             'use strict';
             
-            // Private variables
             let navigationTimer = null;
             let isLoading = false;
             const loader = document.getElementById('circoGlobalLoader');
             
-            // Private functions
             function getCSRFToken() {
                 const name = 'csrftoken';
                 let cookieValue = null;
@@ -854,43 +1101,52 @@
                 }
             }
             
-            function checkPasswordStrength(password) {
-                let strength = 0;
-                if (password.length >= 6) strength++;
-                if (password.length >= 10) strength++;
-                if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
-                if (/[0-9]/.test(password)) strength++;
-                if (/[^a-zA-Z0-9]/.test(password)) strength++;
+            // Theme management
+            function setTheme(theme) {
+                document.documentElement.setAttribute('data-bs-theme', theme);
+                localStorage.setItem('circo-theme', theme);
+                updateThemeIcons();
+            }
+            
+            function getTheme() {
+                return localStorage.getItem('circo-theme') || 'light';
+            }
+            
+            function updateThemeIcons() {
+                const currentTheme = getTheme();
+                const darkIcon = document.getElementById('themeIconDark');
+                const lightIcon = document.getElementById('themeIconLight');
                 
-                const bar = document.getElementById('circoPasswordStrengthBar');
-                const feedback = document.getElementById('circoPasswordFeedback');
-                
-                if (bar && feedback) {
-                    const percentage = (strength / 5) * 100;
-                    bar.style.width = percentage + '%';
-                    
-                    if (strength <= 2) {
-                        bar.style.background = '#ef4444';
-                        feedback.textContent = 'Weak password';
-                    } else if (strength <= 3) {
-                        bar.style.background = '#f59e0b';
-                        feedback.textContent = 'Fair password';
-                    } else if (strength <= 4) {
-                        bar.style.background = '#3b82f6';
-                        feedback.textContent = 'Good password';
+                if (darkIcon && lightIcon) {
+                    if (currentTheme === 'dark') {
+                        darkIcon.style.display = 'none';
+                        lightIcon.style.display = 'inline';
                     } else {
-                        bar.style.background = '#10b981';
-                        feedback.textContent = 'Strong password';
+                        darkIcon.style.display = 'inline';
+                        lightIcon.style.display = 'none';
                     }
                 }
             }
             
-            // Public API
+            function toggleTheme() {
+                const currentTheme = getTheme();
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                setTheme(newTheme);
+            }
+            
+            // Initialize theme on load
+            function initTheme() {
+                const savedTheme = getTheme();
+                setTheme(savedTheme);
+            }
+            
             return {
                 showLoading: showLoader,
                 hideLoading: hideLoader,
                 getCSRFToken: getCSRFToken,
                 updateAllAvatars: updateAllAvatars,
+                toggleTheme: toggleTheme,
+                initTheme: initTheme,
                 
                 showToast: function(message, type = 'info') {
                     const toast = document.createElement('div');
@@ -920,14 +1176,11 @@
                     }, 3000);
                 },
                 
-                // Handle navigation with proper loader behavior
                 initNavigation: function() {
-                    // Clear any existing timer
                     if (navigationTimer) {
                         clearTimeout(navigationTimer);
                     }
                     
-                    // Show loader on navigation start
                     document.addEventListener('click', (e) => {
                         const link = e.target.closest('a');
                         if (link && 
@@ -940,7 +1193,6 @@
                         }
                     });
                     
-                    // Handle form submissions
                     document.addEventListener('submit', (e) => {
                         const form = e.target.closest('form');
                         if (form && !form.id.includes('logout')) {
@@ -948,29 +1200,23 @@
                         }
                     });
                     
-                    // CRITICAL: Hide loader when page is fully loaded
                     window.addEventListener('load', () => {
                         this.hideLoading();
                     });
                     
-                    // Handle back/forward navigation - THE KEY FIX
                     window.addEventListener('pageshow', (event) => {
-                        // Event.persisted is true for bfcache navigation (back/forward)
                         if (event.persisted) {
                             this.hideLoading();
                         }
-                        // Always hide loader after a small delay to be safe
                         navigationTimer = setTimeout(() => {
                             this.hideLoading();
                         }, 100);
                     });
                     
-                    // Handle beforeunload - show loader
                     window.addEventListener('beforeunload', () => {
                         this.showLoading();
                     });
                     
-                    // Safety: hide loader after 5 seconds max (prevents infinite spinner)
                     setInterval(() => {
                         if (isLoading) {
                             this.hideLoading();
@@ -994,7 +1240,7 @@
         `;
         document.head.appendChild(circoStyle);
         
-        // Global functions for HTML access (with circo prefix to avoid conflicts)
+        // Global functions
         window.circoTriggerProfileUpload = function() {
             document.getElementById('circoProfilePictureInput').click();
         };
@@ -1021,10 +1267,8 @@
         
         // Initialize on DOM ready
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize navigation handling
             Circo.initNavigation();
-            
-            // Hide loader initially
+            Circo.initTheme();
             Circo.hideLoading();
             
             // Profile picture upload
@@ -1090,7 +1334,9 @@
                     const formData = {
                         full_name: document.getElementById('circoEditFullName').value,
                         email: document.getElementById('circoEditEmail').value,
-                        phone_number: document.getElementById('circoEditPhone').value
+                        phone_number: document.getElementById('circoEditPhone').value,
+                        school_attended: document.getElementById('circoEditSchool').value,
+                        profession: document.getElementById('circoEditProfession').value
                     };
                     
                     try {

@@ -25,6 +25,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     full_name = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
+    school_attended = models.CharField(max_length=255, blank=True, null=True)
+    profession = models.CharField(max_length=255, blank=True, null=True)
 
     # Optional but useful
     date_joined = models.DateTimeField(auto_now_add=True)
@@ -43,17 +45,21 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
-    
 
 
+# Updated Contact model with new fields
 class Contact(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='contacts')
     name = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=15)
     email = models.EmailField(blank=True, null=True)
+    
+    # New fields
+    school = models.CharField(max_length=255, blank=True, null=True)
+    meeting_context = models.CharField(max_length=255, blank=True, null=True)
 
     last_interaction = models.DateField(blank=True, null=True)
-    interaction_count = models.IntegerField(default=0)  # Track number of interactions
+    interaction_count = models.IntegerField(default=0)
     notes = models.TextField(blank=True, null=True)
 
     # Alumni fields
@@ -75,6 +81,8 @@ class Contact(models.Model):
     def has_interacted_before(self):
         """Check if user has ever interacted with this contact"""
         return self.interaction_count > 0
+    
+
     
 
 class Event(models.Model):
