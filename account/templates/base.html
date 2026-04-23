@@ -734,11 +734,22 @@
                 {% if user.is_authenticated %}
                     <div class="dropdown">
                         <button class="circo-user-menu-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <div class="circo-user-avatar" id="circoNavbarAvatar" style="{% if user.profile_picture %}background-image: url('{{ user.profile_picture.url }}'); background-size: cover; background-position: center;{% else %}background: var(--circo-avatar-gradient);{% endif %}">
+                            <div class="circo-user-avatar" id="circoNavbarAvatar"
+                                style="
+                                    {% if user.profile_picture and user.profile_picture.url %}
+                                        background-image: url('{{ user.profile_picture.url }}');
+                                        background-size: cover;
+                                        background-position: center;
+                                    {% else %}
+                                        background: var(--circo-avatar-gradient);
+                                    {% endif %}
+                                ">
+                                
                                 {% if not user.profile_picture %}
                                     {{ user.full_name|slice:":1"|upper }}
                                 {% endif %}
                             </div>
+
                             <span class="circo-user-name d-none d-sm-inline">{{ user.full_name }}</span>
                         </button>
                         

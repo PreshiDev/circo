@@ -9,7 +9,7 @@
     <!-- HEADER -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5">
         <div class="d-flex align-items-center mb-3 mb-md-0">
-            {% if user.profile_picture %}
+            {% if user.profile_picture and user.profile_picture.url %}
             <img src="{{ user.profile_picture.url }}" 
                  alt="{{ user.full_name }}" 
                  class="rounded-circle me-3"
