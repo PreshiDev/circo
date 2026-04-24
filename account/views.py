@@ -1200,15 +1200,32 @@ class ContactDetailAPIView(APIView):
     def get(self, request, contact_id):
         user = request.user
         
+        print(f"\n{'='*50}")
+        print(f"DEBUG: Contact Detail API Called")
+        print(f"User ID: {user.id}")
+        print(f"User Email: {user.email}")
+        print(f"Requested Contact ID: {contact_id}")
+        print(f"{'='*50}\n")
         
         try:
             # First, check if contact exists at all (for debugging)
             all_contacts = Contact.objects.filter(user=user)
+            print(f"Total contacts for user: {all_contacts.count()}")
+            print(f"Available contact IDs: {list(all_contacts.values_list('id', flat=True))}")
             
             # Get the specific contact
             contact = Contact.objects.get(id=contact_id, user=user)
+            print(f"\n✓ Found contact:")
+            print(f"  - ID: {contact.id}")
+            print(f"  - Name: {contact.name}")
+            print(f"  - Phone: {contact.phone_number}")
+            print(f"  - Email: {contact.email}")
+            print(f"  - Is Alumni: {contact.is_alumni}")
+            print(f"  - Created: {contact.created_at}")
             
         except Contact.DoesNotExist:
+            print(f"\n✗ Contact {contact_id} NOT FOUND for user {user.id}")
+            print(f"Make sure the contact belongs to this user!")
             return Response({"error": "Contact not found"}, status=404)
         
         # Get contact's events
@@ -1217,12 +1234,14 @@ class ContactDetailAPIView(APIView):
             contact=contact
         ).order_by('-date')
         
+        print(f"\n✓ Found {events.count()} events for this contact")
         for event in events:
             print(f"  - {event.title} on {event.date}")
         
         # Check if contact has interaction count
         interaction_count = getattr(contact, 'interaction_count', 0)
-
+        print(f"\n✓ Interaction count: {interaction_count}")
+        
         # Build response
         response_data = {
             "contact": {
@@ -1250,5 +1269,9 @@ class ContactDetailAPIView(APIView):
             ]
         }
         
+        print(f"\n✓ Sending response data:")
+        print(f"  Contact Name in response: {response_data['contact']['name']}")
+        print(f"  Contact ID in response: {response_data['contact']['id']}")
+        print(f"{'='*50}\n")
         
         return Response(response_data)
