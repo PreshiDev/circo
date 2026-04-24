@@ -50,9 +50,7 @@ class Command(BaseCommand):
             users = User.objects.filter(id__in=user_ids, email__isnull=False)
             self.stdout.write(f"Sending to {len(user_ids)} specific users...")
         else:
-            users = User.objects.filter(email__isnull=False).exclude(email='').exclude(
-                last_dashboard_email_sent=today  # Skip users already sent today
-            )
+            users = User.objects.filter(email__isnull=False).exclude(email='')
             self.stdout.write(f"Sending to all eligible users...")
 
         total_users = users.count()

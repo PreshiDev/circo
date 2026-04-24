@@ -1,16 +1,17 @@
-from django.core.mail import send_mail, EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 from django.template.loader import render_to_string
-from django.utils import timezone
 from django.db import transaction
 import logging
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
 
 def send_dashboard_email(user, reconnect_contacts, upcoming_events, today):
     """
-    Send dashboard reminder email to user with optimized queries and better formatting.
+    Send dashboard reminder email to user.
+    Allows multiple sends per day by tracking send count instead of just date.
     Returns True if email was sent, False otherwise.
     """
     try:
@@ -18,10 +19,17 @@ def send_dashboard_email(user, reconnect_contacts, upcoming_events, today):
         if not user.email:
             return False
 
-        # Check if email was already sent today
+        # Check if already sent maximum times today (2 times)
         last_sent = getattr(user, "last_dashboard_email_sent", None)
-        if last_sent == today:
-            logger.info(f"Email already sent today for {user.email}")
+        send_count_today = getattr(user, "dashboard_email_count_today", 0)
+        
+        # Reset count if it's a new day
+        if last_sent and last_sent != today:
+            send_count_today = 0
+        
+        # Maximum 2 emails per day
+        if send_count_today >= 2:
+            logger.info(f"Already sent {send_count_today} times today for {user.email}, skipping")
             return False
 
         # Only prepare data if we're actually sending
@@ -34,6 +42,11 @@ def send_dashboard_email(user, reconnect_contacts, upcoming_events, today):
 
         # Get user's name
         user_name = getattr(user, 'full_name', None) or getattr(user, 'first_name', '') or user.email.split('@')[0]
+
+        # Determine which reminder this is (morning or evening)
+        current_hour = datetime.now().hour
+        greeting = "Good morning" if current_hour < 12 else "Good afternoon" if current_hour < 17 else "Good evening"
+        reminder_type = "Morning" if current_hour < 12 else "Evening"
 
         # Prepare content
         reconnect_list = []
@@ -57,24 +70,11 @@ def send_dashboard_email(user, reconnect_contacts, upcoming_events, today):
                     'contact_name': event.contact.name if event.contact else None
                 })
 
-        # Try to send HTML email first, fall back to plain text
-        try:
-            # HTML version
-            html_message = render_to_string('account/emails/dashboard_reminder.html', {
-                'user_name': user_name,
-                'reconnect_list': reconnect_list,
-                'event_list': event_list,
-                'has_reconnect': has_reconnect,
-                'has_events': has_events,
-                'today': today,
-                'dashboard_url': f"{settings.FRONTEND_URL}/dashboard" if hasattr(settings, 'FRONTEND_URL') else None,
-            })
-            
-            # Plain text fallback
-            text_message = f"""
-Hello {user_name},
+        # Plain text version
+        text_message = f"""
+{greeting} {user_name},
 
-Here are your reminders for today, {today.strftime('%B %d, %Y')}:
+Here is your {reminder_type.lower()} reminder for {today.strftime('%B %d, %Y')}:
 
 {f"🔔 Contacts to Reconnect ({len(reconnect_list)}):" if reconnect_list else ""}
 {chr(10).join([f'- {c["name"]} ({c["days_since"]})' for c in reconnect_list]) if reconnect_list else "None"}
@@ -87,9 +87,23 @@ Here are your reminders for today, {today.strftime('%B %d, %Y')}:
 Best regards,
 Circo Team
 """
+        
+        # Try HTML email
+        try:
+            html_message = render_to_string('account/emails/dashboard_reminder.html', {
+                'user_name': user_name,
+                'greeting': greeting,
+                'reminder_type': reminder_type,
+                'reconnect_list': reconnect_list,
+                'event_list': event_list,
+                'has_reconnect': has_reconnect,
+                'has_events': has_events,
+                'today': today,
+                'dashboard_url': f"{settings.FRONTEND_URL}/dashboard" if hasattr(settings, 'FRONTEND_URL') else None,
+            })
             
             email = EmailMultiAlternatives(
-                subject=f"Your Circo Daily Reminders - {today.strftime('%B %d')}",
+                subject=f"🌅 {reminder_type} Circo Reminder - {today.strftime('%B %d')}",
                 body=text_message,
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 to=[user.email],
@@ -98,46 +112,33 @@ Circo Team
             email.send(fail_silently=False)
             
         except Exception as template_error:
-            # Fallback to simple email if template rendering fails
-            logger.warning(f"Template rendering failed for {user.email}, sending plain text: {str(template_error)}")
-            
-            simple_message = f"""
-Hello {user_name},
-
-Here are your reminders for today:
-
-{f"🔔 Contacts to Reconnect:" if reconnect_list else ""}
-{chr(10).join([f'- {c["name"]}' for c in reconnect_list]) if reconnect_list else "None"}
-
-{f"📅 Upcoming Events:" if event_list else ""}
-{chr(10).join([f'- {e["title"]} on {e["date"]}' for e in event_list]) if event_list else "None"}
-
-Login to your dashboard to see more details.
-
-Best regards,
-Circo Team
-"""
+            # Fallback to simple email
+            logger.warning(f"HTML template failed for {user.email}, sending plain text")
+            from django.core.mail import send_mail
             
             send_mail(
-                subject="Your Dashboard Reminders",
-                message=simple_message,
+                subject=f"{reminder_type} Circo Reminder - {today.strftime('%B %d')}",
+                message=text_message,
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[user.email],
                 fail_silently=True
             )
 
-        # Update last sent timestamp atomically
+        # Update tracking fields
         if hasattr(user, "last_dashboard_email_sent"):
             try:
                 with transaction.atomic():
                     User = type(user)
-                    User.objects.filter(pk=user.pk).update(
-                        last_dashboard_email_sent=today
-                    )
+                    update_fields = {
+                        'last_dashboard_email_sent': today,
+                        'dashboard_email_count_today': send_count_today + 1
+                    }
+                    User.objects.filter(pk=user.pk).update(**update_fields)
+                    
             except Exception as db_error:
-                logger.error(f"Failed to update last_sent for {user.email}: {str(db_error)}")
+                logger.error(f"Failed to update tracking for {user.email}: {str(db_error)}")
 
-        logger.info(f"Dashboard email sent to {user.email}")
+        logger.info(f"Dashboard email #{send_count_today + 1} sent to {user.email}")
         return True
 
     except Exception as e:
