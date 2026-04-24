@@ -5,7 +5,7 @@ from .views import (
     RecordInteractionAPIView, ProfileView, UpdateProfileView, 
     ChangePasswordView, LogoutView, CreateEventAPIView, PaginatedReconnectAPIView,
     PaginatedEventsAPIView, PaginatedRecentContactsAPIView, PaginatedAlumniAPIView,
-    ContactDetailAPIView, BulkImportContactsAPIView
+    ContactDetailAPIView, BulkImportContactsAPIView, InteractionDetailAPIView
 )
 
 app_name = "account"
@@ -22,7 +22,18 @@ urlpatterns = [
     path('auth/contacts/create/', CreateContactAPIView.as_view(), name='api_create_contact'),
     path('api/contacts/bulk-import/', BulkImportContactsAPIView.as_view(), name='api_bulk_import_contacts'),
     path('api/create-event/', CreateEventAPIView.as_view(), name='api_create_event'),
-    path('auth/contacts/<int:contact_id>/interact/', RecordInteractionAPIView.as_view(), name='api_record_interaction'),
+    # Interaction endpoints
+    path('api/contact/<int:contact_id>/interaction/', 
+         RecordInteractionAPIView.as_view(), 
+         name='api_record_interaction'),
+    
+    path('api/contact/<int:contact_id>/interactions/', 
+         RecordInteractionAPIView.as_view(), 
+         name='api_contact_interactions'),
+    
+    path('api/interaction/<int:interaction_id>/', 
+         InteractionDetailAPIView.as_view(), 
+         name='api_interaction_detail'),
     path('api/paginated/reconnect/', PaginatedReconnectAPIView.as_view(), name='api_paginated_reconnect'),
     path('api/paginated/events/', PaginatedEventsAPIView.as_view(), name='api_paginated_events'),
     path('api/paginated/recent-contacts/', PaginatedRecentContactsAPIView.as_view(), name='api_paginated_recent_contacts'),

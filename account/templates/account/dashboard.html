@@ -574,8 +574,15 @@
                     </div>
                 </div>
                 <div class="modal-footer border-0 px-4 pb-4 pt-0" style="border-top: 1px solid var(--circo-border);">
-                    <button type="button" class="btn btn-outline-secondary rounded-3 px-4" data-bs-dismiss="modal" style="border-color: var(--circo-border); color: var(--circo-text-muted);">Close</button>
-                    <button type="button" class="btn btn-dark rounded-3 px-4" id="contactProfileRecordInteractionBtn" style="background: var(--circo-btn-dark-bg);">Record Interaction</button>
+                    <div class="d-flex gap-2 w-100">
+                        <button type="button" class="btn btn-outline-secondary rounded-3 px-4 flex-grow-1" data-bs-dismiss="modal" style="border-color: var(--circo-border); color: var(--circo-text-muted);">Close</button>
+                        <button type="button" class="btn rounded-3 px-4 flex-grow-1" id="contactProfileHistoryBtn" style="background: #e0e7ff; color: #3730a3; border: none;">
+                            📋 View History
+                        </button>
+                        <button type="button" class="btn btn-dark rounded-3 px-4 flex-grow-1" id="contactProfileRecordInteractionBtn" style="background: var(--circo-btn-dark-bg); border: none;">
+                            📝 Log Interaction
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -728,6 +735,157 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= RECORD INTERACTION MODAL ================= -->
+    <div class="modal fade" id="recordInteractionModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content border-0 rounded-4" style="background: var(--circo-bg-secondary);">
+                <div class="modal-header border-0 px-4 pt-4 pb-2" style="border-bottom: 1px solid var(--circo-border);">
+                    <h5 class="modal-title fw-medium" style="color: var(--circo-text-primary);">
+                        📝 Record Interaction
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <div class="modal-body px-4 pb-4">
+                    <div id="interactionMessage"></div>
+                    
+                    <form id="interactionForm">
+                        <input type="hidden" id="interaction_contact_id">
+                        
+                        <div class="mb-4">
+                            <p class="fw-medium mb-2" style="color: var(--circo-text-primary);" id="interaction_contact_name">
+                                Contact Name
+                            </p>
+                        </div>
+                        
+                        <!-- Interaction Type -->
+                        <div class="mb-4">
+                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted); font-size: 0.7rem; letter-spacing: 0.5px;">
+                                Interaction Type *
+                            </label>
+                            <select class="form-select rounded-3 py-2" 
+                                    id="interaction_type" required
+                                    style="background: var(--circo-bg-tertiary); border: 1px solid var(--circo-border); color: var(--circo-text-primary);">
+                                <option value="">Select interaction type...</option>
+                                <option value="coffee_meeting">☕ Coffee Meeting</option>
+                                <option value="phone_call">📞 Phone Call</option>
+                                <option value="video_call">📹 Video Call</option>
+                                <option value="online_conference">💻 Online Conference</option>
+                                <option value="physical_meetup">🤝 Physical Meetup</option>
+                                <option value="whatsapp_call">📱 WhatsApp Call</option>
+                                <option value="chatting">💬 Chatting</option>
+                                <option value="text_message">📝 Text Message</option>
+                                <option value="email">📧 Email</option>
+                                <option value="social_media">📲 Social Media</option>
+                                <option value="other">📌 Other</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Location (shown conditionally) -->
+                        <div class="mb-4" id="locationField">
+                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted); font-size: 0.7rem; letter-spacing: 0.5px;">
+                                Location
+                            </label>
+                            <input type="text" class="form-control rounded-3 py-2" 
+                                id="interaction_location" 
+                                placeholder="e.g., Starbucks, Zoom, Office..."
+                                style="background: var(--circo-bg-tertiary); border: 1px solid var(--circo-border); color: var(--circo-text-primary);">
+                        </div>
+                        
+                        <!-- Duration -->
+                        <div class="mb-4">
+                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted); font-size: 0.7rem; letter-spacing: 0.5px;">
+                                Duration (minutes)
+                            </label>
+                            <input type="number" class="form-control rounded-3 py-2" 
+                                id="interaction_duration" 
+                                placeholder="e.g., 30"
+                                min="1"
+                                style="background: var(--circo-bg-tertiary); border: 1px solid var(--circo-border); color: var(--circo-text-primary);">
+                        </div>
+                        
+                        <!-- Discussion Summary -->
+                        <div class="mb-4">
+                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted); font-size: 0.7rem; letter-spacing: 0.5px;">
+                                Discussion Summary *
+                            </label>
+                            <textarea class="form-control rounded-3 py-2" 
+                                    id="interaction_summary" 
+                                    rows="3" 
+                                    placeholder="What did you discuss? e.g., Business idea, project update, networking..."
+                                    required
+                                    style="background: var(--circo-bg-tertiary); border: 1px solid var(--circo-border); color: var(--circo-text-primary);"></textarea>
+                        </div>
+                        
+                        <!-- Action Items -->
+                        <div class="mb-4">
+                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted); font-size: 0.7rem; letter-spacing: 0.5px;">
+                                Action Items / Follow-ups
+                            </label>
+                            <textarea class="form-control rounded-3 py-2" 
+                                    id="interaction_actions" 
+                                    rows="2" 
+                                    placeholder="e.g., Send proposal, follow up in 2 weeks..."
+                                    style="background: var(--circo-bg-tertiary); border: 1px solid var(--circo-border); color: var(--circo-text-primary);"></textarea>
+                        </div>
+                        
+                        <!-- Additional Notes -->
+                        <div class="mb-4">
+                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted); font-size: 0.7rem; letter-spacing: 0.5px;">
+                                Additional Notes
+                            </label>
+                            <textarea class="form-control rounded-3 py-2" 
+                                    id="interaction_notes" 
+                                    rows="2" 
+                                    placeholder="Any other notes..."
+                                    style="background: var(--circo-bg-tertiary); border: 1px solid var(--circo-border); color: var(--circo-text-primary);"></textarea>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-dark rounded-3 py-2" 
+                                    style="background: var(--circo-btn-dark-bg); border: none; font-weight: 400;">
+                                💾 Record Interaction
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary rounded-3 py-2" 
+                                    style="border-color: var(--circo-border); color: var(--circo-text-muted);"
+                                    onclick="viewInteractionHistory(document.getElementById('interaction_contact_id').value)">
+                                📋 View Interaction History
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= VIEW INTERACTION HISTORY MODAL ================= -->
+    <div class="modal fade" id="interactionHistoryModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content border-0 rounded-4" style="background: var(--circo-bg-secondary);">
+                <div class="modal-header border-0 px-4 pt-4 pb-2" style="border-bottom: 1px solid var(--circo-border);">
+                    <h5 class="modal-title fw-medium" style="color: var(--circo-text-primary);">
+                        📋 Interaction History
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <div class="modal-body px-4 pb-4" id="interactionHistoryBody">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer border-0 px-4 pb-4 pt-0" style="border-top: 1px solid var(--circo-border);">
+                    <button type="button" class="btn btn-outline-secondary rounded-3 px-4" data-bs-dismiss="modal" style="border-color: var(--circo-border); color: var(--circo-text-muted);">
+                        Close
+                    </button>
                 </div>
             </div>
         </div>
@@ -1008,7 +1166,10 @@
 <script>
 const contactUrl = "{% url 'account:api_create_contact' %}";
 const bulkImportUrl = "{% url 'account:api_bulk_import_contacts' %}";
-const interactionBaseUrl = "{% url 'account:api_record_interaction' 0 %}";
+// Interaction URLs
+const interactionBaseUrl = "{% url 'account:api_record_interaction' 0 %}";  // For recording interaction
+const interactionsListUrl = "{% url 'account:api_contact_interactions' 0 %}";  // For listing interactions
+const interactionDetailUrl = "{% url 'account:api_interaction_detail' 0 %}";  // For single interaction details
 const createEventUrl = "{% url 'account:api_create_event' %}";
 const contactDetailUrl = "{% url 'account:api_contact_detail' 0 %}";
 
@@ -1510,6 +1671,10 @@ async function viewProfile(contactId) {
     const modalBody = document.getElementById('contactProfileModalBody');
     const modalTitle = document.getElementById('contactProfileModalTitle');
     const recordBtn = document.getElementById('contactProfileRecordInteractionBtn');
+    const historyBtn = document.getElementById('contactProfileHistoryBtn');
+    
+    // Store contactId for later use
+    modalElement.setAttribute('data-contact-id', contactId);
     
     modalTitle.textContent = 'Loading...';
     modalBody.innerHTML = `
@@ -1519,19 +1684,37 @@ async function viewProfile(contactId) {
         </div>
     `;
     
+    // Disable buttons while loading
+    recordBtn.disabled = true;
+    historyBtn.disabled = true;
+    
     modal.show();
     
     try {
-        const url = contactDetailUrl.replace('0', contactId);
-        console.log('Fetching from:', url);
+        // Fetch both contact details and real-time interaction count simultaneously
+        const contactUrl = contactDetailUrl.replace('0', contactId);
+        const interactionsUrl = `${interactionsListUrl.replace('0', contactId)}?per_page=1`;
         
-        const response = await fetch(url);
-        const data = await response.json();
+        console.log('Fetching from:', contactUrl);
+        console.log('Fetching interactions from:', interactionsUrl);
         
-        console.log('Contact data received:', data);
+        // Make parallel API calls for better performance
+        const [contactResponse, interactionsResponse] = await Promise.all([
+            fetch(contactUrl),
+            fetch(interactionsUrl)
+        ]);
         
-        if (data.contact) {
-            const c = data.contact;
+        const contactData = await contactResponse.json();
+        const interactionsData = await interactionsResponse.json();
+        
+        console.log('Contact data received:', contactData);
+        console.log('Interactions data received:', interactionsData);
+        
+        if (contactData.contact) {
+            const c = contactData.contact;
+            
+            // Get REAL-TIME interaction count from the interactions API
+            const realTimeInteractionCount = interactionsData.total_interactions || 0;
             
             modalTitle.textContent = c.name;
             
@@ -1544,139 +1727,228 @@ async function viewProfile(contactId) {
             ];
             const gradient = gradients[contactId % gradients.length];
             
+            // Update status badge based on real-time interaction count
             let statusBadge = '';
-            if (!c.has_interacted) {
-                statusBadge = '<span class="badge bg-warning">Never Connected</span>';
-            } else if (c.needs_reconnect) {
-                statusBadge = '<span class="badge bg-info">Needs Reconnect</span>';
+            if (realTimeInteractionCount === 0) {
+                statusBadge = '<span class="badge rounded-pill px-3 py-2" style="background: #fef3c7; color: #92400e; font-weight: 400;">⚠️ Never Connected</span>';
             } else {
-                statusBadge = '<span class="badge bg-success">Connected</span>';
+                statusBadge = '<span class="badge rounded-pill px-3 py-2" style="background: #d1fae5; color: #065f46; font-weight: 400;">✅ Connected (' + realTimeInteractionCount + ' interaction' + (realTimeInteractionCount > 1 ? 's' : '') + ')</span>';
             }
             
+            // Format dates
+            const createdDate = c.created_at ? new Date(c.created_at).toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'}) : 'Unknown';
+            const lastInteractionDate = c.last_interaction ? new Date(c.last_interaction).toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'}) : 'Never';
+            
             const html = `
+                <!-- Profile Header -->
                 <div class="text-center mb-4">
-                    <div class="profile-avatar-large" style="background: ${gradient};">
+                    <div class="profile-avatar-large mb-3" style="background: ${gradient}; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                         ${c.name ? c.name.charAt(0).toUpperCase() : '?'}
                     </div>
-                    <h4 class="mt-3 mb-2" style="color: var(--circo-text-primary);">${c.name || ''}</h4>
+                    <h4 class="mb-2" style="color: var(--circo-text-primary);">${c.name || 'Unknown Contact'}</h4>
                     ${statusBadge}
                 </div>
                 
+                <!-- Contact Information -->
                 <div class="row mb-4">
                     <div class="col-12 col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted);">Phone</label>
-                            <p style="color: var(--circo-text-secondary);">${c.phone_number || 'Not provided'}</p>
+                        <div class="rounded-3 p-3 h-100" style="background: var(--circo-bg-tertiary);">
+                            <label class="form-label small fw-medium text-uppercase mb-2" style="color: var(--circo-text-muted); font-size: 0.7rem; letter-spacing: 0.5px;">
+                                📱 Phone Number
+                            </label>
+                            <p class="mb-0" style="color: var(--circo-text-secondary);">
+                                ${c.phone_number ? `<a href="tel:${c.phone_number}" style="color: var(--circo-text-secondary); text-decoration: none;">${c.phone_number}</a>` : '<span style="color: var(--circo-text-muted);">Not provided</span>'}
+                            </p>
                         </div>
                     </div>
                     <div class="col-12 col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted);">Email</label>
-                            <p style="color: var(--circo-text-secondary);">${c.email || 'Not provided'}</p>
-                        </div>
-                    </div>
-                </div>
-                
-                ${c.school ? `
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <div class="mb-3">
-                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted);">School</label>
-                            <p style="color: var(--circo-text-secondary);">
-                                <span class="badge rounded-pill" style="background: #dbeafe; color: #1e40af;">
-                                    <i class="bi bi-mortarboard"></i> ${c.school}
-                                </span>
+                        <div class="rounded-3 p-3 h-100" style="background: var(--circo-bg-tertiary);">
+                            <label class="form-label small fw-medium text-uppercase mb-2" style="color: var(--circo-text-muted); font-size: 0.7rem; letter-spacing: 0.5px;">
+                                ✉️ Email
+                            </label>
+                            <p class="mb-0" style="color: var(--circo-text-secondary);">
+                                ${c.email ? `<a href="mailto:${c.email}" style="color: var(--circo-text-secondary); text-decoration: none;">${c.email}</a>` : '<span style="color: var(--circo-text-muted);">Not provided</span>'}
                             </p>
                         </div>
                     </div>
                 </div>
-                ` : ''}
                 
-                ${c.meeting_context ? `
+                <!-- Additional Details -->
                 <div class="row mb-4">
-                    <div class="col-12">
-                        <div class="mb-3">
-                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted);">Meeting Context</label>
-                            <p style="color: var(--circo-text-secondary);">
-                                <span class="badge rounded-pill" style="background: #e0e7ff; color: #3730a3;">
-                                    <i class="bi bi-geo-alt"></i> ${c.meeting_context}
-                                </span>
-                            </p>
+                    ${c.school ? `
+                    <div class="col-12 col-md-6 mb-3">
+                        <div class="rounded-3 p-3" style="background: var(--circo-bg-tertiary);">
+                            <label class="form-label small fw-medium text-uppercase mb-2" style="color: var(--circo-text-muted); font-size: 0.7rem; letter-spacing: 0.5px;">
+                                🎓 School
+                            </label>
+                            <span class="badge rounded-pill px-3 py-2" style="background: #dbeafe; color: #1e40af; font-size: 0.85rem;">
+                                ${c.school}
+                            </span>
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    ${c.meeting_context ? `
+                    <div class="col-12 col-md-6 mb-3">
+                        <div class="rounded-3 p-3" style="background: var(--circo-bg-tertiary);">
+                            <label class="form-label small fw-medium text-uppercase mb-2" style="color: var(--circo-text-muted); font-size: 0.7rem; letter-spacing: 0.5px;">
+                                📍 Meeting Context
+                            </label>
+                            <span class="badge rounded-pill px-3 py-2" style="background: #e0e7ff; color: #3730a3; font-size: 0.85rem;">
+                                ${c.meeting_context}
+                            </span>
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+                
+                <!-- Dates -->
+                <div class="row mb-4">
+                    <div class="col-12 col-md-6 mb-3">
+                        <div class="rounded-3 p-3" style="background: var(--circo-bg-tertiary);">
+                            <label class="form-label small fw-medium text-uppercase mb-2" style="color: var(--circo-text-muted); font-size: 0.7rem; letter-spacing: 0.5px;">
+                                📅 Date Added
+                            </label>
+                            <p class="mb-0" style="color: var(--circo-text-primary);">${createdDate}</p>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 mb-3">
+                        <div class="rounded-3 p-3" style="background: var(--circo-bg-tertiary);">
+                            <label class="form-label small fw-medium text-uppercase mb-2" style="color: var(--circo-text-muted); font-size: 0.7rem; letter-spacing: 0.5px;">
+                                🔄 Last Interaction
+                            </label>
+                            <p class="mb-0" style="color: var(--circo-text-primary);" id="profileLastInteractionDate">${lastInteractionDate}</p>
                         </div>
                     </div>
                 </div>
-                ` : ''}
                 
-                <div class="row mb-4">
-                    <div class="col-12 col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted);">Added</label>
-                            <p style="color: var(--circo-text-secondary);">${c.created_at ? new Date(c.created_at).toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'}) : 'Unknown'}</p>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted);">Last Interaction</label>
-                            <p style="color: var(--circo-text-secondary);">${c.last_interaction ? new Date(c.last_interaction).toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'}) : 'Never'}</p>
-                        </div>
-                    </div>
-                </div>
-                
+                <!-- Notes -->
+                ${c.notes ? `
                 <div class="mb-4">
-                    <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted);">Notes</label>
-                    <p style="color: var(--circo-text-secondary);">${c.notes || 'No notes'}</p>
+                    <div class="rounded-3 p-3" style="background: var(--circo-bg-tertiary);">
+                        <label class="form-label small fw-medium text-uppercase mb-2" style="color: var(--circo-text-muted); font-size: 0.7rem; letter-spacing: 0.5px;">
+                            📝 Notes
+                        </label>
+                        <p class="mb-0" style="color: var(--circo-text-secondary); white-space: pre-wrap;">${c.notes}</p>
+                    </div>
                 </div>
+                ` : ''}
                 
                 ${c.is_alumni ? `
                 <div class="mb-4">
-                    <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted);">Alumni Information</label>
-                    <p>
-                        <span class="badge bg-primary me-2">Alumni</span>
-                        ${c.alumni_type || ''}
-                    </p>
+                    <div class="rounded-3 p-3" style="background: #fef3c7; border-left: 4px solid #f59e0b;">
+                        <label class="form-label small fw-medium text-uppercase mb-2" style="color: #92400e; font-size: 0.7rem; letter-spacing: 0.5px;">
+                            🎓 Alumni Information
+                        </label>
+                        <span class="badge rounded-pill px-3 py-2 me-2" style="background: #fbbf24; color: #78350f; font-size: 0.85rem;">
+                            Alumni
+                        </span>
+                        ${c.alumni_type ? `<span style="color: #92400e;">${c.alumni_type}</span>` : ''}
+                    </div>
                 </div>
                 ` : ''}
                 
-                ${data.events && data.events.length > 0 ? `
+                <!-- Events Section -->
+                ${contactData.events && contactData.events.length > 0 ? `
                 <div class="mb-4">
-                    <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted);">Events</label>
-                    <div class="list-group">
-                        ${data.events.map(event => `
-                            <div class="list-group-item border-0 mb-2 rounded-3" style="background: var(--circo-bg-tertiary);">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <label class="form-label small fw-medium text-uppercase mb-0" style="color: var(--circo-text-muted); font-size: 0.7rem; letter-spacing: 0.5px;">
+                            🎂 Events (${contactData.events.length})
+                        </label>
+                    </div>
+                    <div class="vstack gap-2">
+                        ${contactData.events.slice(0, 3).map(event => `
+                            <div class="rounded-3 p-3" style="background: var(--circo-bg-tertiary);">
                                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
                                     <div class="mb-2 mb-md-0">
                                         <strong style="color: var(--circo-text-primary);">${event.title}</strong>
                                         <small class="d-block" style="color: var(--circo-text-muted);">${event.event_type}</small>
                                     </div>
-                                    <span class="badge ${event.is_past ? 'bg-secondary' : 'bg-warning'} align-self-start align-self-md-center">
-                                        ${new Date(event.date).toLocaleDateString()}
+                                    <span class="badge rounded-pill px-3 py-2 ${event.is_past ? 'bg-secondary' : ''}" 
+                                          style="background: ${event.is_past ? '#e2e8f0' : '#fef3c7'}; 
+                                                 color: ${event.is_past ? '#64748b' : '#92400e'}; 
+                                                 font-size: 0.8rem;">
+                                        ${new Date(event.date).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}
                                     </span>
                                 </div>
                             </div>
                         `).join('')}
+                        ${contactData.events.length > 3 ? `
+                            <div class="text-center mt-2">
+                                <small style="color: var(--circo-text-muted);">And ${contactData.events.length - 3} more events</small>
+                            </div>
+                        ` : ''}
                     </div>
                 </div>
                 ` : ''}
                 
-                <div class="mb-3">
-                    <label class="form-label small fw-medium text-uppercase" style="color: var(--circo-text-muted);">Statistics</label>
-                    <div class="row g-2">
-                        <div class="col-4">
-                            <div class="rounded-3 p-3 text-center" style="background: var(--circo-bg-tertiary);">
-                                <h3 class="mb-0" style="color: var(--circo-text-primary);">${c.interaction_count || 0}</h3>
-                                <small style="color: var(--circo-text-muted);">Interactions</small>
+                <!-- Recent Interactions Preview -->
+                <div class="mb-4">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <label class="form-label small fw-medium text-uppercase mb-0" style="color: var(--circo-text-muted); font-size: 0.7rem; letter-spacing: 0.5px;">
+                            💬 Recent Interactions
+                        </label>
+                        ${realTimeInteractionCount > 3 ? `
+                            <button class="btn btn-link btn-sm text-decoration-none" 
+                                    style="color: var(--circo-text-muted); font-size: 0.7rem;"
+                                    onclick="viewInteractionHistory(${contactId})">
+                                View All ${realTimeInteractionCount} →
+                            </button>
+                        ` : ''}
+                    </div>
+                    <div id="profileRecentInteractions">
+                        <div class="text-center py-2">
+                            <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
                             </div>
                         </div>
-                        <div class="col-4">
-                            <div class="rounded-3 p-3 text-center" style="background: var(--circo-bg-tertiary);">
-                                <h3 class="mb-0" style="color: var(--circo-text-primary);">${data.events ? data.events.length : 0}</h3>
+                    </div>
+                </div>
+                
+                <!-- Statistics Grid with REAL-TIME counts -->
+                <div class="mb-4">
+                    <label class="form-label small fw-medium text-uppercase mb-3" style="color: var(--circo-text-muted); font-size: 0.7rem; letter-spacing: 0.5px;">
+                        📊 Statistics & Quick Actions
+                    </label>
+                    <div class="row g-3">
+                        <div class="col-6 col-md-3">
+                            <div class="rounded-3 p-3 text-center h-100 d-flex flex-column justify-content-center" 
+                                 style="background: var(--circo-bg-tertiary); cursor: pointer; transition: transform 0.2s ease;"
+                                 onclick="viewInteractionHistory(${contactId})"
+                                 onmouseover="this.style.transform='translateY(-2px)'"
+                                 onmouseout="this.style.transform='translateY(0)'">
+                                <h3 class="mb-1" style="color: var(--circo-text-primary);" id="profileInteractionCount">
+                                    ${realTimeInteractionCount}
+                                </h3>
+                                <small style="color: var(--circo-text-muted);">Interactions</small>
+                                <small class="mt-2" style="color: #3b82f6; font-size: 0.65rem;">View All →</small>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="rounded-3 p-3 text-center h-100 d-flex flex-column justify-content-center" 
+                                 style="background: var(--circo-bg-tertiary);">
+                                <h3 class="mb-1" style="color: var(--circo-text-primary);" id="profileEventsCount">
+                                    ${contactData.events ? contactData.events.length : 0}
+                                </h3>
                                 <small style="color: var(--circo-text-muted);">Events</small>
                             </div>
                         </div>
-                        <div class="col-4">
-                            <div class="rounded-3 p-3 text-center" style="background: var(--circo-bg-tertiary);">
-                                <h3 class="mb-0" style="color: var(--circo-text-primary);">${c.is_alumni ? '🎓' : '👤'}</h3>
-                                <small style="color: var(--circo-text-muted);">Type</small>
+                        <div class="col-6 col-md-3">
+                            <div class="rounded-3 p-3 text-center h-100 d-flex flex-column justify-content-center" 
+                                 style="background: var(--circo-bg-tertiary);">
+                                <h3 class="mb-1" style="color: var(--circo-text-primary);">${c.is_alumni ? '🎓' : '👤'}</h3>
+                                <small style="color: var(--circo-text-muted);">${c.is_alumni ? 'Alumni' : 'Contact'}</small>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="rounded-3 p-3 text-center h-100 d-flex flex-column justify-content-center" 
+                                 style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); cursor: pointer; transition: transform 0.2s ease;"
+                                 onclick="recordInteraction(${contactId})"
+                                 onmouseover="this.style.transform='translateY(-2px)'"
+                                 onmouseout="this.style.transform='translateY(0)'">
+                                <h3 class="mb-1" style="color: white;">📝</h3>
+                                <small style="color: white;">Log New</small>
+                                <small class="mt-2" style="color: #dbeafe; font-size: 0.65rem;">Record →</small>
                             </div>
                         </div>
                     </div>
@@ -1685,19 +1957,292 @@ async function viewProfile(contactId) {
             
             modalBody.innerHTML = html;
             
+            // Setup button handlers
             recordBtn.onclick = () => {
-                recordInteraction(contactId);
                 modal.hide();
+                setTimeout(() => {
+                    recordInteraction(contactId);
+                }, 300);
             };
             
+            historyBtn.onclick = () => {
+                modal.hide();
+                setTimeout(() => {
+                    viewInteractionHistory(contactId);
+                }, 300);
+            };
+            
+            // Enable buttons
+            recordBtn.disabled = false;
+            historyBtn.disabled = false;
+            
+            // Load recent interactions (pass real-time count)
+            loadRecentInteractions(contactId, realTimeInteractionCount);
+            
         } else {
-            modalBody.innerHTML = `<div class="alert alert-danger">No contact data received</div>`;
+            modalBody.innerHTML = `
+                <div class="alert alert-danger rounded-3">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    No contact data received. The contact may have been deleted.
+                </div>
+            `;
+            recordBtn.disabled = true;
+            historyBtn.disabled = true;
         }
     } catch (error) {
-        console.error('Error:', error);
-        modalBody.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+        console.error('Error loading profile:', error);
+        modalBody.innerHTML = `
+            <div class="alert alert-danger rounded-3">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                Error loading contact details: ${error.message}
+            </div>
+        `;
+        recordBtn.disabled = true;
+        historyBtn.disabled = true;
     }
 }
+
+// ================= LOAD RECENT INTERACTIONS IN PROFILE =================
+async function loadRecentInteractions(contactId, totalCount = null) {
+    const container = document.getElementById('profileRecentInteractions');
+    if (!container) return;
+    
+    try {
+        // Fetch the actual interactions data
+        const url = `${interactionsListUrl.replace('0', contactId)}?per_page=3`;
+        
+        console.log('Loading recent interactions from:', url);
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        console.log('Recent interactions data:', data);
+        
+        // Update the interaction count in real-time if we have the element
+        const countElement = document.getElementById('profileInteractionCount');
+        if (countElement && data.total_interactions !== undefined) {
+            countElement.textContent = data.total_interactions;
+            
+            // Add a subtle animation to show it updated
+            countElement.style.transition = 'transform 0.3s ease';
+            countElement.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                countElement.style.transform = 'scale(1)';
+            }, 300);
+        }
+        
+        if (data.interactions && data.interactions.length > 0) {
+            const recentInteractions = data.interactions.slice(0, 3);
+            
+            container.innerHTML = recentInteractions.map((interaction, index) => `
+                <div class="rounded-3 p-3 mb-2" style="background: var(--circo-bg-tertiary); cursor: pointer; animation: fadeInUp 0.3s ease ${index * 0.1}s both;"
+                     onclick="viewInteractionDetail(${interaction.id})"
+                     title="Click to view full details">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge rounded-pill" style="background: #e0e7ff; color: #3730a3; font-size: 0.75rem;">
+                            ${interaction.interaction_type_emoji || interaction.interaction_type_display}
+                        </span>
+                        <small style="color: var(--circo-text-muted); font-size: 0.75rem;">
+                            ${interaction.interaction_date_relative || new Date(interaction.interaction_date).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}
+                        </small>
+                    </div>
+                    ${interaction.discussion_summary ? `
+                        <p class="mb-1" style="color: var(--circo-text-secondary); font-size: 0.85rem; line-height: 1.4;">
+                            ${interaction.discussion_summary.length > 100 ? 
+                                interaction.discussion_summary.substring(0, 100) + '...' : 
+                                interaction.discussion_summary}
+                        </p>
+                    ` : ''}
+                    ${interaction.location || interaction.duration_minutes ? `
+                        <small style="color: var(--circo-text-muted); font-size: 0.7rem;">
+                            ${interaction.location ? `📍 ${interaction.location}` : ''}
+                            ${interaction.location && interaction.duration_minutes ? ' • ' : ''}
+                            ${interaction.duration_minutes ? `⏱ ${interaction.duration_minutes} min` : ''}
+                        </small>
+                    ` : ''}
+                </div>
+            `).join('');
+            
+            // Show "View All" link if there are more interactions
+            if (data.total_interactions > 3) {
+                container.innerHTML += `
+                    <div class="text-center mt-2">
+                        <button class="btn btn-link btn-sm text-decoration-none" 
+                                style="color: var(--circo-text-muted); font-size: 0.75rem;"
+                                onclick="viewInteractionHistory(${contactId})">
+                            View all ${data.total_interactions} interactions →
+                        </button>
+                    </div>
+                `;
+            }
+        } else {
+            container.innerHTML = `
+                <div class="text-center py-2">
+                    <p class="text-muted mb-2" style="color: var(--circo-text-muted) !important; font-size: 0.85rem;">
+                        No interactions recorded yet
+                    </p>
+                    <button class="btn btn-sm rounded-3 px-3" 
+                            style="background: #3b82f6; color: white; font-size: 0.75rem;"
+                            onclick="recordInteraction(${contactId})">
+                        📝 Record First Interaction
+                    </button>
+                </div>
+            `;
+        }
+        
+        // Update last interaction date if available
+        if (data.interactions && data.interactions.length > 0) {
+            const lastInteraction = data.interactions[0];
+            const lastDateElement = document.getElementById('profileLastInteractionDate');
+            if (lastDateElement && lastInteraction.interaction_date) {
+                const formattedDate = new Date(lastInteraction.interaction_date).toLocaleDateString('en-US', {
+                    month: 'long', 
+                    day: 'numeric', 
+                    year: 'numeric'
+                });
+                lastDateElement.textContent = formattedDate;
+            }
+        }
+        
+    } catch (error) {
+        console.error('Error loading interactions:', error);
+        container.innerHTML = `
+            <p class="text-muted text-center" style="color: var(--circo-text-muted) !important; font-size: 0.85rem;">
+                Could not load recent interactions
+            </p>
+        `;
+    }
+}
+
+// Add CSS animation for the real-time updates
+const realTimeStyles = document.createElement('style');
+realTimeStyles.textContent = `
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+    
+    .count-updated {
+        animation: pulse 0.3s ease;
+    }
+`;
+document.head.appendChild(realTimeStyles);
+
+// ================= LOAD RECENT INTERACTIONS IN PROFILE =================
+// Enhanced loadRecentInteractions with live update capability
+async function loadRecentInteractions(contactId, animate = false) {
+    const container = document.getElementById('profileRecentInteractions');
+    if (!container) return;
+    
+    try {
+        const url = `${interactionsListUrl.replace('0', contactId)}?per_page=3`;
+        
+        console.log('Loading recent interactions from:', url);
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        console.log('Recent interactions data:', data);
+        
+        if (data.interactions && data.interactions.length > 0) {
+            const recentInteractions = data.interactions.slice(0, 3);
+            
+            const newContent = recentInteractions.map((interaction, index) => `
+                <div class="rounded-3 p-3 mb-2" style="background: var(--circo-bg-tertiary); cursor: pointer;
+                            ${animate ? 'animation: fadeInUp 0.5s ease ' + (index * 0.1) + 's both;' : ''}"
+                     onclick="viewInteractionDetail(${interaction.id})"
+                     title="Click to view full details">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge rounded-pill" style="background: #e0e7ff; color: #3730a3; font-size: 0.75rem;">
+                            ${interaction.interaction_type_emoji || interaction.interaction_type_display}
+                        </span>
+                        <small style="color: var(--circo-text-muted); font-size: 0.75rem;">
+                            ${interaction.interaction_date_relative || new Date(interaction.interaction_date).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}
+                        </small>
+                    </div>
+                    ${interaction.discussion_summary ? `
+                        <p class="mb-1" style="color: var(--circo-text-secondary); font-size: 0.85rem; line-height: 1.4;">
+                            ${interaction.discussion_summary.length > 100 ? 
+                                interaction.discussion_summary.substring(0, 100) + '...' : 
+                                interaction.discussion_summary}
+                        </p>
+                    ` : ''}
+                    ${interaction.location || interaction.duration_minutes ? `
+                        <small style="color: var(--circo-text-muted); font-size: 0.7rem;">
+                            ${interaction.location ? `📍 ${interaction.location}` : ''}
+                            ${interaction.location && interaction.duration_minutes ? ' • ' : ''}
+                            ${interaction.duration_minutes ? `⏱ ${interaction.duration_minutes} min` : ''}
+                        </small>
+                    ` : ''}
+                </div>
+            `).join('');
+            
+            if (data.total_interactions > 3) {
+                container.innerHTML = newContent + `
+                    <div class="text-center mt-2">
+                        <button class="btn btn-link btn-sm text-decoration-none" 
+                                style="color: var(--circo-text-muted); font-size: 0.75rem;"
+                                onclick="viewInteractionHistory(${contactId})">
+                            View all ${data.total_interactions} interactions →
+                        </button>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = newContent;
+            }
+        } else {
+            container.innerHTML = `
+                <div class="text-center py-2">
+                    <p class="text-muted mb-2" style="color: var(--circo-text-muted) !important; font-size: 0.85rem;">
+                        No interactions recorded yet
+                    </p>
+                    <button class="btn btn-sm rounded-3 px-3" 
+                            style="background: #3b82f6; color: white; font-size: 0.75rem;"
+                            onclick="recordInteraction(${contactId})">
+                        📝 Record First Interaction
+                    </button>
+                </div>
+            `;
+        }
+        
+    } catch (error) {
+        console.error('Error loading interactions:', error);
+        container.innerHTML = `
+            <p class="text-muted text-center" style="color: var(--circo-text-muted) !important; font-size: 0.85rem;">
+                Could not load recent interactions
+            </p>
+        `;
+    }
+}
+
+// Add fadeInUp animation for smooth updates
+const animationStyles = document.createElement('style');
+animationStyles.textContent = `
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+`;
+document.head.appendChild(animationStyles);
+
 
 // ================= VIEW ALUMNI PROFILE =================
 async function viewAlumniProfile(userId) {
@@ -2237,36 +2782,760 @@ function renderPagination(data, type) {
 }
 
 // ================= RECORD INTERACTION =================
-async function recordInteraction(contactId) {
-    await performRecordInteraction(contactId);
-}
-
-async function recordInteractionFromModal(contactId) {
-    await performRecordInteraction(contactId);
-}
-
-async function performRecordInteraction(contactId) {
-    const url = interactionBaseUrl.replace("0", contactId);
-
-    try {
-        const res = await fetch(url, {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": csrftoken,
-                "Content-Type": "application/json"
+function recordInteraction(contactId) {
+    const modal = new bootstrap.Modal(document.getElementById('recordInteractionModal'));
+    const contactNameElement = document.getElementById('interaction_contact_name');
+    const contactIdInput = document.getElementById('interaction_contact_id');
+    
+    // Reset form
+    document.getElementById('interactionForm').reset();
+    document.getElementById('interactionMessage').innerHTML = '';
+    document.getElementById('locationField').style.display = 'block';
+    
+    // Set contact info
+    contactIdInput.value = contactId;
+    
+    // Try to get contact name from the clicked element or nearby elements
+    const clickedElement = window.event?.target;
+    let contactName = 'Contact';
+    
+    if (clickedElement) {
+        // Look for contact name in parent elements
+        const contactCard = clickedElement.closest('[data-contact-name], .vstack.gap-1 > div, .row.g-3 > div');
+        if (contactCard) {
+            const nameElement = contactCard.querySelector('p.fw-medium, .fw-medium');
+            if (nameElement) {
+                contactName = nameElement.textContent.trim();
             }
-        });
+        }
+    }
+    
+    // If we still don't have a name, try to fetch it
+    if (contactName === 'Contact') {
+        fetchContactName(contactId, contactNameElement);
+    } else {
+        contactNameElement.textContent = `Recording interaction with: ${contactName}`;
+    }
+    
+    modal.show();
+}
 
-        const data = await res.json();
-
-        if (res.ok) {
-            showToast("Interaction recorded successfully", "success");
-            setTimeout(() => location.reload(), 1000);
+// Helper function to fetch contact name
+async function fetchContactName(contactId, element) {
+    try {
+        const url = contactDetailUrl.replace('0', contactId);
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.contact && data.contact.name) {
+            element.textContent = `Recording interaction with: ${data.contact.name}`;
         } else {
-            showToast(data.error || "Error recording interaction", "error");
+            element.textContent = 'Record Interaction';
         }
     } catch (error) {
-        showToast("Network error occurred", "error");
+        element.textContent = 'Record Interaction';
+    }
+}
+
+function recordInteractionFromModal(contactId) {
+    // Close the full list modal if open
+    const fullListModal = bootstrap.Modal.getInstance(document.getElementById('fullListModal'));
+    if (fullListModal) {
+        fullListModal.hide();
+    }
+    
+    // Small delay to allow modal to close before opening new one
+    setTimeout(() => {
+        recordInteraction(contactId);
+    }, 300);
+}
+
+// Show/hide location field based on interaction type
+document.getElementById('interaction_type').addEventListener('change', function() {
+    const locationField = document.getElementById('locationField');
+    const virtualTypes = ['video_call', 'online_conference', 'whatsapp_call', 'phone_call', 'chatting', 'text_message', 'email', 'social_media'];
+    
+    if (virtualTypes.includes(this.value)) {
+        locationField.style.display = 'block';
+        document.getElementById('interaction_location').placeholder = 'e.g., Zoom, WhatsApp, Phone...';
+    } else if (this.value === 'coffee_meeting' || this.value === 'physical_meetup') {
+        locationField.style.display = 'block';
+        document.getElementById('interaction_location').placeholder = 'e.g., Starbucks, Office, Restaurant...';
+    } else {
+        locationField.style.display = 'block';
+        document.getElementById('interaction_location').placeholder = 'Enter location...';
+    }
+});
+
+// Interaction Form Submission with HTMX (No page reload)
+document.getElementById('interactionForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const contactId = document.getElementById('interaction_contact_id').value;
+    const interactionType = document.getElementById('interaction_type').value;
+    const summary = document.getElementById('interaction_summary').value;
+    
+    if (!interactionType) {
+        showMessage('interactionMessage', 'Please select an interaction type', 'danger');
+        return;
+    }
+    
+    if (!summary.trim()) {
+        showMessage('interactionMessage', 'Please provide a discussion summary', 'danger');
+        return;
+    }
+    
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalHTML = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Recording...';
+    
+    // Use the correct URL for recording interaction
+    const url = interactionBaseUrl.replace('0', contactId);
+    
+    console.log('Recording interaction at URL:', url);
+    
+    try {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({
+                interaction_type: interactionType,
+                discussion_summary: summary,
+                action_items: document.getElementById('interaction_actions').value,
+                location: document.getElementById('interaction_location').value,
+                duration_minutes: document.getElementById('interaction_duration').value || null,
+                notes: document.getElementById('interaction_notes').value
+            })
+        });
+        
+        const data = await res.json();
+        
+        console.log('Interaction response:', data);
+        
+        if (res.ok) {
+            // Show success message in the form
+            showMessage('interactionMessage', 
+                `✅ ${data.interaction_type} recorded successfully!`, 
+                'success');
+            
+            // Reset form after success
+            document.getElementById('interactionForm').reset();
+            document.getElementById('interaction_contact_id').value = contactId;
+            
+            // Update interaction count in real-time without page reload
+            updateInteractionCounts(contactId);
+            
+            // Update last interaction date in the UI
+            updateLastInteractionDate(contactId);
+            
+            // Show beautiful toast notification
+            showInteractionSuccessToast(data);
+            
+            // Close modal after short delay
+            setTimeout(() => {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('recordInteractionModal'));
+                if (modal) {
+                    modal.hide();
+                }
+            }, 2000);
+            
+            // Reset button
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalHTML;
+            
+        } else {
+            showMessage('interactionMessage', data.error || 'Error recording interaction', 'danger');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalHTML;
+        }
+    } catch (error) {
+        console.error('Interaction error:', error);
+        showMessage('interactionMessage', 'Network error occurred', 'danger');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalHTML;
+    }
+});
+
+// Show success toast when interaction is recorded
+function showInteractionSuccessToast(data) {
+    const toastHTML = `
+        <div class="toast-notification" style="
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 99999;
+            animation: slideInRight 0.5s ease;
+            max-width: 400px;
+        ">
+            <div class="rounded-4 p-4" style="
+                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                color: white;
+                box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            ">
+                <div class="d-flex align-items-start">
+                    <div class="me-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center" 
+                             style="width: 40px; height: 40px; background: rgba(255, 255, 255, 0.2); font-size: 20px;">
+                            ✅
+                        </div>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1 fw-bold" style="font-size: 0.95rem;">Interaction Recorded!</h6>
+                        <p class="mb-2" style="font-size: 0.85rem; opacity: 0.9;">
+                            ${data.interaction_type} recorded successfully
+                        </p>
+                        ${data.interaction_data && data.interaction_data.discussion_summary ? `
+                            <p class="mb-0" style="font-size: 0.75rem; opacity: 0.8; font-style: italic;">
+                                "${data.interaction_data.discussion_summary.substring(0, 100)}${data.interaction_data.discussion_summary.length > 100 ? '...' : ''}"
+                            </p>
+                        ` : ''}
+                    </div>
+                    <button class="btn btn-link btn-sm p-0 ms-2" style="color: white; opacity: 0.7;" 
+                            onclick="this.closest('.toast-notification').remove()">
+                        ✕
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const toastContainer = document.createElement('div');
+    toastContainer.innerHTML = toastHTML;
+    document.body.appendChild(toastContainer.firstElementChild);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        const toast = document.querySelector('.toast-notification');
+        if (toast) {
+            toast.style.animation = 'slideOutRight 0.5s ease';
+            setTimeout(() => toast.remove(), 500);
+        }
+    }, 5000);
+}
+
+// Real-time update of interaction counts without page reload
+async function updateInteractionCounts(contactId) {
+    try {
+        // Fetch updated contact data
+        const url = contactDetailUrl.replace('0', contactId);
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.contact) {
+            const newCount = data.contact.interaction_count || 0;
+            
+            // Update all interaction count displays for this contact
+            updateCountDisplays(contactId, newCount);
+            
+            // If contact profile modal is open, update the statistics
+            updateProfileModalStats(newCount);
+            
+            // Update the "last interaction" displays
+            updateLastInteractionDisplays(contactId, data.contact.last_interaction);
+        }
+    } catch (error) {
+        console.error('Error updating counts:', error);
+    }
+}
+
+// Update count displays throughout the page
+function updateCountDisplays(contactId, newCount) {
+    // Update any element showing interaction count for this contact
+    const countElements = document.querySelectorAll(`[data-interaction-count-contact="${contactId}"]`);
+    countElements.forEach(el => {
+        el.textContent = newCount;
+        // Update the parent badge or indicator if needed
+        updateContactStatusBadge(contactId, newCount);
+    });
+    
+    // Also update if the count is shown in a profile modal
+    const profileCountElements = document.querySelectorAll('#contactProfileModalBody [data-interaction-count]');
+    profileCountElements.forEach(el => {
+        el.textContent = newCount;
+    });
+}
+
+// Update contact status badges based on interaction count
+function updateContactStatusBadge(contactId, count) {
+    const statusBadges = document.querySelectorAll(`[data-contact-status="${contactId}"]`);
+    statusBadges.forEach(badge => {
+        if (count === 0) {
+            badge.className = 'badge rounded-pill px-3 py-2';
+            badge.style.background = '#fef3c7';
+            badge.style.color = '#92400e';
+            badge.innerHTML = '⚠️ Never Connected';
+        } else if (count > 0) {
+            badge.className = 'badge rounded-pill px-3 py-2';
+            badge.style.background = '#d1fae5';
+            badge.style.color = '#065f46';
+            badge.innerHTML = '✅ Connected';
+        }
+    });
+}
+
+// Update profile modal statistics in real-time
+function updateProfileModalStats(newCount) {
+    const modalBody = document.getElementById('contactProfileModalBody');
+    if (!modalBody) return;
+    
+    // Find the interaction count element in the statistics grid
+    const statsElements = modalBody.querySelectorAll('h3');
+    statsElements.forEach(el => {
+        const parentText = el.parentElement?.textContent || '';
+        if (parentText.includes('Interactions')) {
+            el.textContent = newCount;
+            
+            // Add a subtle animation to show it updated
+            el.style.transition = 'transform 0.3s ease';
+            el.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                el.style.transform = 'scale(1)';
+            }, 300);
+        }
+    });
+    
+    // Also update the recent interactions section
+    const contactId = document.getElementById('contactProfileModal').getAttribute('data-contact-id');
+    if (contactId) {
+        loadRecentInteractions(contactId);
+    }
+}
+
+// Update last interaction displays
+function updateLastInteractionDisplays(contactId, lastInteractionDate) {
+    if (!lastInteractionDate) return;
+    
+    const formattedDate = new Date(lastInteractionDate).toLocaleDateString('en-US', {
+        month: 'long', 
+        day: 'numeric', 
+        year: 'numeric'
+    });
+    
+    // Update all last interaction displays
+    const lastInteractionElements = document.querySelectorAll(`[data-last-interaction="${contactId}"]`);
+    lastInteractionElements.forEach(el => {
+        el.textContent = formattedDate;
+    });
+    
+    // Update in the profile modal if open
+    const modalBody = document.getElementById('contactProfileModalBody');
+    if (modalBody) {
+        const lastInteractionLabels = modalBody.querySelectorAll('.form-label');
+        lastInteractionLabels.forEach(label => {
+            if (label.textContent.includes('Last Interaction')) {
+                const valueEl = label.nextElementSibling;
+                if (valueEl) {
+                    valueEl.textContent = formattedDate;
+                }
+            }
+        });
+    }
+}
+
+// Update last interaction date in the UI
+async function updateLastInteractionDate(contactId) {
+    try {
+        const url = contactDetailUrl.replace('0', contactId);
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.contact && data.contact.last_interaction) {
+            updateLastInteractionDisplays(contactId, data.contact.last_interaction);
+        }
+    } catch (error) {
+        console.error('Error updating last interaction:', error);
+    }
+}
+
+// Add these CSS animations for the toast
+const toastStyles = document.createElement('style');
+toastStyles.textContent = `
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideOutRight {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+    
+    .toast-notification {
+        transition: all 0.3s ease;
+    }
+    
+    .toast-notification:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 50px rgba(16, 185, 129, 0.4) !important;
+    }
+`;
+document.head.appendChild(toastStyles);
+
+// ================= VIEW INTERACTION HISTORY =================
+async function viewInteractionHistory(contactId, page = 1) {
+    const historyModal = new bootstrap.Modal(document.getElementById('interactionHistoryModal'));
+    const historyBody = document.getElementById('interactionHistoryBody');
+    
+    historyBody.innerHTML = `
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-3" style="color: var(--circo-text-muted);">Loading interaction history...</p>
+        </div>
+    `;
+    
+    // Close the record modal if open
+    const recordModal = bootstrap.Modal.getInstance(document.getElementById('recordInteractionModal'));
+    if (recordModal) {
+        recordModal.hide();
+    }
+    
+    setTimeout(() => {
+        historyModal.show();
+    }, 300);
+    
+    // Use the correct URL for listing interactions
+    const url = `${interactionsListUrl.replace('0', contactId)}?page=${page}&per_page=10`;
+    
+    console.log('Fetching interactions from:', url);
+    
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        console.log('Interactions data:', data);
+        
+        if (data.interactions && data.interactions.length > 0) {
+            let html = `
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-medium mb-0" style="color: var(--circo-text-primary);">
+                            ${data.contact_name} - ${data.total_interactions} interaction${data.total_interactions > 1 ? 's' : ''}
+                        </h6>
+                        <button class="btn btn-sm rounded-3 px-3" 
+                                style="background: #3b82f6; color: white; font-size: 0.8rem;"
+                                onclick="recordInteraction(${contactId})">
+                            📝 New Interaction
+                        </button>
+                    </div>
+                    
+                    <!-- Timeline -->
+                    <div class="position-relative">
+                        <div style="position: absolute; left: 20px; top: 0; bottom: 0; width: 2px; background: var(--circo-border);"></div>
+                        
+                        ${data.interactions.map((interaction, index) => `
+                            <div class="position-relative mb-4" style="padding-left: 50px;">
+                                <div style="position: absolute; left: 11px; top: 5px; width: 20px; height: 20px; border-radius: 50%; 
+                                          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                                          border: 3px solid var(--circo-bg-secondary); z-index: 1;">
+                                </div>
+                                
+                                <div class="rounded-3 p-3" style="background: var(--circo-bg-tertiary);">
+                                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start mb-2">
+                                        <div class="mb-2 mb-md-0">
+                                            <span class="badge rounded-pill me-2 mb-1" style="background: #e0e7ff; color: #3730a3; font-size: 0.8rem;">
+                                                ${interaction.interaction_type_emoji}
+                                            </span>
+                                            ${interaction.location ? `
+                                                <span class="badge rounded-pill mb-1" style="background: #fce7f3; color: #9d174d; font-size: 0.75rem;">
+                                                    📍 ${interaction.location}
+                                                </span>
+                                            ` : ''}
+                                            ${interaction.duration_minutes ? `
+                                                <span class="badge rounded-pill mb-1" style="background: #d1fae5; color: #065f46; font-size: 0.75rem;">
+                                                    ⏱ ${interaction.duration_minutes} min
+                                                </span>
+                                            ` : ''}
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <small style="color: var(--circo-text-muted); font-size: 0.8rem;">
+                                                ${interaction.interaction_date_formatted}
+                                            </small>
+                                            <button class="btn btn-link btn-sm p-0 text-decoration-none" 
+                                                    style="color: var(--circo-text-muted); font-size: 0.7rem;"
+                                                    onclick="viewInteractionDetail(${interaction.id})"
+                                                    title="View Details">
+                                                <i class="bi bi-arrows-angle-expand"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    ${interaction.discussion_summary ? `
+                                        <div class="mb-2">
+                                            <strong style="color: var(--circo-text-primary); font-size: 0.85rem;">Discussion:</strong>
+                                            <p class="mb-1 mt-1" style="color: var(--circo-text-secondary); font-size: 0.85rem; line-height: 1.5;">
+                                                ${interaction.discussion_summary.length > 200 ? 
+                                                    interaction.discussion_summary.substring(0, 200) + '...' : 
+                                                    interaction.discussion_summary}
+                                            </p>
+                                        </div>
+                                    ` : ''}
+                                    
+                                    ${interaction.action_items ? `
+                                        <div class="mb-2">
+                                            <strong style="color: var(--circo-text-primary); font-size: 0.85rem;">Action Items:</strong>
+                                            <p class="mb-1 mt-1" style="color: var(--circo-text-secondary); font-size: 0.85rem;">
+                                                ${interaction.action_items}
+                                            </p>
+                                        </div>
+                                    ` : ''}
+                                    
+                                    ${interaction.notes ? `
+                                        <div>
+                                            <strong style="color: var(--circo-text-primary); font-size: 0.85rem;">Notes:</strong>
+                                            <p class="mb-0 mt-1" style="color: var(--circo-text-secondary); font-size: 0.85rem;">
+                                                ${interaction.notes}
+                                            </p>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <!-- Pagination -->
+                    ${data.total_pages > 1 ? `
+                        <div class="mt-4">
+                            <nav>
+                                <ul class="pagination justify-content-center flex-wrap mb-0">
+                                    <li class="page-item ${!data.has_previous ? 'disabled' : ''}">
+                                        <a class="page-link" href="#" onclick="viewInteractionHistory(${contactId}, ${data.page - 1}); return false;" 
+                                           style="color: var(--circo-text-secondary); border: none; padding: 0.5rem 0.75rem; margin: 0 0.25rem; border-radius: 0.5rem !important; background: var(--circo-bg-tertiary);">
+                                            ←
+                                        </a>
+                                    </li>
+                                    ${Array.from({length: data.total_pages}, (_, i) => i + 1).map(i => `
+                                        <li class="page-item ${i === data.page ? 'active' : ''}">
+                                            <a class="page-link" href="#" onclick="viewInteractionHistory(${contactId}, ${i}); return false;"
+                                               style="color: var(--circo-text-secondary); border: none; padding: 0.5rem 0.75rem; margin: 0 0.25rem; border-radius: 0.5rem !important; background: ${i === data.page ? '#3b82f6' : 'var(--circo-bg-tertiary)'}; color: ${i === data.page ? 'white' : 'var(--circo-text-secondary)'};">
+                                                ${i}
+                                            </a>
+                                        </li>
+                                    `).join('')}
+                                    <li class="page-item ${!data.has_next ? 'disabled' : ''}">
+                                        <a class="page-link" href="#" onclick="viewInteractionHistory(${contactId}, ${data.page + 1}); return false;"
+                                           style="color: var(--circo-text-secondary); border: none; padding: 0.5rem 0.75rem; margin: 0 0.25rem; border-radius: 0.5rem !important; background: var(--circo-bg-tertiary);">
+                                            →
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            historyBody.innerHTML = html;
+            
+        } else {
+            historyBody.innerHTML = `
+                <div class="text-center py-5">
+                    <div class="mb-3">
+                        <span style="font-size: 3rem;">📝</span>
+                    </div>
+                    <h6 style="color: var(--circo-text-primary);">No interactions yet</h6>
+                    <p class="text-muted mb-3" style="color: var(--circo-text-muted) !important;">
+                        Start recording interactions with ${data.contact_name || 'this contact'}
+                    </p>
+                    <button class="btn btn-dark rounded-3 px-4" 
+                            style="background: var(--circo-btn-dark-bg);"
+                            onclick="recordInteraction(${contactId})">
+                        📝 Record First Interaction
+                    </button>
+                </div>
+            `;
+        }
+        
+    } catch (error) {
+        console.error('Error loading interactions:', error);
+        historyBody.innerHTML = `
+            <div class="alert alert-danger rounded-3">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                Error loading interaction history: ${error.message}
+            </div>
+        `;
+    }
+}
+
+// ================= VIEW SINGLE INTERACTION DETAIL =================
+async function viewInteractionDetail(interactionId) {
+    // Use the correct URL for viewing single interaction
+    const url = interactionDetailUrl.replace('0', interactionId);
+    
+    console.log('Fetching interaction detail from:', url);
+    
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        console.log('Interaction detail:', data);
+        
+        if (data.id) {
+            // Create a detail view within the history modal or as an alert
+            const detailHtml = `
+                <div class="rounded-3 p-4" style="background: var(--circo-bg-tertiary);">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h6 class="fw-medium mb-0" style="color: var(--circo-text-primary);">
+                            Interaction Details
+                        </h6>
+                        <button class="btn btn-link btn-sm p-0 text-decoration-none" 
+                                style="color: var(--circo-text-muted);"
+                                onclick="viewInteractionHistory(${data.contact_id})">
+                            ← Back to History
+                        </button>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <span class="badge rounded-pill me-2" style="background: #e0e7ff; color: #3730a3; font-size: 0.9rem;">
+                            ${data.interaction_type_emoji}
+                        </span>
+                        ${data.location ? `
+                            <span class="badge rounded-pill me-2" style="background: #fce7f3; color: #9d174d; font-size: 0.85rem;">
+                                📍 ${data.location}
+                            </span>
+                        ` : ''}
+                        ${data.duration_minutes ? `
+                            <span class="badge rounded-pill" style="background: #d1fae5; color: #065f46; font-size: 0.85rem;">
+                                ⏱ ${data.duration_minutes} minutes
+                            </span>
+                        ` : ''}
+                    </div>
+                    
+                    <p class="mb-3" style="color: var(--circo-text-muted); font-size: 0.9rem;">
+                        <i class="bi bi-calendar"></i> ${data.interaction_date_formatted}
+                    </p>
+                    
+                    ${data.discussion_summary ? `
+                        <div class="mb-3">
+                            <strong style="color: var(--circo-text-primary);">Discussion Summary:</strong>
+                            <p class="mt-1" style="color: var(--circo-text-secondary); white-space: pre-wrap;">${data.discussion_summary}</p>
+                        </div>
+                    ` : ''}
+                    
+                    ${data.action_items ? `
+                        <div class="mb-3">
+                            <strong style="color: var(--circo-text-primary);">Action Items:</strong>
+                            <p class="mt-1" style="color: var(--circo-text-secondary); white-space: pre-wrap;">${data.action_items}</p>
+                        </div>
+                    ` : ''}
+                    
+                    ${data.notes ? `
+                        <div class="mb-3">
+                            <strong style="color: var(--circo-text-primary);">Additional Notes:</strong>
+                            <p class="mt-1" style="color: var(--circo-text-secondary); white-space: pre-wrap;">${data.notes}</p>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            // Show in the interaction history modal body
+            const historyBody = document.getElementById('interactionHistoryBody');
+            historyBody.innerHTML = detailHtml;
+        }
+        
+    } catch (error) {
+        console.error('Error loading interaction detail:', error);
+        showToast('Error loading interaction details', 'error');
+    }
+}
+
+// Update the loadRecentInteractions function in viewProfile
+async function loadRecentInteractions(contactId) {
+    const container = document.getElementById('profileRecentInteractions');
+    if (!container) return;
+    
+    try {
+        // Use the correct URL for listing interactions
+        const url = `${interactionsListUrl.replace('0', contactId)}?per_page=3`;
+        
+        console.log('Loading recent interactions from:', url);
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        console.log('Recent interactions data:', data);
+        
+        if (data.interactions && data.interactions.length > 0) {
+            const recentInteractions = data.interactions.slice(0, 3);
+            
+            container.innerHTML = recentInteractions.map(interaction => `
+                <div class="rounded-3 p-3 mb-2" style="background: var(--circo-bg-tertiary); cursor: pointer;"
+                     onclick="viewInteractionDetail(${interaction.id})"
+                     title="Click to view full details">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge rounded-pill" style="background: #e0e7ff; color: #3730a3; font-size: 0.75rem;">
+                            ${interaction.interaction_type_emoji || interaction.interaction_type_display}
+                        </span>
+                        <small style="color: var(--circo-text-muted); font-size: 0.75rem;">
+                            ${interaction.interaction_date_relative || new Date(interaction.interaction_date).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}
+                        </small>
+                    </div>
+                    ${interaction.discussion_summary ? `
+                        <p class="mb-1" style="color: var(--circo-text-secondary); font-size: 0.85rem; line-height: 1.4;">
+                            ${interaction.discussion_summary.length > 100 ? 
+                                interaction.discussion_summary.substring(0, 100) + '...' : 
+                                interaction.discussion_summary}
+                        </p>
+                    ` : ''}
+                    ${interaction.location || interaction.duration_minutes ? `
+                        <small style="color: var(--circo-text-muted); font-size: 0.7rem;">
+                            ${interaction.location ? `📍 ${interaction.location}` : ''}
+                            ${interaction.location && interaction.duration_minutes ? ' • ' : ''}
+                            ${interaction.duration_minutes ? `⏱ ${interaction.duration_minutes} min` : ''}
+                        </small>
+                    ` : ''}
+                </div>
+            `).join('');
+            
+            if (data.total_interactions > 3) {
+                container.innerHTML += `
+                    <div class="text-center mt-2">
+                        <button class="btn btn-link btn-sm text-decoration-none" 
+                                style="color: var(--circo-text-muted); font-size: 0.75rem;"
+                                onclick="viewInteractionHistory(${contactId})">
+                            View all ${data.total_interactions} interactions →
+                        </button>
+                    </div>
+                `;
+            }
+        } else {
+            container.innerHTML = `
+                <div class="text-center py-2">
+                    <p class="text-muted mb-2" style="color: var(--circo-text-muted) !important; font-size: 0.85rem;">
+                        No interactions recorded yet
+                    </p>
+                    <button class="btn btn-sm rounded-3 px-3" 
+                            style="background: #3b82f6; color: white; font-size: 0.75rem;"
+                            onclick="recordInteraction(${contactId})">
+                        📝 Record First Interaction
+                    </button>
+                </div>
+            `;
+        }
+        
+    } catch (error) {
+        console.error('Error loading interactions:', error);
+        container.innerHTML = `
+            <p class="text-muted text-center" style="color: var(--circo-text-muted) !important; font-size: 0.85rem;">
+                Could not load recent interactions
+            </p>
+        `;
     }
 }
 

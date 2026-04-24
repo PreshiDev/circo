@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
-from .models import Contact, Event, User
+from .models import Contact, Event, User, Interaction
 from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
@@ -610,6 +610,7 @@ class RecordInteractionAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, contact_id):
+        """Record a new interaction"""
         user = request.user
 
         try:
@@ -617,14 +618,226 @@ class RecordInteractionAPIView(APIView):
         except Contact.DoesNotExist:
             return Response({"error": "Contact not found"}, status=404)
 
+        # Get interaction details from request
+        interaction_type = request.data.get('interaction_type', 'physical_meetup')
+        discussion_summary = request.data.get('discussion_summary', '')
+        action_items = request.data.get('action_items', '')
+        location = request.data.get('location', '')
+        duration_minutes = request.data.get('duration_minutes')
+        notes = request.data.get('notes', '')
+
+        # Validate interaction type
+        valid_types = [choice[0] for choice in Interaction.INTERACTION_TYPES]
+        if interaction_type not in valid_types:
+            return Response(
+                {"error": f"Invalid interaction type. Must be one of: {', '.join(valid_types)}"}, 
+                status=400
+            )
+
+        # Create interaction record
+        interaction = Interaction.objects.create(
+            user=user,
+            contact=contact,
+            interaction_type=interaction_type,
+            discussion_summary=discussion_summary,
+            action_items=action_items,
+            location=location,
+            duration_minutes=duration_minutes if duration_minutes else None,
+            notes=notes
+        )
+
+        # Update contact's last interaction date
         contact.last_interaction = timezone.now().date()
         contact.save()
 
         return Response({
-            "message": "Interaction recorded",
-            "last_interaction": contact.last_interaction.strftime("%Y-%m-%d")
+            "message": "Interaction recorded successfully",
+            "last_interaction": contact.last_interaction.strftime("%Y-%m-%d"),
+            "interaction_id": interaction.id,
+            "interaction_type": interaction.get_interaction_type_display(),
+            "interaction_data": {
+                'id': interaction.id,
+                'interaction_type': interaction.interaction_type,
+                'interaction_type_display': interaction.get_interaction_type_display(),
+                'interaction_type_emoji': interaction.interaction_type_display_emoji,
+                'discussion_summary': interaction.discussion_summary,
+                'action_items': interaction.action_items,
+                'location': interaction.location,
+                'duration_minutes': interaction.duration_minutes,
+                'notes': interaction.notes,
+                'interaction_date': interaction.interaction_date.strftime("%Y-%m-%d %H:%M"),
+                'interaction_date_formatted': interaction.interaction_date.strftime("%B %d, %Y at %I:%M %p"),
+            }
+        }, status=201)
+
+    def get(self, request, contact_id):
+        """Get interaction history for a contact"""
+        user = request.user
+
+        try:
+            contact = Contact.objects.get(id=contact_id, user=user)
+        except Contact.DoesNotExist:
+            return Response({"error": "Contact not found"}, status=404)
+
+        # Get pagination parameters
+        page = int(request.query_params.get('page', 1))
+        per_page = int(request.query_params.get('per_page', 10))
+        
+        interactions = Interaction.objects.filter(
+            user=user, 
+            contact=contact
+        ).order_by('-interaction_date')
+
+        # Calculate pagination
+        total_interactions = interactions.count()
+        total_pages = (total_interactions + per_page - 1) // per_page
+        start = (page - 1) * per_page
+        end = start + per_page
+        
+        paginated_interactions = interactions[start:end]
+        
+        interaction_data = []
+        for interaction in paginated_interactions:
+            interaction_data.append({
+                'id': interaction.id,
+                'interaction_type': interaction.interaction_type,
+                'interaction_type_display': interaction.get_interaction_type_display(),
+                'interaction_type_emoji': interaction.interaction_type_display_emoji,
+                'discussion_summary': interaction.discussion_summary,
+                'action_items': interaction.action_items,
+                'location': interaction.location,
+                'duration_minutes': interaction.duration_minutes,
+                'notes': interaction.notes,
+                'interaction_date': interaction.interaction_date.strftime("%Y-%m-%d %H:%M"),
+                'interaction_date_formatted': interaction.interaction_date.strftime("%B %d, %Y at %I:%M %p"),
+                'interaction_date_relative': self.get_relative_time(interaction.interaction_date),
+            })
+
+        return Response({
+            'contact_id': contact_id,
+            'contact_name': contact.name,
+            'interactions': interaction_data,
+            'total_interactions': total_interactions,
+            'page': page,
+            'per_page': per_page,
+            'total_pages': total_pages,
+            'has_next': page < total_pages,
+            'has_previous': page > 1
         })
     
+    def get_relative_time(self, date):
+        """Return relative time string"""
+        now = timezone.now()
+        diff = now - date
+        
+        if diff.days > 365:
+            years = diff.days // 365
+            return f"{years} year{'s' if years > 1 else ''} ago"
+        elif diff.days > 30:
+            months = diff.days // 30
+            return f"{months} month{'s' if months > 1 else ''} ago"
+        elif diff.days > 0:
+            return f"{diff.days} day{'s' if diff.days > 1 else ''} ago"
+        elif diff.seconds > 3600:
+            hours = diff.seconds // 3600
+            return f"{hours} hour{'s' if hours > 1 else ''} ago"
+        elif diff.seconds > 60:
+            minutes = diff.seconds // 60
+            return f"{minutes} minute{'s' if minutes > 1 else ''} ago"
+        else:
+            return "Just now"
+
+
+
+
+class InteractionDetailAPIView(APIView):
+    """Get, update, or delete a specific interaction"""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, interaction_id):
+        """Get single interaction details"""
+        try:
+            interaction = Interaction.objects.get(id=interaction_id, user=request.user)
+        except Interaction.DoesNotExist:
+            return Response({"error": "Interaction not found"}, status=404)
+
+        return Response({
+            'id': interaction.id,
+            'contact_id': interaction.contact.id,
+            'contact_name': interaction.contact.name,
+            'interaction_type': interaction.interaction_type,
+            'interaction_type_display': interaction.get_interaction_type_display(),
+            'interaction_type_emoji': interaction.interaction_type_display_emoji,
+            'discussion_summary': interaction.discussion_summary,
+            'action_items': interaction.action_items,
+            'location': interaction.location,
+            'duration_minutes': interaction.duration_minutes,
+            'notes': interaction.notes,
+            'interaction_date': interaction.interaction_date.strftime("%Y-%m-%d %H:%M"),
+            'interaction_date_formatted': interaction.interaction_date.strftime("%B %d, %Y at %I:%M %p"),
+        })
+
+    def put(self, request, interaction_id):
+        """Update an interaction"""
+        try:
+            interaction = Interaction.objects.get(id=interaction_id, user=request.user)
+        except Interaction.DoesNotExist:
+            return Response({"error": "Interaction not found"}, status=404)
+
+        # Update fields if provided
+        if 'interaction_type' in request.data:
+            valid_types = [choice[0] for choice in Interaction.INTERACTION_TYPES]
+            if request.data['interaction_type'] not in valid_types:
+                return Response(
+                    {"error": f"Invalid interaction type"}, 
+                    status=400
+                )
+            interaction.interaction_type = request.data['interaction_type']
+        
+        if 'discussion_summary' in request.data:
+            interaction.discussion_summary = request.data['discussion_summary']
+        
+        if 'action_items' in request.data:
+            interaction.action_items = request.data['action_items']
+        
+        if 'location' in request.data:
+            interaction.location = request.data['location']
+        
+        if 'duration_minutes' in request.data:
+            interaction.duration_minutes = request.data['duration_minutes']
+        
+        if 'notes' in request.data:
+            interaction.notes = request.data['notes']
+        
+        interaction.save()
+
+        return Response({
+            "message": "Interaction updated successfully",
+            "interaction": {
+                'id': interaction.id,
+                'interaction_type': interaction.interaction_type,
+                'interaction_type_display': interaction.get_interaction_type_display(),
+                'interaction_type_emoji': interaction.interaction_type_display_emoji,
+                'discussion_summary': interaction.discussion_summary,
+                'action_items': interaction.action_items,
+                'location': interaction.location,
+                'duration_minutes': interaction.duration_minutes,
+                'notes': interaction.notes,
+                'interaction_date': interaction.interaction_date.strftime("%Y-%m-%d %H:%M"),
+            }
+        })
+
+    def delete(self, request, interaction_id):
+        """Delete an interaction"""
+        try:
+            interaction = Interaction.objects.get(id=interaction_id, user=request.user)
+        except Interaction.DoesNotExist:
+            return Response({"error": "Interaction not found"}, status=404)
+
+        interaction.delete()
+        return Response({"message": "Interaction deleted successfully"}, status=200)
+
+
 
 
 class ProfileView(APIView):

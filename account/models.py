@@ -83,7 +83,7 @@ class Contact(models.Model):
         return self.interaction_count > 0
     
 
-    
+
 
 class Event(models.Model):
     EVENT_TYPE_CHOICES = (
@@ -112,13 +112,51 @@ class Event(models.Model):
 
 class Interaction(models.Model):
     """Track interaction history between user and contacts"""
+    
+    INTERACTION_TYPES = [
+        ('coffee_meeting', 'Coffee Meeting'),
+        ('phone_call', 'Phone Call'),
+        ('video_call', 'Video Call'),
+        ('online_conference', 'Online Conference'),
+        ('physical_meetup', 'Physical Meetup'),
+        ('whatsapp_call', 'WhatsApp Call'),
+        ('chatting', 'Chatting'),
+        ('text_message', 'Text Message'),
+        ('email', 'Email'),
+        ('social_media', 'Social Media'),
+        ('other', 'Other'),
+    ]
+    
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     contact = models.ForeignKey(Contact, on_delete=models.CASCADE, related_name='interactions')
     interaction_date = models.DateTimeField(auto_now_add=True)
+    interaction_type = models.CharField(max_length=30, choices=INTERACTION_TYPES, default='physical_meetup')
+    discussion_summary = models.TextField(blank=True, null=True, help_text="Important points discussed during interaction")
+    action_items = models.TextField(blank=True, null=True, help_text="Action items or follow-ups")
+    location = models.CharField(max_length=255, blank=True, null=True, help_text="Location if applicable")
+    duration_minutes = models.PositiveIntegerField(blank=True, null=True, help_text="Duration in minutes")
     notes = models.TextField(blank=True, null=True)
     
     class Meta:
         ordering = ['-interaction_date']
     
     def __str__(self):
-        return f"{self.user.email} - {self.contact.name} - {self.interaction_date.date()}"
+        return f"{self.user.email} - {self.contact.name} - {self.interaction_type} - {self.interaction_date.date()}"
+    
+    @property
+    def interaction_type_display_emoji(self):
+        """Return interaction type with emoji"""
+        emoji_map = {
+            'coffee_meeting': '☕',
+            'phone_call': '📞',
+            'video_call': '📹',
+            'online_conference': '💻',
+            'physical_meetup': '🤝',
+            'whatsapp_call': '📱',
+            'chatting': '💬',
+            'text_message': '📝',
+            'email': '📧',
+            'social_media': '📲',
+            'other': '📌',
+        }
+        return f"{emoji_map.get(self.interaction_type, '')} {self.get_interaction_type_display()}"
