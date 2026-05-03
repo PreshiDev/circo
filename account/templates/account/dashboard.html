@@ -1159,6 +1159,44 @@
             padding-bottom: 0.75rem !important;
         }
     }
+
+
+
+    /* Add to your existing styles */
+.contact-select-item {
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.contact-select-item:hover {
+    background: var(--circo-bg-tertiary) !important;
+    transform: translateX(4px);
+}
+
+.contact-select-item.selected {
+    background: rgba(59, 130, 246, 0.1) !important;
+    border-left: 3px solid #3b82f6;
+    padding-left: calc(1rem - 3px) !important;
+}
+
+.contact-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.contact-checkbox:hover {
+    transform: scale(1.1);
+}
+
+/* Loading spinner animation */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.spinner-border {
+    animation: spin 0.8s linear infinite;
+}
 </style>
 {% endblock %}
 
@@ -1340,7 +1378,7 @@ function openEditProfileModal() {
     modal.show();
 }
 
-// ================= CONTACT IMPORT FUNCTIONS =================
+// ================= CONTACT IMPORT FUNCTIONS (FIXED) =================
 function openImportModal() {
     const modal = new bootstrap.Modal(document.getElementById('importContactsModal'));
     resetImportModal();
@@ -1365,8 +1403,9 @@ function backToImportOptions() {
 }
 
 async function requestContactPermission() {
-    if (!('contacts' in navigator)) {
-        showImportMessage('Your browser does not support the Contact Picker API. Please use "Import All Contacts" or add contacts manually.', 'danger');
+    // Check if Contact Picker API is supported
+    if (!('contacts' in navigator) || !('select' in navigator.contacts)) {
+        showImportMessage('Your browser does not support the Contact Picker API. Please use "Import All Contacts" (not supported in your browser) or add contacts manually.', 'warning');
         return;
     }
     
@@ -1374,59 +1413,91 @@ async function requestContactPermission() {
         const props = ['name', 'tel', 'email'];
         const opts = {multiple: true};
         
+        showImportMessage('Opening contact picker... Please select contacts from the popup.', 'info');
+        
         const contacts = await navigator.contacts.select(props, opts);
         
-        if (contacts.length === 0) {
-            showImportMessage('No contacts selected.', 'warning');
+        if (!contacts || contacts.length === 0) {
+            showImportMessage('No contacts selected. Please try again or use "Import All Contacts" if supported.', 'warning');
             return;
         }
         
+        // Process selected contacts
         allPhoneContacts = contacts.map(contact => ({
-            name: contact.name || 'Unknown',
+            name: contact.name && contact.name[0] ? contact.name[0] : 'Unknown',
             phone: contact.tel && contact.tel.length > 0 ? contact.tel[0] : '',
             email: contact.email && contact.email.length > 0 ? contact.email[0] : ''
-        })).filter(c => c.phone);
+        })).filter(c => c.phone); // Only keep contacts with phone numbers
+        
+        if (allPhoneContacts.length === 0) {
+            showImportMessage('No contacts with phone numbers found. Please select contacts that have phone numbers.', 'warning');
+            return;
+        }
         
         filteredPhoneContacts = [...allPhoneContacts];
         displayContactList();
         
     } catch (error) {
         console.error('Contact picker error:', error);
-        showImportMessage('Unable to access contacts. Please use "Import All Contacts" or add contacts manually.', 'danger');
+        // Check if error is due to user cancelling
+        if (error.name === 'AbortError' || error.message.includes('abort')) {
+            showImportMessage('Contact selection was cancelled. Please try again.', 'info');
+        } else {
+            showImportMessage('Unable to access contacts. Please use "Import All Contacts" (if supported) or add contacts manually.', 'danger');
+        }
     }
 }
 
 async function importAllContacts() {
+    // Check if direct access to all contacts is supported
+    if (!('contacts' in navigator) || !('getAll' in navigator.contacts)) {
+        // Fall back to contact picker with select
+        showImportMessage('Direct import all contacts is not supported in this browser. Please use "Select Contacts to Import" instead.', 'warning');
+        return;
+    }
+    
     document.querySelector('#importContactsModal .modal-body > div:first-of-type').style.display = 'none';
     document.getElementById('contactListContainer').style.display = 'none';
     document.getElementById('importProgress').style.display = 'block';
     
     try {
-        if ('contacts' in navigator && 'getAll' in navigator.contacts) {
-            const contacts = await navigator.contacts.getAll(['name', 'tel', 'email']);
-            await processBulkImport(contacts);
-        } else {
-            const props = ['name', 'tel', 'email'];
-            const opts = {multiple: true};
-            
-            const contacts = await navigator.contacts.select(props, opts);
-            await processBulkImport(contacts);
+        showImportMessage('Accessing all contacts... This may take a moment.', 'info');
+        
+        const contacts = await navigator.contacts.getAll(['name', 'tel', 'email']);
+        
+        if (!contacts || contacts.length === 0) {
+            throw new Error('No contacts found');
         }
+        
+        await processBulkImport(contacts);
+        
     } catch (error) {
-        console.error('Import error:', error);
+        console.error('Import all error:', error);
         document.getElementById('importProgress').style.display = 'none';
         document.querySelector('#importContactsModal .modal-body > div:first-of-type').style.display = 'block';
-        showImportMessage('Unable to import all contacts. Please try selecting contacts manually.', 'danger');
+        
+        if (error.message === 'No contacts found') {
+            showImportMessage('No contacts found in your phone. Please add contacts manually.', 'warning');
+        } else if (error.name === 'NotAllowedError') {
+            showImportMessage('Permission denied. Please grant contact access and try again.', 'danger');
+        } else {
+            showImportMessage('Unable to import all contacts. Please use "Select Contacts to Import" instead.', 'danger');
+        }
     }
 }
 
 async function processBulkImport(contacts) {
     const validContacts = contacts
-        .filter(c => c.name && c.tel && c.tel.length > 0)
+        .filter(c => {
+            // Handle different contact API response formats
+            const name = c.name && (typeof c.name === 'string' ? c.name : (c.name[0] || ''));
+            const phone = c.tel && (typeof c.tel === 'string' ? c.tel : (c.tel[0] || ''));
+            return name && phone;
+        })
         .map(c => ({
-            name: c.name,
-            phone_number: c.tel[0],
-            email: c.email && c.email.length > 0 ? c.email[0] : '',
+            name: typeof c.name === 'string' ? c.name : (c.name && c.name[0] ? c.name[0] : 'Unknown'),
+            phone_number: typeof c.tel === 'string' ? c.tel : (c.tel && c.tel[0] ? c.tel[0] : ''),
+            email: c.email && (typeof c.email === 'string' ? c.email : (c.email[0] || '')),
             notes: 'Imported from phone contacts',
             meeting_context: 'Phone contact import'
         }));
@@ -1439,8 +1510,11 @@ async function processBulkImport(contacts) {
     }
     
     document.getElementById('totalToImport').textContent = validContacts.length;
+    document.getElementById('importedCount').textContent = '0';
+    document.getElementById('importProgressBar').style.width = '0%';
     
     let imported = 0;
+    let failed = 0;
     const batchSize = 10;
     const totalBatches = Math.ceil(validContacts.length / batchSize);
     
@@ -1461,21 +1535,37 @@ async function processBulkImport(contacts) {
             
             if (response.ok) {
                 imported += data.imported_count || batch.length;
+                if (data.errors && data.errors.length > 0) {
+                    failed += data.errors.length;
+                }
+            } else {
+                console.error('Batch import failed:', data);
+                failed += batch.length;
             }
         } catch (error) {
             console.error('Batch import error:', error);
+            failed += batch.length;
         }
         
         document.getElementById('importedCount').textContent = imported;
-        const progress = (imported / validContacts.length) * 100;
+        const progress = ((imported + failed) / validContacts.length) * 100;
         document.getElementById('importProgressBar').style.width = progress + '%';
+        
+        // Small delay to show progress
+        await new Promise(resolve => setTimeout(resolve, 100));
     }
     
+    // Show success message
     setTimeout(() => {
         const modal = bootstrap.Modal.getInstance(document.getElementById('importContactsModal'));
         modal.hide();
-        showToast(`Successfully imported ${imported} contacts`, 'success');
-        setTimeout(() => location.reload(), 1500);
+        
+        if (imported > 0) {
+            showToast(`Successfully imported ${imported} contacts${failed > 0 ? ` (${failed} failed)` : ''}`, imported > 0 ? 'success' : 'warning');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showToast('No contacts were imported. Please check the contact format or add manually.', 'warning');
+        }
     }, 500);
 }
 
@@ -1499,7 +1589,12 @@ function displayContactList() {
         div.className = 'contact-select-item p-3 border-bottom';
         div.dataset.contactId = contactId;
         div.dataset.index = index;
-        div.onclick = (e) => toggleContactSelection(contactId, e);
+        div.onclick = (e) => {
+            // Don't toggle if clicking on checkbox
+            if (e.target.type !== 'checkbox') {
+                toggleContactSelection(contactId, e);
+            }
+        };
         
         const isSelected = selectedContactIds.has(contactId);
         if (isSelected) {
@@ -1521,11 +1616,11 @@ function displayContactList() {
                              style="width: 32px; height: 32px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 14px;">
                             ${contact.name ? contact.name.charAt(0).toUpperCase() : '?'}
                         </div>
-                        <strong>${contact.name || 'Unknown'}</strong>
+                        <strong style="color: var(--circo-text-primary);">${escapeHtml(contact.name) || 'Unknown'}</strong>
                     </div>
                     <div class="ms-5 ps-2">
-                        <small>📱 ${contact.phone}</small>
-                        ${contact.email ? `<br><small>✉️ ${contact.email}</small>` : ''}
+                        <small style="color: var(--circo-text-muted);">📱 ${escapeHtml(contact.phone)}</small>
+                        ${contact.email ? `<br><small style="color: var(--circo-text-muted);">✉️ ${escapeHtml(contact.email)}</small>` : ''}
                     </div>
                 </div>
             </div>
@@ -1539,21 +1634,34 @@ function displayContactList() {
     document.getElementById('contactListContainer').style.display = 'block';
 }
 
+// Helper function to escape HTML
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 function toggleContactSelection(contactId, event) {
     const item = document.querySelector(`[data-contact-id="${contactId}"]`);
     const checkbox = document.getElementById(`check_${contactId}`);
     
     if (selectedContactIds.has(contactId)) {
         selectedContactIds.delete(contactId);
-        item.classList.remove('selected');
+        if (item) item.classList.remove('selected');
         if (checkbox) checkbox.checked = false;
     } else {
         selectedContactIds.add(contactId);
-        item.classList.add('selected');
+        if (item) item.classList.add('selected');
         if (checkbox) checkbox.checked = true;
     }
     
     updateSelectedCount();
+    
+    // Stop propagation to prevent double-toggling
+    if (event) {
+        event.stopPropagation();
+    }
 }
 
 function selectAllContacts() {
@@ -1598,11 +1706,17 @@ function filterContacts() {
 function updateSelectedCount() {
     const count = selectedContactIds.size;
     document.getElementById('selectedCount').textContent = count;
-    document.getElementById('importSelectedBtn').disabled = count === 0;
+    const importBtn = document.getElementById('importSelectedBtn');
+    if (importBtn) {
+        importBtn.disabled = count === 0;
+    }
 }
 
 async function importSelectedContacts() {
-    if (selectedContactIds.size === 0) return;
+    if (selectedContactIds.size === 0) {
+        showImportMessage('Please select at least one contact to import.', 'warning');
+        return;
+    }
     
     const selectedContacts = [];
     filteredPhoneContacts.forEach((contact, index) => {
@@ -1618,11 +1732,19 @@ async function importSelectedContacts() {
         }
     });
     
+    if (selectedContacts.length === 0) {
+        showImportMessage('No valid contacts selected for import.', 'warning');
+        return;
+    }
+    
     document.getElementById('contactListContainer').style.display = 'none';
     document.getElementById('importProgress').style.display = 'block';
     document.getElementById('totalToImport').textContent = selectedContacts.length;
+    document.getElementById('importedCount').textContent = '0';
+    document.getElementById('importProgressBar').style.width = '0%';
     
     let imported = 0;
+    let failed = 0;
     
     for (let i = 0; i < selectedContacts.length; i++) {
         const contact = selectedContacts[i];
@@ -1639,27 +1761,52 @@ async function importSelectedContacts() {
             
             if (response.ok) {
                 imported++;
+            } else {
+                const data = await response.json();
+                console.error('Import failed for contact:', contact.name, data);
+                failed++;
             }
         } catch (error) {
-            console.error('Import error:', error);
+            console.error('Import error for contact:', contact.name, error);
+            failed++;
         }
         
         document.getElementById('importedCount').textContent = imported;
-        const progress = ((i + 1) / selectedContacts.length) * 100;
+        const progress = ((imported + failed) / selectedContacts.length) * 100;
         document.getElementById('importProgressBar').style.width = progress + '%';
+        
+        // Small delay to show progress
+        await new Promise(resolve => setTimeout(resolve, 50));
     }
     
     setTimeout(() => {
         const modal = bootstrap.Modal.getInstance(document.getElementById('importContactsModal'));
         modal.hide();
-        showToast(`Successfully imported ${imported} contacts`, 'success');
-        setTimeout(() => location.reload(), 1500);
+        
+        if (imported > 0) {
+            showToast(`Successfully imported ${imported} contacts${failed > 0 ? ` (${failed} failed)` : ''}`, 'success');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showToast('No contacts were imported. Please check the contact format or add manually.', 'warning');
+        }
     }, 500);
 }
 
 function showImportMessage(message, type) {
     const element = document.getElementById('importMessage');
-    element.innerHTML = `<div class="alert alert-${type} rounded-3 small py-2">${message}</div>`;
+    if (element) {
+        const alertClass = type === 'danger' ? 'alert-danger' : (type === 'warning' ? 'alert-warning' : (type === 'info' ? 'alert-info' : 'alert-success'));
+        element.innerHTML = `<div class="alert ${alertClass} rounded-3 small py-2 mb-3">${message}</div>`;
+        
+        // Auto-clear info/success messages after 5 seconds
+        if (type === 'info' || type === 'success') {
+            setTimeout(() => {
+                if (element.innerHTML.includes(message)) {
+                    element.innerHTML = '';
+                }
+            }, 5000);
+        }
+    }
 }
 
 // ================= VIEW PROFILE =================
