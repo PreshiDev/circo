@@ -34,10 +34,10 @@
                     onclick="openImportModal()">
                 📱 Import Contacts
             </button>
-            <button class="btn btn-outline-success px-4 py-2 rounded-3" 
-                    style="border-color: #25D366; color: #25D366; font-weight: 500; font-size: 0.9rem;"
-                    onclick="openWhatsAppSharePopup()">
-                <i class="bi bi-whatsapp"></i> Invite
+            <button class="btn btn-outline-secondary px-4 py-2 rounded-3" 
+                    style="border-color: var(--circo-border); color: var(--circo-text-secondary); font-weight: 500; font-size: 0.9rem;"
+                    onclick="openSocialSharePopup()">
+                <i class="bi bi-share-fill"></i> Invite Friends
             </button>
             <button class="btn btn-dark px-4 py-2 rounded-3" 
                     style="background: var(--circo-btn-dark-bg); border: none; font-weight: 400; font-size: 0.9rem;"
@@ -992,51 +992,73 @@
         </div>
     </div>
 
-    <!-- ================= WHATSAPP SHARE POPUP ================= -->
-    <div id="whatsappSharePopup" class="whatsapp-share-popup-overlay">
-        <div class="whatsapp-share-popup">
-            <div class="whatsapp-share-header">
+    <!-- ================= SOCIAL MEDIA SHARE POPUP ================= -->
+    <div id="socialSharePopup" class="social-share-popup-overlay">
+        <div class="social-share-popup">
+            <div class="social-share-header">
                 <h3>
-                    <span>📱</span> 
-                    Invite Friends & Family
+                    <span>🌐</span> 
+                    Share Circo with Friends
                 </h3>
-                <button class="whatsapp-share-close" onclick="closeWhatsAppSharePopup()">&times;</button>
+                <button class="social-share-close" onclick="closeSocialSharePopup()">&times;</button>
             </div>
             
-            <div class="whatsapp-share-body">
+            <div class="social-share-body">
                 <div class="share-message-preview">
                     <p style="font-weight: 500; margin-bottom: 8px;">📨 Your invite message:</p>
-                    <div class="invite-link" id="shareMessagePreview">
+                    <div class="invite-link" id="shareMessagePreviewSocial">
                         Join me on Circo - The ultimate network management app! 
                         Track contacts, never miss important events, and grow your network.
                     </div>
                 </div>
                 
                 <div class="share-options">
-                    <button class="share-option-btn" onclick="selectShareTemplate('default')" id="templateDefaultBtn">
+                    <button class="share-option-btn" onclick="selectShareTemplateSocial('default')" id="templateDefaultBtnSocial">
                         📝 Default
                     </button>
-                    <button class="share-option-btn" onclick="selectShareTemplate('professional')" id="templateProfessionalBtn">
+                    <button class="share-option-btn" onclick="selectShareTemplateSocial('professional')" id="templateProfessionalBtnSocial">
                         💼 Professional
                     </button>
-                    <button class="share-option-btn" onclick="selectShareTemplate('casual')" id="templateCasualBtn">
+                    <button class="share-option-btn" onclick="selectShareTemplateSocial('casual')" id="templateCasualBtnSocial">
                         👋 Casual
                     </button>
                 </div>
                 
-                <textarea id="customShareMessage" class="custom-message-input" rows="4" 
+                <textarea id="customShareMessageSocial" class="custom-message-input" rows="3" 
                         placeholder="Or write your custom message here..."></textarea>
                 
-                <div style="font-size: 0.75rem; color: var(--circo-text-muted); text-align: center;">
+                <div style="font-size: 0.75rem; color: var(--circo-text-muted); text-align: center; margin-bottom: 20px;">
                     <i class="bi bi-info-circle"></i> 
                     Your unique invite link will be added automatically
                 </div>
+                
+                <!-- Social Media Buttons Grid -->
+                <div class="social-buttons-grid">
+                    <button class="social-btn whatsapp-btn" onclick="shareToWhatsAppSocial()">
+                        <i class="bi bi-whatsapp"></i> WhatsApp
+                    </button>
+                    <button class="social-btn facebook-btn" onclick="shareToFacebook()">
+                        <i class="bi bi-facebook"></i> Facebook
+                    </button>
+                    <button class="social-btn instagram-btn" onclick="shareToInstagram()">
+                        <i class="bi bi-instagram"></i> Instagram
+                    </button>
+                    <button class="social-btn telegram-btn" onclick="shareToTelegram()">
+                        <i class="bi bi-telegram"></i> Telegram
+                    </button>
+                    <button class="social-btn snapchat-btn" onclick="shareToSnapchat()">
+                        <i class="bi bi-snapchat"></i> Snapchat
+                    </button>
+                    <button class="social-btn twitter-btn" onclick="shareToTwitter()">
+                        <i class="bi bi-twitter-x"></i> X (Twitter)
+                    </button>
+                </div>
             </div>
             
-            <div class="whatsapp-share-footer">
-                <button class="btn-cancel-share" onclick="closeWhatsAppSharePopup()">Cancel</button>
-                <button class="btn-share-whatsapp" onclick="shareToWhatsApp()">
-                    <i class="bi bi-whatsapp"></i> Share on WhatsApp
+            <div class="social-share-footer">
+                <button class="btn-cancel-share" onclick="closeSocialSharePopup()">Cancel</button>
+                <button class="btn-copy-link" onclick="copyInviteLink()">
+                    <i class="bi bi-link"></i> Copy Link
                 </button>
             </div>
         </div>
@@ -1437,15 +1459,181 @@
         opacity: 1;
     }
 }
+
+/* Social Share Popup Styles */
+.social-share-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    z-index: 100000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.social-share-popup {
+    background: var(--circo-bg-secondary);
+    border-radius: 24px;
+    max-width: 550px;
+    width: 90%;
+    margin: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease;
+    border: 1px solid var(--circo-border);
+    overflow: hidden;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.social-share-header {
+    padding: 20px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.social-share-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.social-share-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.social-share-close:hover {
+    opacity: 1;
+}
+
+.social-share-body {
+    padding: 24px;
+}
+
+.social-buttons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.social-btn {
+    padding: 12px 16px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: white;
+}
+
+.social-btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+}
+
+.whatsapp-btn {
+    background: #25D366;
+}
+
+.facebook-btn {
+    background: #1877F2;
+}
+
+.instagram-btn {
+    background: linear-gradient(45deg, #f09433, #d62976, #962fbf, #4f5bd5);
+}
+
+.telegram-btn {
+    background: #26A5E4;
+}
+
+.snapchat-btn {
+    background: #FFFC00;
+    color: #000;
+}
+
+.snapchat-btn i {
+    color: #000;
+}
+
+.twitter-btn {
+    background: #000000;
+}
+
+.btn-copy-link {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 1rem;
+    background: var(--circo-bg-tertiary);
+    border: 1px solid var(--circo-border);
+    color: var(--circo-text-secondary);
+}
+
+.btn-copy-link:hover {
+    background: var(--circo-bg-primary);
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+    .social-buttons-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .social-share-popup {
+        width: 95%;
+        margin: 10px;
+    }
+    
+    .social-share-body {
+        padding: 16px;
+    }
+}
 </style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-// ================= WHATSAPP SHARE POPUP FUNCTIONS =================
-let currentShareTemplate = 'default';
+// ================= SOCIAL MEDIA SHARE POPUP FUNCTIONS =================
+let currentShareTemplateSocial = 'default';
 
-const shareTemplates = {
+const shareTemplatesSocial = {
     default: "Join me on Circo - The ultimate network management app! Track contacts, never miss important events, and grow your network.",
     professional: "I've been using Circo to manage my professional network effectively. It's a game-changer for tracking interactions and staying connected with important contacts. Check it out!",
     casual: "Hey! Found this awesome app called Circo to help me keep track of all my friends, family, and networking contacts. You should join me on it! 🎉"
@@ -1453,7 +1641,7 @@ const shareTemplates = {
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded - initializing WhatsApp share popup');
+    console.log('DOM loaded - initializing social share popup');
     
     // Find the invite button by its classes
     const inviteButtons = document.querySelectorAll('.btn-outline-success');
@@ -1463,23 +1651,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.preventDefault();
                 e.stopPropagation();
                 console.log('Invite button clicked via event listener');
-                openWhatsAppSharePopup();
+                openSocialSharePopup();
             });
         }
     });
     
     // Add event listener to custom message textarea
-    const textarea = document.getElementById('customShareMessage');
+    const textarea = document.getElementById('customShareMessageSocial');
     if (textarea) {
-        textarea.addEventListener('input', updateSharePreview);
+        textarea.addEventListener('input', updateSharePreviewSocial);
     }
     
     // Close popup when clicking overlay
-    const overlay = document.getElementById('whatsappSharePopup');
+    const overlay = document.getElementById('socialSharePopup');
     if (overlay) {
         overlay.addEventListener('click', function(e) {
             if (e.target === overlay) {
-                closeWhatsAppSharePopup();
+                closeSocialSharePopup();
             }
         });
     }
@@ -1487,35 +1675,35 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add keyboard escape to close
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
-            closeWhatsAppSharePopup();
+            closeSocialSharePopup();
         }
     });
     
-    console.log('WhatsApp share popup initialized successfully');
+    console.log('Social share popup initialized successfully');
 });
 
-function openWhatsAppSharePopup() {
-    console.log('Opening WhatsApp share popup...');
-    const popup = document.getElementById('whatsappSharePopup');
+function openSocialSharePopup() {
+    console.log('Opening social share popup...');
+    const popup = document.getElementById('socialSharePopup');
     
     if (!popup) {
-        console.error('ERROR: WhatsApp share popup element not found in DOM!');
+        console.error('ERROR: Social share popup element not found in DOM!');
         alert('Error: Popup element not found. Please check the console.');
         return;
     }
     
     // Reset to default template
-    currentShareTemplate = 'default';
-    const textarea = document.getElementById('customShareMessage');
+    currentShareTemplateSocial = 'default';
+    const textarea = document.getElementById('customShareMessageSocial');
     if (textarea) {
         textarea.value = '';
     }
     
     // Update button states
-    document.querySelectorAll('.share-option-btn').forEach(btn => {
+    document.querySelectorAll('#socialSharePopup .share-option-btn').forEach(btn => {
         btn.classList.remove('active');
     });
-    const defaultBtn = document.getElementById('templateDefaultBtn');
+    const defaultBtn = document.getElementById('templateDefaultBtnSocial');
     if (defaultBtn) {
         defaultBtn.classList.add('active');
     }
@@ -1525,45 +1713,45 @@ function openWhatsAppSharePopup() {
     document.body.style.overflow = 'hidden';
     
     // Update preview
-    updateSharePreview();
+    updateSharePreviewSocial();
     
     console.log('Popup should now be visible. Display value:', popup.style.display);
 }
 
-function closeWhatsAppSharePopup() {
-    console.log('Closing WhatsApp share popup');
-    const popup = document.getElementById('whatsappSharePopup');
+function closeSocialSharePopup() {
+    console.log('Closing social share popup');
+    const popup = document.getElementById('socialSharePopup');
     if (popup) {
         popup.style.display = 'none';
         document.body.style.overflow = '';
     }
 }
 
-function selectShareTemplate(template) {
-    currentShareTemplate = template;
+function selectShareTemplateSocial(template) {
+    currentShareTemplateSocial = template;
     
     // Update active button styles
-    document.querySelectorAll('.share-option-btn').forEach(btn => {
+    document.querySelectorAll('#socialSharePopup .share-option-btn').forEach(btn => {
         btn.classList.remove('active');
     });
     
-    const activeBtn = document.getElementById(`template${template.charAt(0).toUpperCase() + template.slice(1)}Btn`);
+    const activeBtn = document.getElementById(`template${template.charAt(0).toUpperCase() + template.slice(1)}BtnSocial`);
     if (activeBtn) {
         activeBtn.classList.add('active');
     }
     
     // Set the message in textarea
-    const textarea = document.getElementById('customShareMessage');
+    const textarea = document.getElementById('customShareMessageSocial');
     if (textarea) {
-        textarea.value = shareTemplates[template];
+        textarea.value = shareTemplatesSocial[template];
     }
     
-    updateSharePreview();
+    updateSharePreviewSocial();
 }
 
-function updateSharePreview() {
-    const textarea = document.getElementById('customShareMessage');
-    const previewDiv = document.getElementById('shareMessagePreview');
+function updateSharePreviewSocial() {
+    const textarea = document.getElementById('customShareMessageSocial');
+    const previewDiv = document.getElementById('shareMessagePreviewSocial');
     
     if (!previewDiv) return;
     
@@ -1571,7 +1759,7 @@ function updateSharePreview() {
     if (textarea && textarea.value.trim()) {
         message = textarea.value.trim();
     } else {
-        message = shareTemplates[currentShareTemplate];
+        message = shareTemplatesSocial[currentShareTemplateSocial];
     }
     
     // Truncate preview if too long
@@ -1580,32 +1768,173 @@ function updateSharePreview() {
         previewText = previewText.substring(0, 100) + '...';
     }
     
-    previewDiv.innerHTML = `${previewText}<br><br><span style="font-size: 0.7rem; opacity: 0.7;">📱 Join link will be added</span>`;
+    previewDiv.innerHTML = `${previewText}<br><br><span style="font-size: 0.7rem; opacity: 0.7;">🔗 Join link will be added</span>`;
 }
 
-function getInviteLink() {
+function getInviteLinkSocial() {
     const domain = window.location.origin;
     return `${domain}/api/register`;
 }
 
-function shareToWhatsApp() {
-    const textarea = document.getElementById('customShareMessage');
-    let customMessage = textarea && textarea.value.trim() ? textarea.value.trim() : shareTemplates[currentShareTemplate];
-    
-    const inviteLink = getInviteLink();
-    const fullMessage = `${customMessage}\n\n🔗 Join here: ${inviteLink}\n\n✨ Circo helps you:\n• Never miss important interactions\n• Track birthdays & events\n• Grow your network intelligently`;
-    
+function getFullShareMessage() {
+    const textarea = document.getElementById('customShareMessageSocial');
+    let customMessage = textarea && textarea.value.trim() ? textarea.value.trim() : shareTemplatesSocial[currentShareTemplateSocial];
+    const inviteLink = getInviteLinkSocial();
+    return `${customMessage}\n\n🔗 Join here: ${inviteLink}\n\n✨ Circo helps you:\n• Never miss important interactions\n• Track birthdays & events\n• Grow your network intelligently`;
+}
+
+// Share to WhatsApp
+function shareToWhatsAppSocial() {
+    const fullMessage = getFullShareMessage();
     const encodedMessage = encodeURIComponent(fullMessage);
     const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
-    
-    // Open WhatsApp
     window.open(whatsappUrl, '_blank');
-    
-    // Close popup
-    setTimeout(() => {
-        closeWhatsAppSharePopup();
-    }, 500);
+    setTimeout(() => closeSocialSharePopup(), 500);
 }
+
+// Share to Facebook
+function shareToFacebook() {
+    const fullMessage = getFullShareMessage();
+    const encodedMessage = encodeURIComponent(fullMessage);
+    const inviteLink = getInviteLinkSocial();
+    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(inviteLink)}&quote=${encodedMessage}`;
+    window.open(facebookUrl, '_blank', 'width=600,height=400');
+    setTimeout(() => closeSocialSharePopup(), 500);
+}
+
+// Share to Instagram (opens Instagram app or web)
+function shareToInstagram() {
+    const fullMessage = getFullShareMessage();
+    // Instagram doesn't have a direct share URL, so we'll copy to clipboard and suggest opening Instagram
+    copyToClipboard(fullMessage);
+    showToast('Message copied! Open Instagram to share it with your friends.', 'success');
+    
+    // Try to open Instagram app
+    const instagramAppUrl = 'instagram://';
+    const instagramWebUrl = 'https://www.instagram.com/';
+    
+    // Try to open app first
+    window.location.href = instagramAppUrl;
+    
+    // Fallback to web after a delay
+    setTimeout(() => {
+        window.open(instagramWebUrl, '_blank');
+    }, 500);
+    
+    setTimeout(() => closeSocialSharePopup(), 500);
+}
+
+// Share to Telegram
+function shareToTelegram() {
+    const fullMessage = getFullShareMessage();
+    const encodedMessage = encodeURIComponent(fullMessage);
+    const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(getInviteLinkSocial())}&text=${encodedMessage}`;
+    window.open(telegramUrl, '_blank');
+    setTimeout(() => closeSocialSharePopup(), 500);
+}
+
+// Share to Snapchat (opens Snapchat app or web)
+function shareToSnapchat() {
+    const fullMessage = getFullShareMessage();
+    // Snapchat doesn't have a direct share URL, so we'll copy to clipboard
+    copyToClipboard(fullMessage);
+    showToast('Message copied! Open Snapchat to share it with your friends.', 'success');
+    
+    // Try to open Snapchat app
+    const snapchatAppUrl = 'snapchat://';
+    const snapchatWebUrl = 'https://www.snapchat.com/';
+    
+    // Try to open app first
+    window.location.href = snapchatAppUrl;
+    
+    // Fallback to web after a delay
+    setTimeout(() => {
+        window.open(snapchatWebUrl, '_blank');
+    }, 500);
+    
+    setTimeout(() => closeSocialSharePopup(), 500);
+}
+
+// Share to X (Twitter)
+function shareToTwitter() {
+    const fullMessage = getFullShareMessage();
+    const encodedMessage = encodeURIComponent(fullMessage);
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodedMessage}`;
+    window.open(twitterUrl, '_blank', 'width=600,height=400');
+    setTimeout(() => closeSocialSharePopup(), 500);
+}
+
+// Copy invite link to clipboard
+function copyInviteLink() {
+    const inviteLink = getInviteLinkSocial();
+    copyToClipboard(inviteLink);
+    showToast('Invite link copied to clipboard!', 'success');
+    setTimeout(() => closeSocialSharePopup(), 1000);
+}
+
+// Helper function to copy text to clipboard
+function copyToClipboard(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).catch(err => {
+            console.error('Failed to copy: ', err);
+            fallbackCopyToClipboard(text);
+        });
+    } else {
+        fallbackCopyToClipboard(text);
+    }
+}
+
+function fallbackCopyToClipboard(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+        document.execCommand('copy');
+    } catch (err) {
+        console.error('Fallback: Oops, unable to copy', err);
+    }
+    document.body.removeChild(textarea);
+}
+
+// Keep the existing functions but update the button handler
+// Find all invite buttons and ensure they open the new popup
+function updateInviteButtons() {
+    const inviteButtons = document.querySelectorAll('.btn-outline-success');
+    inviteButtons.forEach(button => {
+        if (button.textContent.includes('Invite') || button.innerHTML.includes('Invite')) {
+            // Remove any existing onclick
+            button.removeAttribute('onclick');
+            // Add new event listener
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                openSocialSharePopup();
+            });
+        }
+    });
+}
+
+// Call this on page load and after any dynamic content updates
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', updateInviteButtons);
+} else {
+    updateInviteButtons();
+}
+
+// Also watch for dynamically added buttons
+const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+        if (mutation.addedNodes.length) {
+            updateInviteButtons();
+        }
+    });
+});
+
+observer.observe(document.body, { childList: true, subtree: true });
+
     
 const contactUrl = "{% url 'account:api_create_contact' %}";
 const bulkImportUrl = "{% url 'account:api_bulk_import_contacts' %}";
